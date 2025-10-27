@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Customer Management Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+  <style>
+    :root {
+      --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --success-color: #28a745;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --whatsapp-color: #25D366;
+      --sms-color: #007BFF;
+    }
+
+    body {
+      padding: 20px;
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard-header {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -10%;
+      width: 50%;
+      height: 200%;
+      background: rgba(255,255,255,0.05);
+      transform: rotate(35deg);
+    }
+
+    .card-metric {
+      text-align: center;
+      padding: 25px;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      border: none;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-metric::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary-gradient));
+    }
+
+    .card-metric:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+
+    .card-metric h2 {
+      margin: 0;
+      font-size: 2.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card-metric p {
+      margin: 10px 0 0 0;
+      color: #6c757d;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      font-weight: 600;
+    }
+
+    .metric-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      opacity: 0.8;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .status-badge {
+      padding: 6px 12px;
+      border-radius: 25px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .status-active {
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+    }
+
+    .status-opt-out {
+      background: linear-gradient(135deg, #dc3545, #fd7e14);
+      color: white;
+    }
+
+    .table-actions {
+      white-space: nowrap;
+    }
+
+    .btn-action {
+      padding: 0.35rem 0.6rem;
+      margin: 0 0.15rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      transform: scale(1.1);
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      z-index: 10;
+    }
+
+    .search-input {
+      padding-left: 45px;
+      border-radius: 25px;
+      border: 2px solid #e9ecef;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255,255,255,0.95);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      backdrop-filter: blur(5px);
+    }
+
+    .spinner-border {
+      width: 3.5rem;
+      height: 3.5rem;
+      border-width: 0.3em;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.6s ease-in;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .custom-toast {
+      min-width: 350px;
+      border-radius: 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+
+    .message-template {
+      cursor: pointer;
+      transition: all 0.3s;
+      border-radius: 10px;
+    }
+
+    .message-template:hover {
+      background-color: #f8f9fa;
+      transform: translateX(5px);
+    }
+
+    .message-template.active {
+      background: linear-gradient(135deg, #e7f3ff, #f0f8ff);
+      border-left: 4px solid #007bff;
+    }
+
+    .customer-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .message-type-btn {
+      border-radius: 25px;
+      padding: 10px 25px;
+      margin: 0 8px;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .message-type-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .message-preview {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 15px;
+      padding: 20px;
+      min-height: 120px;
+      border: 2px solid #dee2e6;
+    }
+
+    .message-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 25px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 15px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: #6c757d;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .company-info {
+      background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+      padding: 15px 20px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .branch-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 15px;
+      background: linear-gradient(135deg, #e9ecef, #dee2e6);
+      color: #495057;
+      font-weight: 600;
+    }
+
+    .debug-info {
+      position: fixed;
+      bottom: 15px;
+      left: 15px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 8px;
+      font-size: 12px;
+      z-index: 1000;
+      font-family: monospace;
+    }
+
+    .send-progress {
+      margin-top: 15px;
+      display: none;
+    }
+
+    .progress-item {
+      padding: 8px;
+      margin: 3px 0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .progress-sending {
+      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+      color: #856404;
+    }
+
+    .progress-sent {
+      background: linear-gradient(135deg, #d4edda, #a8e6cf);
+      color: #155724;
+    }
+
+    .progress-failed {
+      background: linear-gradient(135deg, #f8d7da, #fab1a0);
+      color: #721c24;
+    }
+
+    .whatsapp-links {
+      margin-top: 15px;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .whatsapp-link-item {
+      padding: 12px;
+      margin: 8px 0;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .whatsapp-link-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+    .whatsapp-link-item a {
+      color: #25D366;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .whatsapp-link-item a:hover {
+      text-decoration: underline;
+    }
+
+    .copy-btn {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    .table {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+    }
+
+    .table thead th {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      border: none;
+      padding: 15px;
+    }
+
+    .table tbody tr {
+      transition: all 0.2s;
+    }
+
+    .table tbody tr:hover {
+      background-color: #f8f9fa;
+      transform: scale(1.01);
+    }
+
+    .table td {
+      padding: 15px;
+      vertical-align: middle;
+    }
+
+    .card {
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border-radius: 15px 15px 0 0 !important;
+      border: none;
+      padding: 20px;
+      font-weight: 600;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #5a6fd8, #6a4190);
+      transform: translateY(-2px);
+    }
+
+    .data-status {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: linear-gradient(135deg, #28a745, #20c997);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      z-index: 1000;
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .card-metric h2 {
+        font-size: 2rem;
+      }
+      
+      .table-responsive {
+        font-size: 0.85rem;
+      }
+      
+      .dashboard-header {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Data Status Indicator -->
+  <div class="data-status" id="dataStatus">
+    <i class="bi bi-check-circle me-2"></i>
+    <span id="dataStatusText">Loading data...</span>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3 text-primary">Loading Customer Data...</p>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container"></div>
+
+  <!-- Debug Info -->
+  <div class="debug-info" id="debugInfo">
+    Debug: Initializing...
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="dashboard-header">
+      <div class="row align-items-center position-relative">
+        <div class="col-md-8">
+          <h1 class="mb-0 display-5">
+            <i class="bi bi-people-fill me-3"></i>Customer Management Dashboard
+          </h1>
+          <p class="mb-0 mt-3 opacity-75 fs-5">Manage your customer relationships efficiently</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+          <button class="btn btn-light btn-lg me-2" onclick="exportToCSV()">
+            <i class="bi bi-download me-2"></i>Export CSV
+          </button>
+          <button class="btn btn-success btn-lg me-2" onclick="openMessageModal()">
+            <i class="bi bi-send me-2"></i>Send Message
+          </button>
+          <button class="btn btn-outline-light btn-lg" onclick="clearAllData()">
+            <i class="bi bi-trash me-2"></i>Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Company Info -->
+    <div class="company-info">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <i class="bi bi-telephone-fill text-primary me-2"></i>
+          <strong>Company Number:</strong> +971501882206
+        </div>
+        <div class="col-md-6 text-md-end">
+          <i class="bi bi-calendar-check text-primary me-2"></i>
+          <strong>Last Updated:</strong> <span id="lastUpdated"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metrics -->
+    <div class="row mb-4">
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-metric">
+          <div class="metric-icon"><i class="bi bi-people"></i></div>
+          <h2 id="metricTotal">0</h2>
+          <p>Total Customers</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-metric">
+          <div class="metric-icon"><i class="bi bi-person-plus"></i></div>
+          <h2 id="metricNewToday">0</h2>
+          <p>New Today</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-metric">
+          <div class="metric-icon"><i class="bi bi-person-x"></i></div>
+          <h2 id="metricOptOut">0</h2>
+          <p>Opt-Outs</p>
+        </div>
+      </div>
+      <div class="col-md-3 col-sm-6 mb-3">
+        <div class="card card-metric">
+          <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
+          <h2 id="metricNoContact60">0</h2>
+          <p>Not Contacted 60+ Days</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add / Update Form -->
+    <div class="card mb-4 fade-in">
+      <div class="card-header">
+        <h5 class="mb-0">
+          <i class="bi bi-person-plus-fill me-2"></i>Add / Update Customer
+        </h5>
+      </div>
+      <div class="card-body">
+        <form id="customerForm">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="phone" class="form-label fw-bold">Phone Number *</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                <input type="tel" class="form-control form-control-lg" id="phone" placeholder="+9715xxxxxxx" required>
+                <div class="invalid-feedback">Please provide a valid phone number</div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="name" class="form-label fw-bold">Customer Name</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                <input type="text" class="form-control form-control-lg" id="name" placeholder="Enter name">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label for="branch" class="form-label fw-bold">Branch</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                <select class="form-select form-select-lg" id="branch">
+                  <option value="Hamdan">Hamdan</option>
+                  <option value="Muroor">Muroor</option>
+                  <option value="Shabiya 11">Shabiya 11</option>
+                  <option value="Al Barsha">Al Barsha</option>
+                  <option value="Al Rigga">Al Rigga</option>
+                  <option value="Khalidiya">Khalidiya</option>
+                  <option value="Al Satwa">Al Satwa</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="status" class="form-label fw-bold">Status</label>
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-toggle-on"></i></span>
+                <select class="form-select form-select-lg" id="status">
+                  <option value="Active">Active</option>
+                  <option value="Opt-Out">Opt-Out</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="bi bi-save me-2"></i>Save Customer
+            </button>
+            <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
+              <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Customer List Table -->
+    <div class="card fade-in">
+      <div class="card-header">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <h5 class="mb-0">
+              <i class="bi bi-list-ul me-2"></i>Customer List
+            </h5>
+          </div>
+          <div class="col-md-6">
+            <div class="d-flex align-items-center justify-content-end">
+              <div class="form-check me-3">
+                <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                <label class="form-check-label text-white" for="selectAll">
+                  Select All
+                </label>
+              </div>
+              <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" class="form-control form-control-sm search-input" id="searchInput" placeholder="Search customers..." style="width: 300px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive">
+        <table class="table table-hover" id="customerTable">
+          <thead>
+            <tr>
+              <th width="50">
+                <input type="checkbox" class="form-check-input" id="headerCheckbox" onchange="toggleSelectAll()">
+              </th>
+              <th onclick="sortTable('phone')" style="cursor: pointer;">
+                Phone <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th onclick="sortTable('name')" style="cursor: pointer;">
+                Name <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th onclick="sortTable('branch')" style="cursor: pointer;">
+                Branch <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th onclick="sortTable('status')" style="cursor: pointer;">
+                Status <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th onclick="sortTable('lastContact')" style="cursor: pointer;">
+                Last Contact <i class="bi bi-arrow-down-up"></i>
+              </th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+        
+        <!-- Pagination -->
+        <div class="pagination-container">
+          <nav>
+            <ul class="pagination" id="pagination"></ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Customer</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm">
+            <input type="hidden" id="editIndex">
+            <div class="mb-3">
+              <label for="editPhone" class="form-label">Phone Number</label>
+              <input type="tel" class="form-control" id="editPhone" readonly>
+            </div>
+            <div class="mb-3">
+              <label for="editName" class="form-label">Customer Name</label>
+              <input type="text" class="form-control" id="editName">
+            </div>
+            <div class="mb-3">
+              <label for="editBranch" class="form-label">Branch</label>
+              <select class="form-select" id="editBranch">
+                <option value="Hamdan">Hamdan</option>
+                <option value="Muroor">Muroor</option>
+                <option value="Shabiya 11">Shabiya 11</option>
+                <option value="Al Barsha">Al Barsha</option>
+                <option value="Al Rigga">Al Rigga</option>
+                <option value="Khalidiya">Khalidiya</option>
+                <option value="Al Satwa">Al Satwa</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="editStatus" class="form-label">Status</label>
+              <select class="form-select" id="editStatus">
+                <option value="Active">Active</option>
+                <option value="Opt-Out">Opt-Out</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Message Modal -->
+  <div class="modal fade" id="messageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-send me-2"></i>Send Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Message Type Selection -->
+          <div class="text-center mb-4">
+            <button class="btn message-type-btn active btn-success" id="whatsappBtn" onclick="selectMessageType('whatsapp')">
+              <i class="bi bi-whatsapp me-2"></i>WhatsApp
+            </button>
+            <button class="btn message-type-btn btn-outline-primary" id="smsBtn" onclick="selectMessageType('sms')">
+              <i class="bi bi-chat-dots me-2"></i>SMS
+            </button>
+          </div>
+
+          <!-- Customer Selection -->
+          <div class="mb-4">
+            <h6><i class="bi bi-people me-2"></i>Select Customers</h6>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="selectionType" id="selectAllRadio" value="all" checked onchange="updateCustomerSelection()">
+                  <label class="form-check-label" for="selectAllRadio">
+                    Send to all active customers
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="radio" name="selectionType" id="selectCustomRadio" value="custom" onchange="updateCustomerSelection()">
+                  <label class="form-check-label" for="selectCustomRadio">
+                    Select specific customers
+                  </label>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div id="selectedCount" class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  <span id="selectedCountText">0 customers selected</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Custom Customer Selection -->
+            <div id="customSelection" class="mt-3" style="display: none;">
+              <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+                <div id="customerCheckboxes"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Templates -->
+          <div class="mb-4">
+            <h6><i class="bi bi-file-text me-2"></i>Message Templates</h6>
+            <div class="list-group" id="templateList">
+              <div class="list-group-item message-template" onclick="selectTemplate(0)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">Welcome Message</h6>
+                  <small>Promotional</small>
+                </div>
+                <p class="mb-1">Welcome to our service! We're excited to have you with us.</p>
+              </div>
+              <div class="list-group-item message-template" onclick="selectTemplate(1)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">Special Offer</h6>
+                  <small>Promotional</small>
+                </div>
+                <p class="mb-1">Special offer just for you! Get 20% off on your next order.</p>
+              </div>
+              <div class="list-group-item message-template" onclick="selectTemplate(2)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">Follow-up</h6>
+                  <small>Reminder</small>
+                </div>
+                <p class="mb-1">Just checking in. How was your recent experience with us?</p>
+              </div>
+              <div class="list-group-item message-template" onclick="selectTemplate(3)">
+                <div class="d-flex w-100 justify-content-between">
+                  <h6 class="mb-1">Custom Message</h6>
+                  <small>Custom</small>
+                </div>
+                <p class="mb-1">Write your own custom message...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Message Composition -->
+          <div class="mb-4">
+            <h6><i class="bi bi-pencil me-2"></i>Compose Message</h6>
+            <textarea class="form-control" id="messageText" rows="4" placeholder="Type your message here..." maxlength="500"></textarea>
+            <div class="text-end mt-1">
+              <small class="text-muted"><span id="charCount">0</span>/500 characters</small>
+            </div>
+          </div>
+
+          <!-- Message Preview -->
+          <div class="mb-4">
+            <h6><i class="bi bi-eye me-2"></i>Preview</h6>
+            <div class="message-preview" id="messagePreview">
+              <p class="text-muted mb-0">Your message will appear here...</p>
+            </div>
+          </div>
+
+          <!-- Send Progress -->
+          <div class="send-progress" id="sendProgress">
+            <h6><i class="bi bi-activity me-2"></i>Sending Progress</h6>
+            <div id="progressList"></div>
+          </div>
+
+          <!-- WhatsApp Links Section -->
+          <div class="whatsapp-links" id="whatsappLinks" style="display: none;">
+            <h6><i class="bi bi-link-45deg me-2"></i>WhatsApp Links</h6>
+            <p class="text-muted small">Click on any link to open WhatsApp with pre-filled message</p>
+            <div id="whatsappLinksList"></div>
+          </div>
+
+          <!-- Message Statistics -->
+          <div class="message-stats">
+            <div class="stat-item">
+              <div class="stat-number" id="totalMessages">0</div>
+              <div class="stat-label">Total Messages</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="whatsappCount">0</div>
+              <div class="stat-label">WhatsApp</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="smsCount">0</div>
+              <div class="stat-label">SMS</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-number" id="estimatedCost">$0.00</div>
+              <div class="stat-label">Est. Cost</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-success" onclick="sendMessage()">
+            <i class="bi bi-send me-2"></i>Send Message
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Company information
+    const companyNumber = '+971501882206';
+    
+    // Customer data provided
+    const customerData = [
+      { branch: 'Hamdan', mobile: '564394125', name: 'CHRISTINE' },
+      { branch: 'Muroor', mobile: '527186938', name: 'REN' },
+      { branch: 'Shabiya 11', mobile: '501320863', name: 'FARDUS' },
+      { branch: 'Shabiya 11', mobile: '504007898', name: 'JUMANA' },
+      { branch: 'Al Barsha', mobile: '567578678', name: 'CAMILLE' },
+      { branch: 'Al Rigga', mobile: '569307444', name: 'ROSE' },
+      { branch: 'Hamdan', mobile: '501989046', name: 'MUSTAFA' },
+      { branch: 'Hamdan', mobile: '505916622', name: 'ABDO' },
+      { branch: 'Hamdan', mobile: '507913592', name: 'MOHAMMED' },
+      { branch: 'Hamdan', mobile: '561380830', name: 'MOHAMMED' },
+      { branch: 'Al Rigga', mobile: '555602882', name: 'AHMED' },
+      { branch: 'Al Rigga', mobile: '526988212', name: 'AHMED' },
+      { branch: 'Khalidiya', mobile: '505028089', name: 'YOUSEF' },
+      { branch: 'Khalidiya', mobile: '509739438', name: 'YOUSEF' },
+      { branch: 'Khalidiya', mobile: '508893856', name: 'IMAN' },
+      { branch: 'Al Barsha', mobile: '502303812', name: 'GRACE' },
+      { branch: 'Shabiya 11', mobile: '545946188', name: 'METO' },
+      { branch: 'Shabiya 11', mobile: '526334675', name: 'VALANTINE' },
+      { branch: 'Hamdan', mobile: '554823068', name: 'JOVY' },
+      { branch: 'Muroor', mobile: '506713519', name: 'AYAZ' },
+      { branch: 'Shabiya 11', mobile: '552548908', name: 'Mohamad' },
+      { branch: 'Khalidiya', mobile: '506713519', name: 'AJIN' },
+      { branch: 'Hamdan', mobile: '528297700', name: 'MALIY' },
+      { branch: 'Khalidiya', mobile: '545626243', name: 'LORI' },
+      { branch: 'Shabiya 11', mobile: '563560162', name: 'AISHA' },
+      { branch: 'Hamdan', mobile: '507336642', name: 'ANU' },
+      { branch: 'Hamdan', mobile: '543534143', name: 'KLEVIN' },
+      { branch: 'Hamdan', mobile: '558297721', name: 'RHEA' },
+      { branch: 'Khalidiya', mobile: '507024996', name: 'RAHMA' },
+      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
+      { branch: 'Hamdan', mobile: '568877380', name: 'MIRA' },
+      { branch: 'Shabiya 11', mobile: '529840203', name: 'SHIJU' },
+      { branch: 'Khalidiya', mobile: '523107089', name: 'SONIYA' },
+      { branch: 'Muroor', mobile: '508580082', name: 'TASNIMA' },
+      { branch: 'Hamdan', mobile: '562575749', name: 'TERESA' },
+      { branch: 'Khalidiya', mobile: '503019353', name: 'JOSH' },
+      { branch: 'Hamdan', mobile: '502863604', name: 'BETH' },
+      { branch: 'Al Rigga', mobile: '565405682', name: 'PIOLO' },
+      { branch: 'Khalidiya', mobile: '565107419', name: 'DEXTER' },
+      { branch: 'Hamdan', mobile: '568741270', name: 'CIELO' },
+      { branch: 'Hamdan', mobile: '547954507', name: 'ZAYED' },
+      { branch: 'Hamdan', mobile: '553192458', name: 'MICHELLE' },
+      { branch: 'Shabiya 11', mobile: '554430260', name: 'NIDHIN' },
+      { branch: 'Muroor', mobile: '555584918', name: 'SUFIYAN' },
+      { branch: 'Hamdan', mobile: '527565425', name: 'JOHN' },
+      { branch: 'Khalidiya', mobile: '565724773', name: 'ROSAN' },
+      { branch: 'Shabiya 11', mobile: '586549821', name: 'NITIN' },
+      { branch: 'Al Barsha', mobile: '505147354', name: 'MUHAMMMAD' },
+      { branch: 'Al Barsha', mobile: '543536153', name: 'MARIN' },
+      { branch: 'Hamdan', mobile: '545835702', name: 'SARA' },
+      { branch: 'Shabiya 11', mobile: '561992001', name: 'JITHIN' },
+      { branch: 'Khalidiya', mobile: '565788498', name: 'DALA' },
+      { branch: 'Hamdan', mobile: '567090818', name: 'DEVIKA' },
+      { branch: 'Shabiya 11', mobile: '545617576', name: 'AJMAL' },
+      { branch: 'Khalidiya', mobile: '507724753', name: 'SANA' },
+      { branch: 'Hamdan', mobile: '502815217', name: 'RENELYN' },
+      { branch: 'Hamdan', mobile: '501492750', name: 'DEXTER' },
+      { branch: 'Shabiya 11', mobile: '566318838', name: 'LAXMI' },
+      { branch: 'Shabiya 11', mobile: '502530369', name: 'SANTOSH' },
+      { branch: 'Al Barsha', mobile: '529066607', name: 'DENAB' },
+      { branch: 'Khalidiya', mobile: '569053528', name: 'MONA' },
+      { branch: 'Khalidiya', mobile: '502214804', name: 'HIZRA' },
+      { branch: 'Hamdan', mobile: '568447261', name: 'ANWAR' },
+      { branch: 'Hamdan', mobile: '551407910', name: 'FERDINAND' },
+      { branch: 'Shabiya 11', mobile: '564011493', name: 'ANGEL' },
+      { branch: 'Hamdan', mobile: '589301919', name: 'ANABEL' },
+      { branch: 'Khalidiya', mobile: '507363128', name: 'KATER' },
+      { branch: 'Al Barsha', mobile: '581177457', name: 'DANISH' },
+      { branch: 'Shabiya 11', mobile: '503756368', name: 'MOHAMMAD' },
+      { branch: 'Khalidiya', mobile: '503251268', name: 'EMELDA' },
+      { branch: 'Muroor', mobile: '582093916', name: 'AMJED' },
+      { branch: 'Khalidiya', mobile: '585870654', name: 'BADF' },
+      { branch: 'Hamdan', mobile: '589664200', name: 'AMEER' },
+      { branch: 'Al Barsha', mobile: '525064488', name: 'MAI MD' },
+      { branch: 'Al Barsha', mobile: '562360831', name: 'HALIN' },
+      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
+      { branch: 'Muroor', mobile: '559806470', name: 'JOSEPH' },
+      { branch: 'Hamdan', mobile: '508434230', name: 'MANOJ' },
+      { branch: 'Muroor', mobile: '563229319', name: 'ABIR' },
+      { branch: 'Khalidiya', mobile: '582093916', name: 'ANA' },
+      { branch: 'Al Barsha', mobile: '504236876', name: 'SUPTHI' },
+      { branch: 'Muroor', mobile: '562840716', name: 'EUNICE' },
+      { branch: 'Khalidiya', mobile: '501603113', name: 'INA' },
+      { branch: 'Hamdan', mobile: '507629296', name: 'OMER' },
+      { branch: 'Shabiya 11', mobile: '526774551', name: 'ABDUL' },
+      { branch: 'Shabiya 11', mobile: '502743880', name: 'ALI' },
+      { branch: 'Hamdan', mobile: '506967108', name: 'RABAB' },
+      { branch: 'Al Rigga', mobile: '523961724', name: 'AASHAM' },
+      { branch: 'Khalidiya', mobile: '553775627', name: 'ROCHELLE' },
+      { branch: 'Al Satwa', mobile: '552466774', name: 'BABY' },
+      { branch: 'Khalidiya', mobile: '527426680', name: 'LIGO' },
+      { branch: 'Hamdan', mobile: '558718744', name: 'MAYA' },
+      { branch: 'Shabiya 11', mobile: '506072378', name: 'ISRAD' },
+      { branch: 'Shabiya 11', mobile: '557184725', name: 'SANTOS' },
+      { branch: 'Shabiya 11', mobile: '589023557', name: 'AMJAD' },
+      { branch: 'Hamdan', mobile: '557918114', name: 'UNIS' },
+      { branch: 'Shabiya 11', mobile: '505253250', name: 'NOUSHAD' },
+      { branch: 'Hamdan', mobile: '564628011', name: 'AYHAM' },
+      { branch: 'Hamdan', mobile: '544755895', name: 'MARIVIC' },
+      { branch: 'Al Satwa', mobile: '504246316', name: 'NOEL' },
+      { branch: 'Hamdan', mobile: '503822598', name: 'EMELY' },
+      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
+      { branch: 'Hamdan', mobile: '529921915', name: 'RISSA' },
+      { branch: 'Khalidiya', mobile: '554304756', name: 'SELENA' },
+      { branch: 'Al Satwa', mobile: '568805262', name: 'MONICA' },
+      { branch: 'Khalidiya', mobile: '558334849', name: 'BINU' },
+      { branch: 'Shabiya 11', mobile: '508403439', name: 'MINU' },
+      { branch: 'Muroor', mobile: '505409310', name: 'SALEEM' },
+      { branch: 'Khalidiya', mobile: '522415255', name: 'SHERAZ' },
+      { branch: 'Hamdan', mobile: '503898614', name: 'KHALEEN' },
+      { branch: 'Hamdan', mobile: '507319957', name: 'DAISY' },
+      { branch: 'Hamdan', mobile: '526468843', name: 'LARA' },
+      { branch: 'Shabiya 11', mobile: '542415727', name: 'MARJORIE' },
+      { branch: 'Hamdan', mobile: '567978948', name: 'JUNE' },
+      { branch: 'Shabiya 11', mobile: '526774551', name: 'RIYAZ' },
+      { branch: 'Muroor', mobile: '503514614', name: 'RAJAD' },
+      { branch: 'Hamdan', mobile: '569799768', name: 'LILITH' },
+      { branch: 'Shabiya 11', mobile: '509184419', name: 'NEYA' },
+      { branch: 'Shabiya 11', mobile: '551661645', name: 'MAHESH' },
+      { branch: 'Hamdan', mobile: '545114176', name: 'JENNY' },
+      { branch: 'Hamdan', mobile: '545097366', name: 'HARSHA' },
+      { branch: 'Hamdan', mobile: '586689227', name: 'JESTON' },
+      { branch: 'Muroor', mobile: '547925889', name: 'FATHY' },
+      { branch: 'Khalidiya', mobile: '567815135', name: 'MANU' },
+      { branch: 'Al Rigga', mobile: '551522707', name: 'CJ' },
+      { branch: 'Al Satwa', mobile: '559248153', name: 'SIKANDAR' },
+      { branch: 'Khalidiya', mobile: '568780234', name: 'MOHAMMAD' },
+      { branch: 'Shabiya 11', mobile: '543652804', name: 'WENG' },
+      { branch: 'Muroor', mobile: '524400674', name: 'MAEAQYA' },
+      { branch: 'Khalidiya', mobile: '545083609', name: 'QEUL' },
+      { branch: 'Khalidiya', mobile: '508496161', name: 'SHERLY' },
+      { branch: 'Khalidiya', mobile: '501322442', name: 'ABUKHARIFA' },
+      { branch: 'Khalidiya', mobile: '526862119', name: 'MARWA' },
+      { branch: 'Al Satwa', mobile: '566917381', name: 'KAYE' },
+      { branch: 'Al Satwa', mobile: '556466009', name: 'KAN' },
+      { branch: 'Hamdan', mobile: '561085971', name: 'JOANNA MARIE' },
+      { branch: 'Khalidiya', mobile: '566825992', name: 'ERANDA' },
+      { branch: 'Al Rigga', mobile: '561509464', name: 'SARYA' },
+      { branch: 'Shabiya 11', mobile: '566252534', name: 'MUSTAFA' },
+      { branch: 'Muroor', mobile: '525311599', name: 'SHIELA' },
+      { branch: 'Al Barsha', mobile: '567376011', name: 'ARSHAN' },
+      { branch: 'Hamdan', mobile: '501457191', name: 'LUKE' },
+      { branch: 'Hamdan', mobile: '554504024', name: 'marry' },
+      { branch: 'Shabiya 11', mobile: '502394008', name: 'DARREL' },
+      { branch: 'Hamdan', mobile: '521872614', name: 'JOHNSON' },
+      { branch: 'Muroor', mobile: '545357584', name: 'REMY' },
+      { branch: 'Hamdan', mobile: '522279467', name: 'ANIL' },
+      { branch: 'Khalidiya', mobile: '551661172', name: 'BUSRA' },
+      { branch: 'Hamdan', mobile: '547327449', name: 'NIKI' },
+      { branch: 'Al Barsha', mobile: '585958703', name: 'Farag' },
+      { branch: 'Shabiya 11', mobile: '552438334', name: 'ABDU' },
+      { branch: 'Hamdan', mobile: '562585496', name: 'PRITI' },
+      { branch: 'Khalidiya', mobile: '509931008', name: 'WASHID' },
+      { branch: 'Hamdan', mobile: '563699844', name: 'NAZIH' },
+      { branch: 'Hamdan', mobile: '554525590', name: 'RALI' },
+      { branch: 'Muroor', mobile: '569033720', name: 'AHMED' },
+      { branch: 'Khalidiya', mobile: '505125294', name: 'RASSEL' },
+      { branch: 'Muroor', mobile: '503176539', name: 'AMIR' },
+      { branch: 'Shabiya 11', mobile: '506751814', name: 'ISMAIL' },
+      { branch: 'Muroor', mobile: '501801620', name: 'VELLA' },
+      { branch: 'Hamdan', mobile: '562362221', name: 'LONA' },
+      { branch: 'Shabiya 11', mobile: '569968276', name: 'KABITA' },
+      { branch: 'Al Barsha', mobile: '585107762', name: 'AYOM' },
+      { branch: 'Al Satwa', mobile: '501251665', name: 'MAJI' },
+      { branch: 'Hamdan', mobile: '505855270', name: 'MADAN KUMAR' },
+      { branch: 'Hamdan', mobile: '566050368', name: 'NOUSHAD' },
+      { branch: 'Al Barsha', mobile: '567312091', name: 'SHAMBHU' },
+      { branch: 'Al Satwa', mobile: '508226845', name: 'PRINCESS' },
+      { branch: 'Hamdan', mobile: '567117293', name: 'MOHAMMAD' },
+      { branch: 'Shabiya 11', mobile: '547212972', name: 'ANITA' },
+      { branch: 'Al Rigga', mobile: '502242169', name: 'ALI' },
+      { branch: 'Hamdan', mobile: '547104498', name: 'GULAM' },
+      { branch: 'Shabiya 11', mobile: '551823426', name: 'SABER' },
+      { branch: 'Khalidiya', mobile: '545080157', name: 'ZEN' },
+      { branch: 'Muroor', mobile: '582910029', name: 'SABIR' },
+      { branch: 'Khalidiya', mobile: '561150558', name: 'NOAH' },
+      { branch: 'Muroor', mobile: '561350792', name: 'RAJ' },
+      { branch: 'Khalidiya', mobile: '547115926', name: 'JENNY' },
+      { branch: 'Al Satwa', mobile: '565513916', name: 'SURESH' },
+      { branch: 'Khalidiya', mobile: '508442208', name: 'INAH' },
+      { branch: 'Hamdan', mobile: '558425275', name: 'HAZEM' },
+      { branch: 'Hamdan', mobile: '545097366', name: 'HARSHA' },
+      { branch: 'Hamdan', mobile: '507161463', name: 'MALOU' },
+      { branch: 'Khalidiya', mobile: '551781595', name: 'MRYNA' },
+      { branch: 'Hamdan', mobile: '559127243', name: 'JAZAR' },
+      { branch: 'Al Rigga', mobile: '526943166', name: 'BIKRAM' },
+      { branch: 'Shabiya 11', mobile: '503285513', name: 'MUHAMMED' },
+      { branch: 'Shabiya 11', mobile: '502032488', name: 'NADARE' },
+      { branch: 'Muroor', mobile: '562912512', name: 'KASIF' },
+      { branch: 'Shabiya 11', mobile: '569974544', name: 'SEJITH' }
+    ];
+
+    // Data storage with LocalStorage persistence
+    let customers = [];
+    let messageHistory = [];
+    let currentPage = 1;
+    const itemsPerPage = 15;
+    let sortColumn = 'lastContact';
+    let sortDirection = 'desc';
+    let filteredCustomers = [];
+    let selectedCustomers = new Set();
+    let messageType = 'whatsapp';
+    let selectedTemplate = -1;
+
+    // Message templates
+    const messageTemplates = [
+      {
+        name: 'Welcome Message',
+        category: 'Promotional',
+        text: 'Welcome to our service! We\'re excited to have you with us. Use code WELCOME10 for 10% off your first order!'
+      },
+      {
+        name: 'Special Offer',
+        category: 'Promotional',
+        text: 'Special offer just for you! Get 20% off on your next order. Valid until the end of this month. Shop now!'
+      },
+      {
+        name: 'Follow-up',
+        category: 'Reminder',
+        text: 'Just checking in. How was your recent experience with us? We value your feedback and would love to hear from you.'
+      },
+      {
+        name: 'Custom Message',
+        category: 'Custom',
+        text: ''
+      }
+    ];
+
+    // Debug function
+    function debug(message) {
+      console.log(message);
+      document.getElementById('debugInfo').textContent = `Debug: ${message}`;
+    }
+
+    // Show data status
+    function showDataStatus(message, type = 'success') {
+      const statusEl = document.getElementById('dataStatus');
+      const statusText = document.getElementById('dataStatusText');
+      
+      statusEl.style.display = 'block';
+      statusText.textContent = message;
+      
+      if (type === 'success') {
+        statusEl.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+      } else {
+        statusEl.style.background = 'linear-gradient(135deg, #dc3545, #fd7e14)';
+      }
+      
+      setTimeout(() => {
+        statusEl.style.display = 'none';
+      }, 3000);
+    }
+
+    // Initialize customers from provided data
+    function initializeCustomers() {
+      debug('Initializing customers...');
+      showLoading();
+      
+      // Always use the provided data to ensure data is displayed
+      debug('Creating customers from provided data');
+      const now = new Date();
+      customers = customerData.map(item => ({
+        phone: `+971${item.mobile}`,
+        name: item.name,
+        branch: item.branch,
+        status: 'Active',
+        addedDate: now.toISOString(),
+        lastContact: now.toLocaleString()
+      }));
+      
+      // Save to localStorage
+      saveToLocalStorage();
+      debug(`Created ${customers.length} new customers`);
+      showDataStatus(`Successfully loaded ${customers.length} customers!`);
+      
+      filteredCustomers = [...customers];
+      debug(`Filtered customers: ${filteredCustomers.length}`);
+      
+      hideLoading();
+    }
+
+    // Update last updated time
+    function updateLastUpdatedTime() {
+      const now = new Date();
+      document.getElementById('lastUpdated').textContent = now.toLocaleString();
+    }
+
+    // Utility: format date/time
+    function nowStr() {
+      const d = new Date();
+      return d.toLocaleString();
+    }
+
+    // Show loading overlay
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      const toastHtml = `
+        <div class="toast custom-toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+          <div class="d-flex">
+            <div class="toast-body">
+              ${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+          </div>
+        </div>
+      `;
+      
+      const toastContainer = document.querySelector('.toast-container');
+      const toastElement = document.createElement('div');
+      toastElement.innerHTML = toastHtml;
+      toastContainer.appendChild(toastElement.firstElementChild);
+      
+      const toast = new bootstrap.Toast(toastContainer.lastElementChild);
+      toast.show();
+      
+      setTimeout(() => {
+        if (toastContainer.lastElementChild) {
+          toastContainer.lastElementChild.remove();
+        }
+      }, 5000);
+    }
+
+    // Save data to LocalStorage
+    function saveToLocalStorage() {
+      localStorage.setItem('customers', JSON.stringify(customers));
+      localStorage.setItem('messageHistory', JSON.stringify(messageHistory));
+      updateLastUpdatedTime();
+      debug('Data saved to localStorage');
+    }
+
+    // Validate phone number
+    function validatePhone(phone) {
+      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+      return phoneRegex.test(phone);
+    }
+
+    // Render table rows & metrics
+    function render() {
+      debug('Rendering table...');
+      showLoading();
+      
+      const tbody = document.querySelector("#customerTable tbody");
+      tbody.innerHTML = '';
+      
+      if (filteredCustomers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No customers found</td></tr>';
+        hideLoading();
+        return;
+      }
+      
+      // Calculate pagination
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
+      
+      debug(`Showing ${paginatedCustomers.length} of ${filteredCustomers.length} customers`);
+      
+      paginatedCustomers.forEach((c, index) => {
+        const tr = document.createElement("tr");
+        const globalIndex = startIndex + index;
+        tr.innerHTML = 
+          `<td>
+             <input type="checkbox" class="customer-checkbox form-check-input" 
+                    data-index="${globalIndex}" 
+                    onchange="toggleCustomerSelection(${globalIndex})"
+                    ${selectedCustomers.has(globalIndex) ? 'checked' : ''}>
+           </td>
+           <td><strong>${c.phone}</strong></td>
+           <td>${c.name || '-'}</td>
+           <td><span class="branch-badge">${c.branch}</span></td>
+           <td><span class="status-badge ${c.status === 'Active' ? 'status-active' : 'status-opt-out'}">${c.status}</span></td>
+           <td><small>${c.lastContact}</small></td>
+           <td class="table-actions">
+             <button class="btn btn-sm btn-success btn-action" onclick="quickMessage(${globalIndex})" title="Send Message">
+               <i class="bi bi-send"></i>
+             </button>
+             <button class="btn btn-sm btn-primary btn-action" onclick="editCustomer(${globalIndex})" title="Edit">
+               <i class="bi bi-pencil"></i>
+             </button>
+             <button class="btn btn-sm btn-danger btn-action" onclick="deleteCustomer(${globalIndex})" title="Delete">
+               <i class="bi bi-trash"></i>
+             </button>
+           </td>`;
+        tbody.appendChild(tr);
+      });
+
+      // Render pagination
+      renderPagination();
+      
+      // Update metrics
+      updateMetrics();
+      
+      hideLoading();
+      debug('Table rendered successfully');
+    }
+
+    // Update metrics
+    function updateMetrics() {
+      document.getElementById("metricTotal").textContent = customers.length;
+      
+      const today = new Date().toDateString();
+      const newTodayCount = customers.filter(c => 
+        new Date(c.addedDate).toDateString() === today
+      ).length;
+      document.getElementById("metricNewToday").textContent = newTodayCount;
+      
+      const optOutCount = customers.filter(c => c.status === "Opt-Out").length;
+      document.getElementById("metricOptOut").textContent = optOutCount;
+      
+      const now = new Date();
+      const noContact60 = customers.filter(c => {
+        const last = new Date(c.lastContact);
+        const diffDays = (now - last) / (1000 * 60 * 60 * 24);
+        return diffDays > 60;
+      }).length;
+      document.getElementById("metricNoContact60").textContent = noContact60;
+    }
+
+    // Render pagination
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+      const pagination = document.getElementById('pagination');
+      pagination.innerHTML = '';
+      
+      if (totalPages <= 1) return;
+      
+      // Previous button
+      const prevLi = document.createElement('li');
+      prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
+      prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>`;
+      pagination.appendChild(prevLi);
+      
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        const li = document.createElement('li');
+        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
+        li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
+        pagination.appendChild(li);
+      }
+      
+      // Next button
+      const nextLi = document.createElement('li');
+      nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
+      nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>`;
+      pagination.appendChild(nextLi);
+    }
+
+    // Change page
+    function changePage(page) {
+      const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
+      if (page >= 1 && page <= totalPages) {
+        currentPage = page;
+        render();
+      }
+      return false;
+    }
+
+    // Sort table
+    function sortTable(column) {
+      if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+      }
+      
+      filteredCustomers.sort((a, b) => {
+        let aVal = a[column];
+        let bVal = b[column];
+        
+        if (column === 'lastContact' || column === 'addedDate') {
+          aVal = new Date(aVal);
+          bVal = new Date(bVal);
+        }
+        
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+      
+      currentPage = 1;
+      render();
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      if (searchTerm === '') {
+        filteredCustomers = [...customers];
+      } else {
+        filteredCustomers = customers.filter(c => 
+          c.phone.toLowerCase().includes(searchTerm) ||
+          (c.name && c.name.toLowerCase().includes(searchTerm)) ||
+          (c.branch && c.branch.toLowerCase().includes(searchTerm)) ||
+          c.status.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      currentPage = 1;
+      render();
+    });
+
+    // Form submission
+    document.getElementById("customerForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      
+      const phone = document.getElementById("phone").value.trim();
+      const name = document.getElementById("name").value.trim();
+      const branch = document.getElementById("branch").value;
+      const status = document.getElementById("status").value;
+
+      if (!phone) {
+        showToast("Phone number is required.", 'error');
+        return;
+      }
+
+      if (!validatePhone(phone)) {
+        showToast("Please enter a valid phone number.", 'error');
+        return;
+      }
+
+      const existingIndex = customers.findIndex(c => c.phone === phone);
+      
+      if (existingIndex !== -1) {
+        // Update existing
+        customers[existingIndex] = {
+          ...customers[existingIndex],
+          name,
+          branch,
+          status,
+          lastContact: nowStr()
+        };
+        showToast("Customer updated successfully!");
+      } else {
+        // Add new
+        customers.push({
+          phone,
+          name,
+          branch,
+          status,
+          addedDate: new Date().toISOString(),
+          lastContact: nowStr()
+        });
+        showToast("New customer added successfully!");
+      }
+
+      saveToLocalStorage();
+      filteredCustomers = [...customers];
+      this.reset();
+      render();
+    });
+
+    // Edit customer
+    function editCustomer(index) {
+      const customer = filteredCustomers[index];
+      const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+      
+      document.getElementById('editIndex').value = originalIndex;
+      document.getElementById('editPhone').value = customer.phone;
+      document.getElementById('editName').value = customer.name || '';
+      document.getElementById('editBranch').value = customer.branch;
+      document.getElementById('editStatus').value = customer.status;
+      
+      const modal = new bootstrap.Modal(document.getElementById('editModal'));
+      modal.show();
+    }
+
+    // Save edit
+    function saveEdit() {
+      const index = parseInt(document.getElementById('editIndex').value);
+      const name = document.getElementById('editName').value.trim();
+      const branch = document.getElementById('editBranch').value;
+      const status = document.getElementById('editStatus').value;
+      
+      customers[index] = {
+        ...customers[index],
+        name,
+        branch,
+        status,
+        lastContact: nowStr()
+      };
+      
+      saveToLocalStorage();
+      filteredCustomers = [...customers];
+      render();
+      
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+      modal.hide();
+      
+      showToast("Customer updated successfully!");
+    }
+
+    // Delete customer
+    function deleteCustomer(index) {
+      const customer = filteredCustomers[index];
+      
+      if (confirm(`Are you sure you want to delete customer ${customer.phone}?`)) {
+        const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+        customers.splice(originalIndex, 1);
+        
+        saveToLocalStorage();
+        filteredCustomers = [...customers];
+        render();
+        
+        showToast("Customer deleted successfully!");
+      }
+    }
+
+    // Reset form
+    function resetForm() {
+      document.getElementById('customerForm').reset();
+    }
+
+    // Export to CSV
+    function exportToCSV() {
+      if (customers.length === 0) {
+        showToast("No data to export.", 'error');
+        return;
+      }
+      
+      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact\n';
+      
+      customers.forEach(c => {
+        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      
+      showToast("Data exported successfully!");
+    }
+
+    // Clear all data
+    function clearAllData() {
+      if (confirm("Are you sure you want to delete all customer data? This action cannot be undone.")) {
+        customers = [];
+        filteredCustomers = [];
+        saveToLocalStorage();
+        render();
+        showToast("All data cleared successfully!");
+      }
+    }
+
+    // Toggle select all customers
+    function toggleSelectAll() {
+      const selectAll = document.getElementById('selectAll').checked || document.getElementById('headerCheckbox').checked;
+      const checkboxes = document.querySelectorAll('.customer-checkbox');
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll;
+        const index = parseInt(checkbox.dataset.index);
+        if (selectAll) {
+          selectedCustomers.add(index);
+        } else {
+          selectedCustomers.delete(index);
+        }
+      });
+    }
+
+    // Toggle customer selection
+    function toggleCustomerSelection(index) {
+      if (selectedCustomers.has(index)) {
+        selectedCustomers.delete(index);
+      } else {
+        selectedCustomers.add(index);
+      }
+    }
+
+    // Open message modal
+    function openMessageModal() {
+      // Reset message modal state
+      selectedCustomers.clear();
+      selectedTemplate = -1;
+      messageType = 'whatsapp';
+      document.getElementById('messageText').value = '';
+      document.getElementById('messagePreview').innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
+      document.getElementById('selectAllRadio').checked = true;
+      document.getElementById('customSelection').style.display = 'none';
+      document.getElementById('sendProgress').style.display = 'none';
+      document.getElementById('progressList').innerHTML = '';
+      document.getElementById('whatsappLinks').style.display = 'none';
+      document.getElementById('whatsappLinksList').innerHTML = '';
+      
+      // Update customer checkboxes
+      updateCustomerCheckboxes();
+      updateMessageStats();
+      
+      const modal = new bootstrap.Modal(document.getElementById('messageModal'));
+      modal.show();
+    }
+
+    // Update customer checkboxes in message modal
+    function updateCustomerCheckboxes() {
+      const container = document.getElementById('customerCheckboxes');
+      container.innerHTML = '';
+      
+      const activeCustomers = customers.filter(c => c.status === 'Active');
+      
+      activeCustomers.forEach((customer, index) => {
+        const div = document.createElement('div');
+        div.className = 'form-check';
+        div.innerHTML = `
+          <input class="form-check-input" type="checkbox" value="${index}" id="customerCheck${index}">
+          <label class="form-check-label" for="customerCheck${index}">
+            ${customer.name || customer.phone} (${customer.phone}) - ${customer.branch}
+          </label>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Update customer selection based on radio button
+    function updateCustomerSelection() {
+      const selectionType = document.querySelector('input[name="selectionType"]:checked').value;
+      const customSelection = document.getElementById('customSelection');
+      
+      if (selectionType === 'all') {
+        customSelection.style.display = 'none';
+        // Select all active customers
+        customers.forEach((c, index) => {
+          if (c.status === 'Active') {
+            selectedCustomers.add(index);
+          }
+        });
+      } else {
+        customSelection.style.display = 'block';
+        selectedCustomers.clear();
+        
+        // Update selection based on checkboxes
+        const checkboxes = document.querySelectorAll('#customerCheckboxes input[type="checkbox"]');
+        checkboxes.forEach((checkbox, index) => {
+          if (checkbox.checked) {
+            // Find the actual customer index
+            const activeCustomers = customers.filter(c => c.status === 'Active');
+            const customer = activeCustomers[index];
+            const actualIndex = customers.findIndex(c => c.phone === customer.phone);
+            selectedCustomers.add(actualIndex);
+          }
+        });
+      }
+      
+      updateSelectedCount();
+      updateMessageStats();
+    }
+
+    // Update selected count display
+    function updateSelectedCount() {
+      const count = selectedCustomers.size;
+      document.getElementById('selectedCountText').textContent = `${count} customer${count !== 1 ? 's' : ''} selected`;
+    }
+
+    // Select message type
+    function selectMessageType(type) {
+      messageType = type;
+      
+      // Update button styles
+      document.getElementById('whatsappBtn').className = `btn message-type-btn ${type === 'whatsapp' ? 'active btn-success' : 'btn-outline-success'}`;
+      document.getElementById('smsBtn').className = `btn message-type-btn ${type === 'sms' ? 'active btn-primary' : 'btn-outline-primary'}`;
+      
+      updateMessageStats();
+    }
+
+    // Select message template
+    function selectTemplate(index) {
+      selectedTemplate = index;
+      
+      // Update template selection UI
+      document.querySelectorAll('.message-template').forEach((el, i) => {
+        if (i === index) {
+          el.classList.add('active');
+        } else {
+          el.classList.remove('active');
+        }
+      });
+      
+      // Update message text
+      const template = messageTemplates[index];
+      document.getElementById('messageText').value = template.text;
+      updateMessagePreview();
+      updateCharCount();
+    }
+
+    // Update message preview
+    function updateMessagePreview() {
+      const messageText = document.getElementById('messageText').value;
+      const preview = document.getElementById('messagePreview');
+      
+      if (messageText.trim() === '') {
+        preview.innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
+      } else {
+        // Format message based on type
+        let formattedMessage = messageText;
+        if (messageType === 'whatsapp') {
+          formattedMessage = `<i class="bi bi-whatsapp text-success me-2"></i>${messageText}`;
+        } else {
+          formattedMessage = `<i class="bi bi-chat-dots text-primary me-2"></i>${messageText}`;
+        }
+        preview.innerHTML = `<p class="mb-0">${formattedMessage}</p>`;
+      }
+    }
+
+    // Update character count
+    function updateCharCount() {
+      const messageText = document.getElementById('messageText').value;
+      document.getElementById('charCount').textContent = messageText.length;
+    }
+
+    // Update message statistics
+    function updateMessageStats() {
+      const count = selectedCustomers.size;
+      const whatsappCost = count * 0.05; // Example cost
+      const smsCost = count * 0.10; // Example cost
+      
+      document.getElementById('totalMessages').textContent = count;
+      document.getElementById('whatsappCount').textContent = messageType === 'whatsapp' ? count : 0;
+      document.getElementById('smsCount').textContent = messageType === 'sms' ? count : 0;
+      document.getElementById('estimatedCost').textContent = `$${messageType === 'whatsapp' ? whatsappCost.toFixed(2) : smsCost.toFixed(2)}`;
+    }
+
+    // Open WhatsApp with multiple fallback methods
+    function openWhatsApp(phoneNumber, message) {
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+      
+      // Method 1: Try to open in new tab
+      try {
+        const newWindow = window.open(whatsappUrl, '_blank');
+        if (newWindow) {
+          return true;
+        }
+      } catch (e) {
+        debug('Method 1 failed: ' + e.message);
+      }
+      
+      // Method 2: Try to open in same tab
+      try {
+        window.open(whatsappUrl, '_self');
+        return true;
+      } catch (e) {
+        debug('Method 2 failed: ' + e.message);
+      }
+      
+      // Method 3: Create temporary link and click
+      try {
+        const link = document.createElement('a');
+        link.href = whatsappUrl;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return true;
+      } catch (e) {
+        debug('Method 3 failed: ' + e.message);
+      }
+      
+      // Method 4: Change location
+      try {
+        window.location.href = whatsappUrl;
+        return true;
+      } catch (e) {
+        debug('Method 4 failed: ' + e.message);
+      }
+      
+      return false;
+    }
+
+    // Send message - WORKING IMPLEMENTATION WITH FALLBACKS
+    async function sendMessage() {
+      const messageText = document.getElementById('messageText').value.trim();
+      
+      if (selectedCustomers.size === 0) {
+        showToast("Please select at least one customer.", 'error');
+        return;
+      }
+      
+      if (messageText === '') {
+        showToast("Please enter a message.", 'error');
+        return;
+      }
+      
+      // Get selected customers
+      const recipients = Array.from(selectedCustomers).map(i => customers[i]);
+      
+      if (messageType === 'whatsapp') {
+        // Show WhatsApp links section
+        document.getElementById('whatsappLinks').style.display = 'block';
+        const linksList = document.getElementById('whatsappLinksList');
+        linksList.innerHTML = '';
+        
+        // Create WhatsApp links for all recipients
+        recipients.forEach((customer, index) => {
+          const phoneNumber = customer.phone.replace(/[^\d]/g, '');
+          const encodedMessage = encodeURIComponent(messageText);
+          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+          
+          const linkItem = document.createElement('div');
+          linkItem.className = 'whatsapp-link-item';
+          linkItem.innerHTML = `
+            <span>${customer.name || customer.phone} (${customer.phone})</span>
+            <div>
+              <a href="${whatsappUrl}" target="_blank" class="btn btn-sm btn-success">
+                <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
+              </a>
+              <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${whatsappUrl}')">
+                <i class="bi bi-clipboard me-1"></i>Copy Link
+              </button>
+            </div>
+          `;
+          linksList.appendChild(linkItem);
+          
+          // Update last contact
+          const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+          customers[originalIndex].lastContact = nowStr();
+        });
+        
+        showToast(`WhatsApp links created! Click on any link to open WhatsApp with pre-filled message.`);
+        
+        // Try to open first WhatsApp automatically
+        if (recipients.length > 0) {
+          const firstCustomer = recipients[0];
+          const phoneNumber = firstCustomer.phone.replace(/[^\d]/g, '');
+          if (openWhatsApp(phoneNumber, messageText)) {
+            showToast(`Opening WhatsApp for ${firstCustomer.name || firstCustomer.phone}...`);
+          }
+        }
+      } else {
+        // SMS - Copy phone numbers to clipboard
+        const phoneNumbers = recipients.map(c => c.phone).join('\n');
+        
+        try {
+          await navigator.clipboard.writeText(phoneNumbers);
+          showToast('Phone numbers copied to clipboard! You can now use your SMS app to send messages.');
+        } catch (error) {
+          showToast('Failed to copy phone numbers. Please try again.', 'error');
+        }
+      }
+      
+      // Add to message history
+      const messageRecord = {
+        type: messageType,
+        text: messageText,
+        recipients: recipients,
+        timestamp: new Date().toISOString(),
+        status: 'sent'
+      };
+      
+      messageHistory.push(messageRecord);
+      saveToLocalStorage();
+      
+      // Close modal after delay
+      setTimeout(() => {
+        const modal = bootstrap.Modal.getInstance(document.getElementById('messageModal'));
+        modal.hide();
+        render();
+      }, 5000);
+    }
+
+    // Copy to clipboard function
+    async function copyToClipboard(text) {
+      try {
+        await navigator.clipboard.writeText(text);
+        showToast('Link copied to clipboard!');
+      } catch (error) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('Link copied to clipboard!');
+      }
+    }
+
+    // Quick message for single customer
+    function quickMessage(index) {
+      const customer = filteredCustomers[index];
+      
+      // Clean phone number
+      const phoneNumber = customer.phone.replace(/[^\d]/g, '');
+      
+      // Try multiple methods to open WhatsApp
+      if (openWhatsApp(phoneNumber, '')) {
+        // Update last contact
+        const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+        customers[originalIndex].lastContact = nowStr();
+        saveToLocalStorage();
+        render();
+        
+        showToast(`Opening WhatsApp for ${customer.name || customer.phone}...`);
+      } else {
+        // Fallback: Show the link
+        const whatsappUrl = `https://wa.me/${phoneNumber}`;
+        showToast(`WhatsApp blocked. Please click here: <a href="${whatsappUrl}" target="_blank">Open WhatsApp</a>`, 'error');
+      }
+    }
+
+    // Event listeners for message modal
+    document.getElementById('messageText').addEventListener('input', function() {
+      updateMessagePreview();
+      updateCharCount();
+    });
+
+    // Event listeners for customer checkboxes in modal
+    document.addEventListener('change', function(e) {
+      if (e.target.matches('#customerCheckboxes input[type="checkbox"]')) {
+        updateCustomerSelection();
+      }
+    });
+
+    // Initialize the application
+    document.addEventListener('DOMContentLoaded', function() {
+      debug('DOM loaded, initializing...');
+      initializeCustomers();
+      updateLastUpdatedTime();
+      render();
+      debug('Initialization complete');
+    });
+  </script>
+</body>
+</html>
