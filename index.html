@@ -117,6 +117,24 @@
       color: white;
     }
 
+    .message-status {
+      padding: 4px 8px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-block;
+    }
+
+    .message-sent-today {
+      background: linear-gradient(135deg, #e7f3ff, #f0f8ff);
+      color: #0066cc;
+    }
+
+    .message-can-send {
+      background: linear-gradient(135deg, #e7f9e7, #f0fff0);
+      color: #006600;
+    }
+
     .table-actions {
       white-space: nowrap;
     }
@@ -507,6 +525,51 @@
       cursor: pointer;
     }
 
+    .branch-selector {
+      margin-bottom: 15px;
+    }
+
+    .branch-checkbox {
+      margin-right: 10px;
+    }
+
+    .branch-stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .branch-stat {
+      text-align: center;
+    }
+
+    .branch-stat-number {
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .branch-stat-label {
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+
+    .rate-limit-warning {
+      background-color: #fff3cd;
+      border: 1px solid #ffeeba;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 15px;
+      color: #856404;
+    }
+
+    .customer-message-status {
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+
     @media (max-width: 768px) {
       .card-metric h2 {
         font-size: 2rem;
@@ -745,6 +808,7 @@
               <th onclick="sortTable('lastContact')" style="cursor: pointer;">
                 Last Contact <i class="bi bi-arrow-down-up"></i>
               </th>
+              <th>Message Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -818,6 +882,12 @@
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
+          <!-- Rate Limiting Notice -->
+          <div class="rate-limit-warning">
+            <i class="bi bi-info-circle me-2"></i>
+            <strong>Rate Limiting:</strong> Customers can only receive one message per day to prevent spam.
+          </div>
+
           <!-- Message Type Selection -->
           <div class="text-center mb-4">
             <button class="btn message-type-btn active btn-success" id="whatsappBtn" onclick="selectMessageType('whatsapp')">
@@ -840,6 +910,12 @@
                   </label>
                 </div>
                 <div class="form-check">
+                  <input class="form-check-input" type="radio" name="selectionType" id="selectBranchRadio" value="branch" onchange="updateCustomerSelection()">
+                  <label class="form-check-label" for="selectBranchRadio">
+                    Send by branch
+                  </label>
+                </div>
+                <div class="form-check">
                   <input class="form-check-input" type="radio" name="selectionType" id="selectCustomRadio" value="custom" onchange="updateCustomerSelection()">
                   <label class="form-check-label" for="selectCustomRadio">
                     Select specific customers
@@ -851,6 +927,15 @@
                   <i class="bi bi-info-circle me-1"></i>
                   <span id="selectedCountText">0 customers selected</span>
                 </div>
+              </div>
+            </div>
+            
+            <!-- Branch Selection -->
+            <div id="branchSelection" class="mt-3" style="display: none;">
+              <div class="border rounded p-3">
+                <h6>Select Branches</h6>
+                <div id="branchCheckboxes"></div>
+                <div class="branch-stats mt-3" id="branchStats"></div>
               </div>
             </div>
             
@@ -1165,6 +1250,7 @@
     let sortDirection = 'desc';
     let filteredCustomers = [];
     let selectedCustomers = new Set();
+    let selectedBranches = new Set();
     let messageType = 'whatsapp';
     let selectedTemplate = -1;
 
@@ -1191,6 +1277,29 @@
         text: ''
       }
     ];
+
+    // Get all unique branches
+    function getUniqueBranches() {
+      const branches = new Set();
+      customers.forEach(customer => {
+        branches.add(customer.branch);
+      });
+      return Array.from(branches);
+    }
+
+    // Check if customer can receive a message today (rate limiting)
+    function canSendMessageToday(customer) {
+      if (!customer.lastMessageDate) return true;
+      
+      const lastMessageDate = new Date(customer.lastMessageDate);
+      const today = new Date();
+      
+      // Reset time to compare only dates
+      lastMessageDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+      
+      return lastMessageDate.getTime() < today.getTime();
+    }
 
     // Debug function
     function debug(message) {
@@ -1231,7 +1340,8 @@
         branch: item.branch,
         status: 'Active',
         addedDate: now.toISOString(),
-        lastContact: now.toLocaleString()
+        lastContact: now.toLocaleString(),
+        lastMessageDate: null // Track when customer was last messaged
       }));
       
       // Save to localStorage
@@ -1318,7 +1428,7 @@
       tbody.innerHTML = '';
       
       if (filteredCustomers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted py-4">No customers found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No customers found</td></tr>';
         hideLoading();
         return;
       }
@@ -1333,6 +1443,8 @@
       paginatedCustomers.forEach((c, index) => {
         const tr = document.createElement("tr");
         const globalIndex = startIndex + index;
+        const canSend = canSendMessageToday(c);
+        
         tr.innerHTML = 
           `<td>
              <input type="checkbox" class="customer-checkbox form-check-input" 
@@ -1345,8 +1457,13 @@
            <td><span class="branch-badge">${c.branch}</span></td>
            <td><span class="status-badge ${c.status === 'Active' ? 'status-active' : 'status-opt-out'}">${c.status}</span></td>
            <td><small>${c.lastContact}</small></td>
+           <td>
+             <span class="message-status ${canSend ? 'message-can-send' : 'message-sent-today'}">
+               ${canSend ? 'Can Message' : 'Messaged Today'}
+             </span>
+           </td>
            <td class="table-actions">
-             <button class="btn btn-sm btn-success btn-action" onclick="quickMessage(${globalIndex})" title="Send Message">
+             <button class="btn btn-sm btn-success btn-action" onclick="quickMessage(${globalIndex})" title="Send Message" ${!canSend ? 'disabled' : ''}>
                <i class="bi bi-send"></i>
              </button>
              <button class="btn btn-sm btn-primary btn-action" onclick="editCustomer(${globalIndex})" title="Edit">
@@ -1443,9 +1560,9 @@
         let aVal = a[column];
         let bVal = b[column];
         
-        if (column === 'lastContact' || column === 'addedDate') {
-          aVal = new Date(aVal);
-          bVal = new Date(bVal);
+        if (column === 'lastContact' || column === 'addedDate' || column === 'lastMessageDate') {
+          aVal = aVal ? new Date(aVal) : new Date(0);
+          bVal = bVal ? new Date(bVal) : new Date(0);
         }
         
         if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
@@ -1515,7 +1632,8 @@
           branch,
           status,
           addedDate: new Date().toISOString(),
-          lastContact: nowStr()
+          lastContact: nowStr(),
+          lastMessageDate: null
         });
         showToast("New customer added successfully!");
       }
@@ -1594,10 +1712,10 @@
         return;
       }
       
-      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact\n';
+      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact,Last Message Date\n';
       
       customers.forEach(c => {
-        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}"\n`;
+        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}","${c.lastMessageDate || ''}"\n`;
       });
       
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -1650,12 +1768,14 @@
     function openMessageModal() {
       // Reset message modal state
       selectedCustomers.clear();
+      selectedBranches.clear();
       selectedTemplate = -1;
       messageType = 'whatsapp';
       document.getElementById('messageText').value = '';
       document.getElementById('messagePreview').innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
       document.getElementById('selectAllRadio').checked = true;
       document.getElementById('customSelection').style.display = 'none';
+      document.getElementById('branchSelection').style.display = 'none';
       document.getElementById('sendProgress').style.display = 'none';
       document.getElementById('progressList').innerHTML = '';
       document.getElementById('whatsappLinks').style.display = 'none';
@@ -1663,6 +1783,7 @@
       
       // Update customer checkboxes
       updateCustomerCheckboxes();
+      updateBranchCheckboxes();
       updateMessageStats();
       
       const modal = new bootstrap.Modal(document.getElementById('messageModal'));
@@ -1677,45 +1798,132 @@
       const activeCustomers = customers.filter(c => c.status === 'Active');
       
       activeCustomers.forEach((customer, index) => {
+        const canSend = canSendMessageToday(customer);
         const div = document.createElement('div');
         div.className = 'form-check';
         div.innerHTML = `
-          <input class="form-check-input" type="checkbox" value="${index}" id="customerCheck${index}">
+          <input class="form-check-input" type="checkbox" value="${index}" id="customerCheck${index}" ${!canSend ? 'disabled' : ''}>
           <label class="form-check-label" for="customerCheck${index}">
             ${customer.name || customer.phone} (${customer.phone}) - ${customer.branch}
+            ${!canSend ? '<span class="text-muted">(Already messaged today)</span>' : ''}
           </label>
         `;
         container.appendChild(div);
       });
     }
 
+    // Update branch checkboxes in message modal
+    function updateBranchCheckboxes() {
+      const container = document.getElementById('branchCheckboxes');
+      container.innerHTML = '';
+      
+      const branches = getUniqueBranches();
+      
+      branches.forEach(branch => {
+        const div = document.createElement('div');
+        div.className = 'form-check form-check-inline';
+        div.innerHTML = `
+          <input class="form-check-input branch-checkbox" type="checkbox" value="${branch}" id="branchCheck${branch}">
+          <label class="form-check-label" for="branchCheck${branch}">
+            ${branch}
+          </label>
+        `;
+        container.appendChild(div);
+      });
+      
+      // Add event listeners to branch checkboxes
+      document.querySelectorAll('.branch-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          if (this.checked) {
+            selectedBranches.add(this.value);
+          } else {
+            selectedBranches.delete(this.value);
+          }
+          updateBranchStats();
+          updateSelectedCount();
+          updateMessageStats();
+        });
+      });
+    }
+
+    // Update branch statistics
+    function updateBranchStats() {
+      const statsContainer = document.getElementById('branchStats');
+      statsContainer.innerHTML = '';
+      
+      if (selectedBranches.size === 0) {
+        statsContainer.innerHTML = '<p class="text-muted">Please select at least one branch</p>';
+        return;
+      }
+      
+      let totalCustomers = 0;
+      let eligibleCustomers = 0;
+      
+      selectedBranches.forEach(branch => {
+        const branchCustomers = customers.filter(c => 
+          c.branch === branch && c.status === 'Active'
+        );
+        totalCustomers += branchCustomers.length;
+        
+        const eligibleBranchCustomers = branchCustomers.filter(c => 
+          canSendMessageToday(c)
+        );
+        eligibleCustomers += eligibleBranchCustomers.length;
+      });
+      
+      statsContainer.innerHTML = `
+        <div class="branch-stat">
+          <div class="branch-stat-number">${totalCustomers}</div>
+          <div class="branch-stat-label">Total Customers</div>
+        </div>
+        <div class="branch-stat">
+          <div class="branch-stat-number">${eligibleCustomers}</div>
+          <div class="branch-stat-label">Can Message Today</div>
+        </div>
+        <div class="branch-stat">
+          <div class="branch-stat-number">${totalCustomers - eligibleCustomers}</div>
+          <div class="branch-stat-label">Already Messaged</div>
+        </div>
+      `;
+    }
+
     // Update customer selection based on radio button
     function updateCustomerSelection() {
       const selectionType = document.querySelector('input[name="selectionType"]:checked').value;
       const customSelection = document.getElementById('customSelection');
+      const branchSelection = document.getElementById('branchSelection');
+      
+      // Hide all selection options first
+      customSelection.style.display = 'none';
+      branchSelection.style.display = 'none';
+      
+      // Clear selected customers
+      selectedCustomers.clear();
       
       if (selectionType === 'all') {
-        customSelection.style.display = 'none';
-        // Select all active customers
+        // Select all active customers who can be messaged today
         customers.forEach((c, index) => {
-          if (c.status === 'Active') {
+          if (c.status === 'Active' && canSendMessageToday(c)) {
             selectedCustomers.add(index);
           }
         });
+      } else if (selectionType === 'branch') {
+        // Show branch selection
+        branchSelection.style.display = 'block';
+        updateBranchStats();
+        return; // Don't update selected count yet, wait for branch selection
       } else {
+        // Show custom selection
         customSelection.style.display = 'block';
-        selectedCustomers.clear();
         
         // Update selection based on checkboxes
-        const checkboxes = document.querySelectorAll('#customerCheckboxes input[type="checkbox"]');
-        checkboxes.forEach((checkbox, index) => {
-          if (checkbox.checked) {
-            // Find the actual customer index
-            const activeCustomers = customers.filter(c => c.status === 'Active');
-            const customer = activeCustomers[index];
-            const actualIndex = customers.findIndex(c => c.phone === customer.phone);
-            selectedCustomers.add(actualIndex);
-          }
+        const checkboxes = document.querySelectorAll('#customerCheckboxes input[type="checkbox"]:checked');
+        checkboxes.forEach(checkbox => {
+          // Find the actual customer index
+          const activeCustomers = customers.filter(c => c.status === 'Active');
+          const customer = activeCustomers[parseInt(checkbox.value)];
+          const actualIndex = customers.findIndex(c => c.phone === customer.phone);
+          selectedCustomers.add(actualIndex);
         });
       }
       
@@ -1821,7 +2029,7 @@
       return true;
     }
 
-    // Send message - IMPROVED IMPLEMENTATION
+    // Send message - ENHANCED WITH RATE LIMITING
     async function sendMessage() {
       const messageText = document.getElementById('messageText').value.trim();
       
@@ -1838,14 +2046,28 @@
       // Get selected customers
       const recipients = Array.from(selectedCustomers).map(i => customers[i]);
       
+      // Filter out customers who have already been messaged today
+      const eligibleRecipients = recipients.filter(customer => 
+        canSendMessageToday(customer)
+      );
+      
+      if (eligibleRecipients.length === 0) {
+        showToast("All selected customers have already been messaged today.", 'error');
+        return;
+      }
+      
+      if (eligibleRecipients.length < recipients.length) {
+        showToast(`${recipients.length - eligibleRecipients.length} customer(s) have already been messaged today and will be skipped.`);
+      }
+      
       if (messageType === 'whatsapp') {
         // Show WhatsApp modal with all links
         const whatsappModal = document.getElementById('whatsappModal');
         const linkList = document.getElementById('whatsappLinkList');
         linkList.innerHTML = '';
         
-        // Create WhatsApp links for all recipients
-        recipients.forEach((customer, index) => {
+        // Create WhatsApp links for all eligible recipients
+        eligibleRecipients.forEach((customer, index) => {
           const phoneNumber = customer.phone.replace(/[^\d]/g, '');
           const encodedMessage = encodeURIComponent(messageText);
           const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
@@ -1860,32 +2082,40 @@
           `;
           linkList.appendChild(listItem);
           
-          // Update last contact
+          // Update last message date
           const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+          customers[originalIndex].lastMessageDate = new Date().toISOString();
           customers[originalIndex].lastContact = nowStr();
         });
         
         // Show the modal
         whatsappModal.style.display = 'flex';
         
-        showToast(`WhatsApp links created! Click on any link to open WhatsApp with pre-filled message.`);
+        showToast(`WhatsApp links created for ${eligibleRecipients.length} customer(s)! Click on any link to open WhatsApp with pre-filled message.`);
       } else {
         // SMS - Copy phone numbers to clipboard
-        const phoneNumbers = recipients.map(c => c.phone).join('\n');
+        const phoneNumbers = eligibleRecipients.map(c => c.phone).join('\n');
         
         try {
           await navigator.clipboard.writeText(phoneNumbers);
-          showToast('Phone numbers copied to clipboard! You can now use your SMS app to send messages.');
+          showToast(`Phone numbers for ${eligibleRecipients.length} customer(s) copied to clipboard! You can now use your SMS app to send messages.`);
         } catch (error) {
           showToast('Failed to copy phone numbers. Please try again.', 'error');
         }
+        
+        // Update last message date for SMS recipients
+        eligibleRecipients.forEach(customer => {
+          const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+          customers[originalIndex].lastMessageDate = new Date().toISOString();
+          customers[originalIndex].lastContact = nowStr();
+        });
       }
       
       // Add to message history
       const messageRecord = {
         type: messageType,
         text: messageText,
-        recipients: recipients,
+        recipients: eligibleRecipients,
         timestamp: new Date().toISOString(),
         status: 'sent'
       };
@@ -1922,13 +2152,20 @@
     function quickMessage(index) {
       const customer = filteredCustomers[index];
       
+      // Check if customer can be messaged today
+      if (!canSendMessageToday(customer)) {
+        showToast("This customer has already been messaged today. Please try again tomorrow.", 'error');
+        return;
+      }
+      
       // Clean phone number
       const phoneNumber = customer.phone.replace(/[^\d]/g, '');
       
       // Open WhatsApp with empty message
       if (openWhatsApp(phoneNumber, '')) {
-        // Update last contact
+        // Update last message date
         const originalIndex = customers.findIndex(c => c.phone === customer.phone);
+        customers[originalIndex].lastMessageDate = new Date().toISOString();
         customers[originalIndex].lastContact = nowStr();
         saveToLocalStorage();
         render();
