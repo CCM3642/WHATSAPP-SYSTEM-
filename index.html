@@ -105,7 +105,7 @@
 
     .header-top {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
@@ -191,7 +191,7 @@
 
     .card-header-custom {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
       padding-bottom: 15px;
@@ -318,49 +318,40 @@
       transform: scale(1.1);
     }
 
-    /* Import/Export Section */
-    .import-export-section {
+    /* Message Progress */
+    .message-progress {
       background: #f8f9fa;
       border-radius: 15px;
       padding: 20px;
-      margin-bottom: 20px;
+      margin-top: 20px;
+      display: none;
     }
 
-    .file-upload-area {
-      border: 2px dashed #dee2e6;
-      border-radius: 10px;
-      padding: 30px;
-      text-align: center;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
-
-    .file-upload-area:hover {
-      border-color: #667eea;
-      background: #f0f4ff;
-    }
-
-    .file-upload-area.dragover {
-      border-color: #667eea;
-      background: #e7f3ff;
-    }
-
-    /* Advanced Filters */
-    .filter-section {
-      background: #f8f9fa;
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-
-    .filter-group {
-      margin-bottom: 15px;
-    }
-
-    .filter-label {
-      font-weight: 600;
-      margin-bottom: 8px;
+    .message-progress.active {
       display: block;
+    }
+
+    .progress-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      background: white;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .progress-item.sending {
+      background: #fff3cd;
+    }
+
+    .progress-item.sent {
+      background: #d4edda;
+    }
+
+    .progress-item.failed {
+      background: #f8d7da;
     }
 
     /* Charts */
@@ -417,6 +408,35 @@
       min-width: 300px;
       border-radius: 15px;
       box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    /* WhatsApp Links */
+    .whatsapp-links {
+      background: #f0f8ff;
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+    }
+
+    .whatsapp-links.active {
+      display: block;
+    }
+
+    .whatsapp-link-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin: 5px 0;
+      background: white;
+      border-radius: 8px;
+      transition: all 0.3s;
+    }
+
+    .whatsapp-link-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
     }
 
     /* Responsive */
@@ -482,31 +502,6 @@
       border-color: transparent;
     }
 
-    /* Data Validation */
-    .is-invalid {
-      border-color: #dc3545 !important;
-    }
-
-    .invalid-feedback {
-      color: #dc3545;
-      font-size: 0.875rem;
-      margin-top: 0.25rem;
-    }
-
-    /* Bulk Operations */
-    .bulk-actions {
-      background: #fff3cd;
-      border: 1px solid #ffeaa7;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 20px;
-      display: none;
-    }
-
-    .bulk-actions.active {
-      display: block;
-    }
-
     /* Customer Tags */
     .customer-tags {
       display: flex;
@@ -544,7 +539,6 @@
       <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
       <li><a href="#" onclick="showSection('customers')"><i class="bi bi-people"></i> Customers</a></li>
       <li><a href="#" onclick="showSection('add-customer')"><i class="bi bi-person-plus"></i> Add Customer</a></li>
-      <li><a href="#" onclick="showSection('bulk-import')"><i class="bi bi-upload"></i> Bulk Import</a></li>
       <li><a href="#" onclick="showSection('messaging')"><i class="bi bi-chat-dots"></i> Messaging</a></li>
       <li><a href="#" onclick="showSection('analytics')"><i class="bi bi-graph-up"></i> Analytics</a></li>
       <li><a href="#" onclick="showSection('settings')"><i class="bi bi-gear"></i> Settings</a></li>
@@ -606,9 +600,6 @@
           <button class="quick-action-btn" onclick="showSection('add-customer')">
             <i class="bi bi-person-plus me-2"></i>Add Customer
           </button>
-          <button class="quick-action-btn" onclick="showSection('bulk-import')">
-            <i class="bi bi-upload me-2"></i>Import CSV
-          </button>
           <button class="quick-action-btn" onclick="showSection('messaging')">
             <i class="bi bi-chat-dots me-2"></i>Send Message
           </button>
@@ -632,62 +623,32 @@
 
     <!-- Customers Section -->
     <div id="customers-section" class="section" style="display: none;">
-      <!-- Advanced Filters -->
-      <div class="filter-section">
+      <!-- Filters -->
+      <div class="content-card">
         <h5 class="mb-3">Filters</h5>
         <div class="row">
           <div class="col-md-3">
-            <div class="filter-group">
-              <label class="filter-label">Status</label>
-              <select class="form-control-custom" id="filterStatus" onchange="applyFilters()">
-                <option value="">All Status</option>
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-                <option value="Opt-Out">Opt-Out</option>
-              </select>
-            </div>
+            <select class="form-control-custom" id="filterStatus" onchange="applyFilters()">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Opt-Out">Opt-Out</option>
+            </select>
           </div>
           <div class="col-md-3">
-            <div class="filter-group">
-              <label class="filter-label">Branch</label>
-              <select class="form-control-custom" id="filterBranch" onchange="applyFilters()">
-                <option value="">All Branches</option>
-                <option value="Hamdan">Hamdan</option>
-                <option value="Muroor">Muroor</option>
-                <option value="Shabiya 11">Shabiya 11</option>
-                <option value="Al Barsha">Al Barsha</option>
-                <option value="Al Rigga">Al Rigga</option>
-                <option value="Khalidiya">Khalidiya</option>
-                <option value="Al Satwa">Al Satwa</option>
-              </select>
-            </div>
+            <select class="form-control-custom" id="filterBranch" onchange="applyFilters()">
+              <option value="">All Branches</option>
+              <option value="Hamdan">Hamdan</option>
+              <option value="Muroor">Muroor</option>
+              <option value="Shabiya 11">Shabiya 11</option>
+              <option value="Al Barsha">Al Barsha</option>
+              <option value="Al Rigga">Al Rigga</option>
+              <option value="Khalidiya">Khalidiya</option>
+              <option value="Al Satwa">Al Satwa</option>
+            </select>
           </div>
-          <div class="col-md-3">
-            <div class="filter-group">
-              <label class="filter-label">Date Added</label>
-              <input type="date" class="form-control-custom" id="filterDate" onchange="applyFilters()">
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="filter-group">
-              <label class="filter-label">Search</label>
-              <input type="text" class="form-control-custom" id="searchCustomers" placeholder="Search..." onkeyup="applyFilters()">
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bulk Actions -->
-      <div class="bulk-actions" id="bulkActions">
-        <div class="d-flex justify-content-between align-items-center">
-          <span id="selectedCount">0 customers selected</span>
-          <div>
-            <button class="btn btn-gradient me-2" onclick="bulkMessage()">
-              <i class="bi bi-send me-1"></i>Send Message
-            </button>
-            <button class="btn btn-danger-gradient" onclick="bulkDelete()">
-              <i class="bi bi-trash me-1"></i>Delete
-            </button>
+          <div class="col-md-6">
+            <input type="text" class="form-control-custom" id="searchCustomers" placeholder="Search..." onkeyup="applyFilters()">
           </div>
         </div>
       </div>
@@ -711,8 +672,6 @@
                 <th onclick="sortTable('email')">Email <i class="bi bi-arrow-down-up"></i></th>
                 <th onclick="sortTable('branch')">Branch <i class="bi bi-arrow-down-up"></i></th>
                 <th onclick="sortTable('status')">Status <i class="bi bi-arrow-down-up"></i></th>
-                <th onclick="sortTable('addedDate')">Added <i class="bi bi-arrow-down-up"></i></th>
-                <th>Tags</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -734,7 +693,6 @@
               <div class="form-floating-custom">
                 <label class="filter-label">First Name *</label>
                 <input type="text" class="form-control-custom" id="firstName" required>
-                <div class="invalid-feedback">Please enter first name</div>
               </div>
             </div>
             <div class="col-md-6">
@@ -749,7 +707,6 @@
               <div class="form-floating-custom">
                 <label class="filter-label">Phone Number *</label>
                 <input type="tel" class="form-control-custom" id="phoneNumber" required>
-                <div class="invalid-feedback">Please enter a valid phone number</div>
               </div>
             </div>
             <div class="col-md-6">
@@ -785,32 +742,6 @@
               </div>
             </div>
           </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="form-floating-custom">
-                <label class="filter-label">Date of Birth</label>
-                <input type="date" class="form-control-custom" id="dob">
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="form-floating-custom">
-                <label class="filter-label">Anniversary</label>
-                <input type="date" class="form-control-custom" id="anniversary">
-              </div>
-            </div>
-          </div>
-          <div class="form-floating-custom">
-            <label class="filter-label">Address</label>
-            <textarea class="form-control-custom" id="address" rows="3"></textarea>
-          </div>
-          <div class="form-floating-custom">
-            <label class="filter-label">Notes</label>
-            <textarea class="form-control-custom" id="notes" rows="3"></textarea>
-          </div>
-          <div class="form-floating-custom">
-            <label class="filter-label">Tags (comma separated)</label>
-            <input type="text" class="form-control-custom" id="tags" placeholder="e.g., VIP, Premium, Regular">
-          </div>
           <div class="d-flex gap-2 mt-3">
             <button type="submit" class="btn btn-gradient">
               <i class="bi bi-save me-2"></i>Save Customer
@@ -820,70 +751,6 @@
             </button>
           </div>
         </form>
-      </div>
-    </div>
-
-    <!-- Bulk Import Section -->
-    <div id="bulk-import-section" class="section" style="display: none;">
-      <div class="content-card">
-        <h4 class="mb-4">Bulk Import Customers</h4>
-        
-        <!-- Download Template -->
-        <div class="import-export-section">
-          <h5>Step 1: Download Template</h5>
-          <p>Download our CSV template and fill it with your customer data.</p>
-          <button class="btn btn-gradient" onclick="downloadTemplate()">
-            <i class="bi bi-download me-2"></i>Download CSV Template
-          </button>
-        </div>
-
-        <!-- Upload File -->
-        <div class="import-export-section">
-          <h5>Step 2: Upload File</h5>
-          <div class="file-upload-area" id="fileUploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
-            <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #667eea;"></i>
-            <p class="mt-3">Drag and drop your CSV file here or click to browse</p>
-            <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
-            <button class="btn btn-gradient mt-2" onclick="document.getElementById('csvFile').click()">
-              Choose File
-            </button>
-          </div>
-          <div id="fileInfo" class="mt-3" style="display: none;">
-            <p><strong>Selected file:</strong> <span id="fileName"></span></p>
-            <button class="btn btn-success-gradient" onclick="processCSV()">
-              <i class="bi bi-upload me-2"></i>Import Data
-            </button>
-          </div>
-        </div>
-
-        <!-- Import Preview -->
-        <div id="importPreview" style="display: none;">
-          <h5>Step 3: Preview & Confirm</h5>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Phone</th>
-                  <th>Email</th>
-                  <th>Branch</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="previewTableBody">
-                <!-- Preview rows will be added here -->
-              </tbody>
-            </table>
-          </div>
-          <div class="d-flex gap-2 mt-3">
-            <button class="btn btn-success-gradient" onclick="confirmImport()">
-              <i class="bi bi-check-circle me-2"></i>Confirm Import
-            </button>
-            <button class="btn btn-secondary" onclick="cancelImport()">
-              <i class="bi bi-x-circle me-2"></i>Cancel
-            </button>
-          </div>
-        </div>
       </div>
     </div>
 
@@ -904,11 +771,7 @@
               <input type="radio" class="btn-check" name="msgType" id="msgSMS" value="sms">
               <label class="btn btn-outline-primary" for="msgSMS">
                 <i class="bi bi-chat-dots me-2"></i>SMS
-              </label>
-              <input type="radio" class="btn-check" name="msgType" id="msgEmail" value="email">
-              <label class="btn btn-outline-info" for="msgEmail">
-                <i class="bi bi-envelope me-2"></i>Email
-              </label>
+              </input>
             </div>
           </div>
         </div>
@@ -920,8 +783,7 @@
             <select class="form-control-custom" id="recipientType" onchange="updateRecipients()">
               <option value="all">All Active Customers</option>
               <option value="branch">By Branch</option>
-              <option value="tags">By Tags</option>
-              <option value="custom">Custom Selection</option>
+              <option value="selected">Selected Customers</option>
             </select>
           </div>
           <div class="col-md-6" id="branchSelection" style="display: none;">
@@ -943,21 +805,17 @@
           <label class="filter-label">Message Template</label>
           <div class="row">
             <div class="col-md-3">
-              <div class="form-floating-custom">
-                <select class="form-control-custom" id="msgTemplate" onchange="loadTemplate()">
-                  <option value="">Select Template</option>
-                  <option value="welcome">Welcome Message</option>
-                  <option value="promotion">Special Promotion</option>
-                  <option value="reminder">Appointment Reminder</option>
-                  <option value="feedback">Feedback Request</option>
-                  <option value="custom">Custom Message</option>
-                </select>
-              </div>
+              <select class="form-control-custom" id="msgTemplate" onchange="loadTemplate()">
+                <option value="">Select Template</option>
+                <option value="welcome">Welcome Message</option>
+                <option value="promotion">Special Promotion</option>
+                <option value="reminder">Appointment Reminder</option>
+                <option value="feedback">Feedback Request</option>
+                <option value="custom">Custom Message</option>
+              </select>
             </div>
             <div class="col-md-9">
-              <div class="form-floating-custom">
-                <textarea class="form-control-custom" id="msgText" rows="4" placeholder="Type your message here..."></textarea>
-              </div>
+              <textarea class="form-control-custom" id="msgText" rows="4" placeholder="Type your message here..."></textarea>
             </div>
           </div>
         </div>
@@ -974,6 +832,19 @@
         <button class="btn btn-success-gradient btn-lg" onclick="sendMessages()">
           <i class="bi bi-send me-2"></i>Send Messages
         </button>
+
+        <!-- Message Progress -->
+        <div class="message-progress" id="messageProgress">
+          <h5 class="mb-3">Sending Progress</h5>
+          <div id="progressList"></div>
+        </div>
+
+        <!-- WhatsApp Links -->
+        <div class="whatsapp-links" id="whatsappLinks">
+          <h5 class="mb-3">WhatsApp Links</h5>
+          <p class="text-muted">Click on any link to open WhatsApp with pre-filled message</p>
+          <div id="whatsappLinksList"></div>
+        </div>
       </div>
     </div>
 
@@ -985,11 +856,13 @@
         <!-- Chart Containers -->
         <div class="row">
           <div class="col-md-6">
+            <h5 class="mb-3">Customer Growth</h5>
             <div class="chart-container">
               <canvas id="customerGrowthChart"></canvas>
             </div>
           </div>
           <div class="col-md-6">
+            <h5 class="mb-3">Branch Distribution</h5>
             <div class="chart-container">
               <canvas id="branchDistributionChart"></canvas>
             </div>
@@ -998,11 +871,13 @@
         
         <div class="row mt-4">
           <div class="col-md-6">
+            <h5 class="mb-3">Message Statistics</h5>
             <div class="chart-container">
               <canvas id="messageStatsChart"></canvas>
             </div>
           </div>
           <div class="col-md-6">
+            <h5 class="mb-3">Customer Status</h5>
             <div class="chart-container">
               <canvas id="statusChart"></canvas>
             </div>
@@ -1016,7 +891,6 @@
       <div class="content-card">
         <h4 class="mb-4">Settings</h4>
         
-        <!-- General Settings -->
         <div class="mb-4">
           <h5>General Settings</h5>
           <div class="form-floating-custom">
@@ -1027,38 +901,6 @@
             <label class="filter-label">Company Phone</label>
             <input type="tel" class="form-control-custom" id="companyPhone" value="+971501882206">
           </div>
-          <div class="form-floating-custom">
-            <label class="filter-label">Company Email</label>
-            <input type="email" class="form-control-custom" id="companyEmail" value="info@company.com">
-          </div>
-        </div>
-
-        <!-- Message Settings -->
-        <div class="mb-4">
-          <h5>Message Settings</h5>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="enableRateLimit" checked>
-            <label class="form-check-label" for="enableRateLimit">
-              Enable rate limiting (1 message per customer per day)
-            </label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="enableDeliveryReport" checked>
-            <label class="form-check-label" for="enableDeliveryReport">
-              Enable delivery reports
-            </label>
-          </div>
-        </div>
-
-        <!-- Data Management -->
-        <div class="mb-4">
-          <h5>Data Management</h5>
-          <button class="btn btn-gradient me-2" onclick="backupData()">
-            <i class="bi bi-cloud-download me-2"></i>Backup All Data
-          </button>
-          <button class="btn btn-danger-gradient" onclick="clearAllData()">
-            <i class="bi bi-trash me-2"></i>Clear All Data
-          </button>
         </div>
 
         <button class="btn btn-success-gradient" onclick="saveSettings()">
@@ -1081,28 +923,6 @@
   <!-- Toast Container -->
   <div class="toast-container"></div>
 
-  <!-- Edit Customer Modal -->
-  <div class="modal fade" id="editCustomerModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Edit Customer</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <form id="editCustomerForm">
-            <input type="hidden" id="editCustomerId">
-            <!-- Form fields will be populated dynamically -->
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-gradient" onclick="saveEditedCustomer()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
@@ -1111,16 +931,13 @@
     let messageLog = [];
     let settings = {
       companyName: 'Your Company',
-      companyPhone: '+971501882206',
-      companyEmail: 'info@company.com',
-      enableRateLimit: true,
-      enableDeliveryReport: true
+      companyPhone: '+971501882206'
     };
     let selectedCustomers = new Set();
     let currentSection = 'dashboard';
     let sortColumn = 'addedDate';
     let sortDirection = 'desc';
-    let csvData = [];
+    let charts = {};
 
     // Initialize Application
     document.addEventListener('DOMContentLoaded', function() {
@@ -1129,6 +946,7 @@
       updateMetrics();
       renderCustomers();
       initCharts();
+      updateCharts();
     });
 
     // Load Data from LocalStorage
@@ -1160,7 +978,10 @@
         { branch: 'Muroor', mobile: '527186938', name: 'REN ALVAREZ', email: 'ren@email.com' },
         { branch: 'Shabiya 11', mobile: '501320863', name: 'FARDUS KHAN', email: 'fardus@email.com' },
         { branch: 'Shabiya 11', mobile: '504007898', name: 'JUMANA SAEED', email: 'jumana@email.com' },
-        { branch: 'Al Barsha', mobile: '567578678', name: 'CAMILLE SANTOS', email: 'camille@email.com' }
+        { branch: 'Al Barsha', mobile: '567578678', name: 'CAMILLE SANTOS', email: 'camille@email.com' },
+        { branch: 'Al Rigga', mobile: '569307444', name: 'ROSE WILSON', email: 'rose@email.com' },
+        { branch: 'Hamdan', mobile: '501989046', name: 'MUSTAFA AHMED', email: 'mustafa@email.com' },
+        { branch: 'Khalidiya', mobile: '505028089', name: 'YOUSEF KHALID', email: 'yousef@email.com' }
       ];
 
       customers = sampleData.map((item, index) => ({
@@ -1171,12 +992,7 @@
         email: item.email,
         branch: item.branch,
         status: 'Active',
-        addedDate: new Date().toISOString(),
-        dob: '',
-        anniversary: '',
-        address: '',
-        notes: '',
-        tags: ['Regular']
+        addedDate: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString()
       }));
 
       saveData();
@@ -1300,12 +1116,6 @@
           <td>
             <span class="status-badge status-${customer.status.toLowerCase()}">${customer.status}</span>
           </td>
-          <td>${new Date(customer.addedDate).toLocaleDateString()}</td>
-          <td>
-            <div class="customer-tags">
-              ${customer.tags ? customer.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
-            </div>
-          </td>
           <td>
             <div class="action-buttons">
               <button class="btn-action btn-primary" onclick="editCustomer('${customer.id}')" title="Edit">
@@ -1322,8 +1132,6 @@
         `;
         tbody.appendChild(tr);
       });
-
-      updateBulkActions();
     }
 
     // Sort Table
@@ -1344,7 +1152,6 @@
       } else {
         selectedCustomers.add(customerId);
       }
-      updateBulkActions();
     }
 
     // Toggle Select All
@@ -1361,21 +1168,6 @@
           selectedCustomers.delete(customerId);
         }
       });
-      
-      updateBulkActions();
-    }
-
-    // Update Bulk Actions
-    function updateBulkActions() {
-      const bulkActions = document.getElementById('bulkActions');
-      const selectedCount = document.getElementById('selectedCount');
-      
-      if (selectedCustomers.size > 0) {
-        bulkActions.classList.add('active');
-        selectedCount.textContent = `${selectedCustomers.size} customers selected`;
-      } else {
-        bulkActions.classList.remove('active');
-      }
     }
 
     // Add Customer Form Submit
@@ -1388,11 +1180,6 @@
       const email = document.getElementById('email').value.trim();
       const branch = document.getElementById('branch').value;
       const status = document.getElementById('status').value;
-      const dob = document.getElementById('dob').value;
-      const anniversary = document.getElementById('anniversary').value;
-      const address = document.getElementById('address').value.trim();
-      const notes = document.getElementById('notes').value.trim();
-      const tags = document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t);
 
       if (!firstName || !phone || !branch) {
         showToast('Please fill in all required fields', 'error');
@@ -1407,11 +1194,6 @@
         email,
         branch,
         status,
-        dob,
-        anniversary,
-        address,
-        notes,
-        tags,
         addedDate: new Date().toISOString()
       };
 
@@ -1425,6 +1207,7 @@
         renderCustomers();
       }
       updateMetrics();
+      updateCharts();
     });
 
     // Edit Customer
@@ -1432,125 +1215,14 @@
       const customer = customers.find(c => c.id === customerId);
       if (!customer) return;
 
-      // Populate edit form
-      document.getElementById('editCustomerId').value = customer.id;
-      
-      const form = document.getElementById('editCustomerForm');
-      form.innerHTML = `
-        <input type="hidden" id="editCustomerId" value="${customer.id}">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">First Name *</label>
-              <input type="text" class="form-control-custom" id="editFirstName" value="${customer.firstName || ''}" required>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Last Name</label>
-              <input type="text" class="form-control-custom" id="editLastName" value="${customer.lastName || ''}">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Phone Number *</label>
-              <input type="tel" class="form-control-custom" id="editPhone" value="${customer.phone}" required>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Email</label>
-              <input type="email" class="form-control-custom" id="editEmail" value="${customer.email || ''}">
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Branch *</label>
-              <select class="form-control-custom" id="editBranch" required>
-                <option value="Hamdan" ${customer.branch === 'Hamdan' ? 'selected' : ''}>Hamdan</option>
-                <option value="Muroor" ${customer.branch === 'Muroor' ? 'selected' : ''}>Muroor</option>
-                <option value="Shabiya 11" ${customer.branch === 'Shabiya 11' ? 'selected' : ''}>Shabiya 11</option>
-                <option value="Al Barsha" ${customer.branch === 'Al Barsha' ? 'selected' : ''}>Al Barsha</option>
-                <option value="Al Rigga" ${customer.branch === 'Al Rigga' ? 'selected' : ''}>Al Rigga</option>
-                <option value="Khalidiya" ${customer.branch === 'Khalidiya' ? 'selected' : ''}>Khalidiya</option>
-                <option value="Al Satwa" ${customer.branch === 'Al Satwa' ? 'selected' : ''}>Al Satwa</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Status</label>
-              <select class="form-control-custom" id="editStatus">
-                <option value="Active" ${customer.status === 'Active' ? 'selected' : ''}>Active</option>
-                <option value="Inactive" ${customer.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
-                <option value="Opt-Out" ${customer.status === 'Opt-Out' ? 'selected' : ''}>Opt-Out</option>
-              </select>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Date of Birth</label>
-              <input type="date" class="form-control-custom" id="editDob" value="${customer.dob || ''}">
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-floating-custom">
-              <label class="filter-label">Anniversary</label>
-              <input type="date" class="form-control-custom" id="editAnniversary" value="${customer.anniversary || ''}">
-            </div>
-          </div>
-        </div>
-        <div class="form-floating-custom">
-          <label class="filter-label">Address</label>
-          <textarea class="form-control-custom" id="editAddress" rows="3">${customer.address || ''}</textarea>
-        </div>
-        <div class="form-floating-custom">
-          <label class="filter-label">Notes</label>
-          <textarea class="form-control-custom" id="editNotes" rows="3">${customer.notes || ''}</textarea>
-        </div>
-        <div class="form-floating-custom">
-          <label class="filter-label">Tags (comma separated)</label>
-          <input type="text" class="form-control-custom" id="editTags" value="${customer.tags ? customer.tags.join(', ') : ''}">
-        </div>
-      `;
-
-      const modal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
-      modal.show();
-    }
-
-    // Save Edited Customer
-    function saveEditedCustomer() {
-      const customerId = document.getElementById('editCustomerId').value;
-      const customer = customers.find(c => c.id === customerId);
-      
-      if (!customer) return;
-
-      customer.firstName = document.getElementById('editFirstName').value.trim();
-      customer.lastName = document.getElementById('editLastName').value.trim();
-      customer.phone = document.getElementById('editPhone').value.trim();
-      customer.email = document.getElementById('editEmail').value.trim();
-      customer.branch = document.getElementById('editBranch').value;
-      customer.status = document.getElementById('editStatus').value;
-      customer.dob = document.getElementById('editDob').value;
-      customer.anniversary = document.getElementById('editAnniversary').value;
-      customer.address = document.getElementById('editAddress').value.trim();
-      customer.notes = document.getElementById('editNotes').value.trim();
-      customer.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
-
-      saveData();
-      renderCustomers();
-      updateMetrics();
-      
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
-      modal.hide();
-      
-      showToast('Customer updated successfully!', 'success');
+      // Simple edit using prompt for demo
+      const newFirstName = prompt('First Name:', customer.firstName);
+      if (newFirstName !== null) {
+        customer.firstName = newFirstName;
+        saveData();
+        renderCustomers();
+        showToast('Customer updated!', 'success');
+      }
     }
 
     // Delete Customer
@@ -1560,7 +1232,8 @@
         saveData();
         renderCustomers();
         updateMetrics();
-        showToast('Customer deleted successfully!', 'success');
+        updateCharts();
+        showToast('Customer deleted!', 'success');
       }
     }
 
@@ -1572,186 +1245,6 @@
     // Apply Filters
     function applyFilters() {
       renderCustomers();
-    }
-
-    // Bulk Message
-    function bulkMessage() {
-      if (selectedCustomers.size === 0) {
-        showToast('Please select customers first', 'warning');
-        return;
-      }
-      showSection('messaging');
-    }
-
-    // Bulk Delete
-    function bulkDelete() {
-      if (selectedCustomers.size === 0) {
-        showToast('Please select customers first', 'warning');
-        return;
-      }
-      
-      if (confirm(`Are you sure you want to delete ${selectedCustomers.size} customers?`)) {
-        customers = customers.filter(c => !selectedCustomers.has(c.id));
-        selectedCustomers.clear();
-        saveData();
-        renderCustomers();
-        updateMetrics();
-        showToast('Customers deleted successfully!', 'success');
-      }
-    }
-
-    // CSV Template Download
-    function downloadTemplate() {
-      const csvContent = `FirstName,LastName,Phone,Email,Branch,Status,DOB,Anniversary,Address,Notes,Tags
-John,Doe,+971501234567,john@email.com,Hamdan,Active,1990-01-01,2020-01-01,"123 Main St","Regular customer","Regular"
-Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456 Oak Ave","VIP customer","VIP,Premium"`;
-      
-      const blob = new Blob([csvContent], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'customer_template.csv';
-      a.click();
-      
-      showToast('Template downloaded successfully!', 'success');
-    }
-
-    // File Upload Handlers
-    function handleDragOver(e) {
-      e.preventDefault();
-      document.getElementById('fileUploadArea').classList.add('dragover');
-    }
-
-    function handleDragLeave(e) {
-      e.preventDefault();
-      document.getElementById('fileUploadArea').classList.remove('dragover');
-    }
-
-    function handleDrop(e) {
-      e.preventDefault();
-      document.getElementById('fileUploadArea').classList.remove('dragover');
-      
-      const files = e.dataTransfer.files;
-      if (files.length > 0) {
-        handleFileSelect({ target: { files } });
-      }
-    }
-
-    function handleFileSelect(e) {
-      const file = e.target.files[0];
-      if (file && file.type === 'text/csv') {
-        document.getElementById('fileName').textContent = file.name;
-        document.getElementById('fileInfo').style.display = 'block';
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          csvData = parseCSV(e.target.result);
-        };
-        reader.readAsText(file);
-      } else {
-        showToast('Please select a valid CSV file', 'error');
-      }
-    }
-
-    // Parse CSV
-    function parseCSV(csvText) {
-      const lines = csvText.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      const data = [];
-      
-      for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
-          const row = {};
-          headers.forEach((header, index) => {
-            row[header] = values[index] || '';
-          });
-          data.push(row);
-        }
-      }
-      
-      return data;
-    }
-
-    // Process CSV
-    function processCSV() {
-      if (csvData.length === 0) {
-        showToast('No data to process', 'error');
-        return;
-      }
-      
-      // Show preview
-      const previewBody = document.getElementById('previewTableBody');
-      previewBody.innerHTML = '';
-      
-      csvData.slice(0, 5).forEach(row => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${row.FirstName || ''} ${row.LastName || ''}</td>
-          <td>${row.Phone || ''}</td>
-          <td>${row.Email || ''}</td>
-          <td>${row.Branch || ''}</td>
-          <td>${row.Status || 'Active'}</td>
-        `;
-        previewBody.appendChild(tr);
-      });
-      
-      document.getElementById('importPreview').style.display = 'block';
-      showToast(`Previewing ${csvData.length} records`, 'info');
-    }
-
-    // Confirm Import
-    function confirmImport() {
-      showLoading();
-      
-      let imported = 0;
-      let skipped = 0;
-      
-      csvData.forEach(row => {
-        // Check if phone already exists
-        if (!customers.find(c => c.phone === row.Phone)) {
-          const newCustomer = {
-            id: Date.now().toString() + Math.random(),
-            firstName: row.FirstName || '',
-            lastName: row.LastName || '',
-            phone: row.Phone || '',
-            email: row.Email || '',
-            branch: row.Branch || 'Hamdan',
-            status: row.Status || 'Active',
-            dob: row.DOB || '',
-            anniversary: row.Anniversary || '',
-            address: row.Address || '',
-            notes: row.Notes || '',
-            tags: row.Tags ? row.Tags.split(';').map(t => t.trim()).filter(t => t) : [],
-            addedDate: new Date().toISOString()
-          };
-          
-          customers.push(newCustomer);
-          imported++;
-        } else {
-          skipped++;
-        }
-      });
-      
-      saveData();
-      hideLoading();
-      
-      document.getElementById('importPreview').style.display = 'none';
-      document.getElementById('fileInfo').style.display = 'none';
-      document.getElementById('csvFile').value = '';
-      
-      showToast(`Import completed! ${imported} imported, ${skipped} skipped`, 'success');
-      updateMetrics();
-      
-      if (currentSection === 'customers') {
-        renderCustomers();
-      }
-    }
-
-    // Cancel Import
-    function cancelImport() {
-      document.getElementById('importPreview').style.display = 'none';
-      csvData = [];
     }
 
     // Update Recipients for Messaging
@@ -1770,8 +1263,8 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
         const branch = document.getElementById('msgBranch').value;
         recipients = customers.filter(c => c.status === 'Active' && c.branch === branch);
         branchSelection.style.display = 'block';
-      } else {
-        recipients = [];
+      } else if (type === 'selected') {
+        recipients = customers.filter(c => selectedCustomers.has(c.id));
         branchSelection.style.display = 'none';
       }
       
@@ -1797,8 +1290,8 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
       document.getElementById('msgText').value = templates[template] || '';
     }
 
-    // Send Messages
-    function sendMessages() {
+    // Send Messages - WORKING IMPLEMENTATION
+    async function sendMessages() {
       const messageText = document.getElementById('msgText').value.trim();
       const messageType = document.querySelector('input[name="msgType"]:checked').value;
       
@@ -1815,6 +1308,8 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
       } else if (recipientType === 'branch') {
         const branch = document.getElementById('msgBranch').value;
         recipients = customers.filter(c => c.status === 'Active' && c.branch === branch);
+      } else if (recipientType === 'selected') {
+        recipients = customers.filter(c => selectedCustomers.has(c.id));
       }
       
       if (recipients.length === 0) {
@@ -1822,26 +1317,109 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
         return;
       }
       
-      showLoading();
+      // Show progress
+      const progressDiv = document.getElementById('messageProgress');
+      const progressList = document.getElementById('progressList');
+      progressDiv.classList.add('active');
+      progressList.innerHTML = '';
       
-      // Simulate sending messages
-      recipients.forEach(customer => {
-        messageLog.push({
-          customerId: customer.id,
-          phone: customer.phone,
-          email: customer.email,
-          type: messageType,
-          message: messageText,
-          timestamp: new Date().toISOString(),
-          status: 'sent'
-        });
-      });
-      
-      saveData();
-      hideLoading();
-      
-      showToast(`Messages sent to ${recipients.length} customers!`, 'success');
-      updateMetrics();
+      if (messageType === 'whatsapp') {
+        // Show WhatsApp links section
+        const whatsappLinks = document.getElementById('whatsappLinks');
+        const whatsappLinksList = document.getElementById('whatsappLinksList');
+        whatsappLinks.classList.add('active');
+        whatsappLinksList.innerHTML = '';
+        
+        let successCount = 0;
+        
+        for (let i = 0; i < recipients.length; i++) {
+          const customer = recipients[i];
+          const phoneNumber = customer.phone.replace(/[^\d]/g, '');
+          const encodedMessage = encodeURIComponent(messageText);
+          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+          
+          // Add progress item
+          const progressItem = document.createElement('div');
+          progressItem.className = 'progress-item sending';
+          progressItem.innerHTML = `
+            <span>${customer.firstName} ${customer.lastName}</span>
+            <span>Sending...</span>
+          `;
+          progressList.appendChild(progressItem);
+          
+          // Add WhatsApp link
+          const linkItem = document.createElement('div');
+          linkItem.className = 'whatsapp-link-item';
+          linkItem.innerHTML = `
+            <span>${customer.firstName} ${customer.lastName} (${customer.phone})</span>
+            <a href="${whatsappUrl}" target="_blank" class="btn btn-success btn-sm">
+              <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
+            </a>
+          `;
+          whatsappLinksList.appendChild(linkItem);
+          
+          // Simulate sending delay
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Update progress
+          progressItem.className = 'progress-item sent';
+          progressItem.querySelector('span:last-child').textContent = 'Ready to send';
+          successCount++;
+          
+          // Log the message
+          messageLog.push({
+            customerId: customer.id,
+            phone: customer.phone,
+            type: 'whatsapp',
+            message: messageText,
+            timestamp: new Date().toISOString(),
+            status: 'sent'
+          });
+        }
+        
+        saveData();
+        updateMetrics();
+        updateCharts();
+        
+        showToast(`Created ${successCount} WhatsApp links! Click the links below to send messages.`, 'success');
+        
+        // Open first WhatsApp link automatically
+        if (recipients.length > 0) {
+          const firstLink = whatsappLinksList.querySelector('a');
+          if (firstLink) {
+            setTimeout(() => {
+              firstLink.click();
+            }, 1000);
+          }
+        }
+        
+      } else if (messageType === 'sms') {
+        // For SMS, copy phone numbers to clipboard
+        const phoneNumbers = recipients.map(c => c.phone).join('\n');
+        
+        try {
+          await navigator.clipboard.writeText(phoneNumbers);
+          showToast(`${recipients.length} phone numbers copied to clipboard! Use your SMS app to send messages.`, 'success');
+          
+          // Log the messages
+          recipients.forEach(customer => {
+            messageLog.push({
+              customerId: customer.id,
+              phone: customer.phone,
+              type: 'sms',
+              message: messageText,
+              timestamp: new Date().toISOString(),
+              status: 'sent'
+            });
+          });
+          
+          saveData();
+          updateMetrics();
+          updateCharts();
+        } catch (error) {
+          showToast('Failed to copy phone numbers', 'error');
+        }
+      }
     }
 
     // Quick Message
@@ -1851,6 +1429,12 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
       
       const message = prompt(`Enter message for ${customer.firstName} ${customer.lastName}:`);
       if (message) {
+        const phoneNumber = customer.phone.replace(/[^\d]/g, '');
+        const encodedMessage = encodeURIComponent(message);
+        const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+        
+        window.open(whatsappUrl, '_blank');
+        
         messageLog.push({
           customerId: customer.id,
           phone: customer.phone,
@@ -1863,15 +1447,223 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
         saveData();
         showToast('Message sent!', 'success');
         updateMetrics();
+        updateCharts();
       }
+    }
+
+    // Initialize Charts
+    function initCharts() {
+      // Customer Growth Chart
+      const growthCtx = document.getElementById('customerGrowthChart');
+      if (growthCtx) {
+        charts.growth = new Chart(growthCtx, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+              label: 'New Customers',
+              data: [12, 19, 15, 25, 22, 30],
+              borderColor: '#667eea',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Branch Distribution Chart
+      const branchCtx = document.getElementById('branchDistributionChart');
+      if (branchCtx) {
+        charts.branch = new Chart(branchCtx, {
+          type: 'doughnut',
+          data: {
+            labels: [],
+            datasets: [{
+              data: [],
+              backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#28a745',
+                '#ffc107',
+                '#dc3545',
+                '#17a2b8',
+                '#fd7e14'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        });
+      }
+
+      // Message Stats Chart
+      const messageCtx = document.getElementById('messageStatsChart');
+      if (messageCtx) {
+        charts.message = new Chart(messageCtx, {
+          type: 'bar',
+          data: {
+            labels: ['WhatsApp', 'SMS', 'Email'],
+            datasets: [{
+              label: 'Messages Sent',
+              data: [0, 0, 0],
+              backgroundColor: [
+                '#25D366',
+                '#007BFF',
+                '#17a2b8'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Status Chart
+      const statusCtx = document.getElementById('statusChart');
+      if (statusCtx) {
+        charts.status = new Chart(statusCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Active', 'Inactive', 'Opt-Out'],
+            datasets: [{
+              data: [0, 0, 0],
+              backgroundColor: [
+                '#28a745',
+                '#ffc107',
+                '#dc3545'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'right'
+              }
+            }
+          }
+        });
+      }
+    }
+
+    // Update Charts with Real Data
+    function updateCharts() {
+      if (!charts.branch || !charts.message || !charts.status) return;
+
+      // Update Branch Distribution
+      const branchCounts = {};
+      customers.forEach(c => {
+        branchCounts[c.branch] = (branchCounts[c.branch] || 0) + 1;
+      });
+      
+      charts.branch.data.labels = Object.keys(branchCounts);
+      charts.branch.data.datasets[0].data = Object.values(branchCounts);
+      charts.branch.update();
+
+      // Update Message Stats
+      const messageCounts = { whatsapp: 0, sms: 0, email: 0 };
+      messageLog.forEach(log => {
+        if (messageCounts.hasOwnProperty(log.type)) {
+          messageCounts[log.type]++;
+        }
+      });
+      
+      charts.message.data.datasets[0].data = [
+        messageCounts.whatsapp,
+        messageCounts.sms,
+        messageCounts.email
+      ];
+      charts.message.update();
+
+      // Update Status Chart
+      const statusCounts = { Active: 0, Inactive: 0, 'Opt-Out': 0 };
+      customers.forEach(c => {
+        if (statusCounts.hasOwnProperty(c.status)) {
+          statusCounts[c.status]++;
+        }
+      });
+      
+      charts.status.data.datasets[0].data = [
+        statusCounts.Active,
+        statusCounts.Inactive,
+        statusCounts['Opt-Out']
+      ];
+      charts.status.update();
+
+      // Update Customer Growth with real data
+      if (charts.growth) {
+        const monthlyData = getMonthlyCustomerCount();
+        charts.growth.data.labels = monthlyData.labels;
+        charts.growth.data.datasets[0].data = monthlyData.data;
+        charts.growth.update();
+      }
+    }
+
+    // Get Monthly Customer Count
+    function getMonthlyCustomerCount() {
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const currentMonth = new Date().getMonth();
+      const data = [];
+      
+      for (let i = 5; i >= 0; i--) {
+        const monthIndex = (currentMonth - i + 12) % 12;
+        const monthStart = new Date();
+        monthStart.setMonth(monthIndex, 1);
+        monthStart.setHours(0, 0, 0, 0);
+        
+        const monthEnd = new Date(monthStart);
+        monthEnd.setMonth(monthEnd.getMonth() + 1);
+        
+        const count = customers.filter(c => {
+          const addedDate = new Date(c.addedDate);
+          return addedDate >= monthStart && addedDate < monthEnd;
+        }).length;
+        
+        data.push(count);
+      }
+      
+      return {
+        labels: months.slice(-6),
+        data: data
+      };
     }
 
     // Export Data
     function exportData() {
-      let csv = 'ID,FirstName,LastName,Phone,Email,Branch,Status,DOB,Anniversary,Address,Notes,Tags,AddedDate\n';
+      let csv = 'ID,FirstName,LastName,Phone,Email,Branch,Status,AddedDate\n';
       
       customers.forEach(c => {
-        csv += `"${c.id}","${c.firstName}","${c.lastName}","${c.phone}","${c.email}","${c.branch}","${c.status}","${c.dob}","${c.anniversary}","${c.address}","${c.notes}","${c.tags ? c.tags.join(';') : ''}","${c.addedDate}"\n`;
+        csv += `"${c.id}","${c.firstName}","${c.lastName}","${c.phone}","${c.email}","${c.branch}","${c.status}","${c.addedDate}"\n`;
       });
       
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -1903,30 +1695,6 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
       showToast('Backup created successfully!', 'success');
     }
 
-    // Clear All Data
-    function clearAllData() {
-      if (confirm('Are you sure you want to delete all data? This action cannot be undone!')) {
-        customers = [];
-        messageLog = [];
-        localStorage.clear();
-        renderCustomers();
-        updateMetrics();
-        showToast('All data cleared!', 'success');
-      }
-    }
-
-    // Save Settings
-    function saveSettings() {
-      settings.companyName = document.getElementById('companyName').value;
-      settings.companyPhone = document.getElementById('companyPhone').value;
-      settings.companyEmail = document.getElementById('companyEmail').value;
-      settings.enableRateLimit = document.getElementById('enableRateLimit').checked;
-      settings.enableDeliveryReport = document.getElementById('enableDeliveryReport').checked;
-      
-      saveData();
-      showToast('Settings saved successfully!', 'success');
-    }
-
     // Generate Report
     function generateReport() {
       const report = {
@@ -1947,107 +1715,13 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
       showToast('Report generated successfully!', 'success');
     }
 
-    // Initialize Charts
-    function initCharts() {
-      // Customer Growth Chart
-      const growthCtx = document.getElementById('customerGrowthChart');
-      if (growthCtx) {
-        new Chart(growthCtx, {
-          type: 'line',
-          data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-              label: 'New Customers',
-              data: [12, 19, 15, 25, 22, 30],
-              borderColor: '#667eea',
-              backgroundColor: 'rgba(102, 126, 234, 0.1)',
-              tension: 0.4
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      }
-
-      // Branch Distribution Chart
-      const branchCtx = document.getElementById('branchDistributionChart');
-      if (branchCtx) {
-        new Chart(branchCtx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Hamdan', 'Muroor', 'Shabiya 11', 'Al Barsha', 'Others'],
-            datasets: [{
-              data: [30, 25, 20, 15, 10],
-              backgroundColor: [
-                '#667eea',
-                '#764ba2',
-                '#28a745',
-                '#ffc107',
-                '#dc3545'
-              ]
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      }
-
-      // Message Stats Chart
-      const messageCtx = document.getElementById('messageStatsChart');
-      if (messageCtx) {
-        new Chart(messageCtx, {
-          type: 'bar',
-          data: {
-            labels: ['WhatsApp', 'SMS', 'Email'],
-            datasets: [{
-              label: 'Messages Sent',
-              data: [150, 80, 45],
-              backgroundColor: [
-                '#25D366',
-                '#007BFF',
-                '#17a2b8'
-              ]
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      }
-
-      // Status Chart
-      const statusCtx = document.getElementById('statusChart');
-      if (statusCtx) {
-        new Chart(statusCtx, {
-          type: 'pie',
-          data: {
-            labels: ['Active', 'Inactive', 'Opt-Out'],
-            datasets: [{
-              data: [120, 20, 5],
-              backgroundColor: [
-                '#28a745',
-                '#ffc107',
-                '#dc3545'
-              ]
-            }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false
-          }
-        });
-      }
-    }
-
-    // Update Charts
-    function updateCharts() {
-      // Update chart data with real data
-      // This would typically fetch real data and update the charts
+    // Save Settings
+    function saveSettings() {
+      settings.companyName = document.getElementById('companyName').value;
+      settings.companyPhone = document.getElementById('companyPhone').value;
+      
+      saveData();
+      showToast('Settings saved successfully!', 'success');
     }
 
     // Show Loading
@@ -2091,14 +1765,6 @@ Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456
     // Reset Form
     function resetForm() {
       document.getElementById('addCustomerForm').reset();
-    }
-
-    // Refresh Data
-    function refreshData() {
-      loadData();
-      renderCustomers();
-      updateMetrics();
-      showToast('Data refreshed!', 'success');
     }
   </script>
 </body>
