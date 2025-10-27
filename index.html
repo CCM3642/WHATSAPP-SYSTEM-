@@ -447,6 +447,66 @@
       display: none;
     }
 
+    .whatsapp-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .whatsapp-modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 15px;
+      width: 80%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .whatsapp-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .whatsapp-modal-title {
+      color: #25D366;
+      font-weight: bold;
+      font-size: 1.5rem;
+    }
+
+    .whatsapp-link-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .whatsapp-link-item {
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 8px;
+      background-color: #f8f9fa;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .whatsapp-link-button {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
     @media (max-width: 768px) {
       .card-metric h2 {
         font-size: 2rem;
@@ -485,6 +545,22 @@
   <!-- Debug Info -->
   <div class="debug-info" id="debugInfo">
     Debug: Initializing...
+  </div>
+
+  <!-- WhatsApp Modal -->
+  <div class="whatsapp-modal" id="whatsappModal">
+    <div class="whatsapp-modal-content">
+      <div class="whatsapp-modal-header">
+        <h3 class="whatsapp-modal-title">
+          <i class="bi bi-whatsapp me-2"></i>WhatsApp Links
+        </h3>
+        <button class="btn-close" onclick="closeWhatsAppModal()"></button>
+      </div>
+      <div class="whatsapp-modal-body">
+        <p>Click on any link to open WhatsApp with pre-filled message:</p>
+        <ul class="whatsapp-link-list" id="whatsappLinkList"></ul>
+      </div>
+    </div>
   </div>
 
   <div class="container">
@@ -1721,55 +1797,31 @@
       document.getElementById('estimatedCost').textContent = `$${messageType === 'whatsapp' ? whatsappCost.toFixed(2) : smsCost.toFixed(2)}`;
     }
 
+    // Close WhatsApp modal
+    function closeWhatsAppModal() {
+      document.getElementById('whatsappModal').style.display = 'none';
+    }
+
     // Open WhatsApp with multiple fallback methods
     function openWhatsApp(phoneNumber, message) {
       const encodedMessage = encodeURIComponent(message);
       const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
       
-      // Method 1: Try to open in new tab
-      try {
-        const newWindow = window.open(whatsappUrl, '_blank');
-        if (newWindow) {
-          return true;
-        }
-      } catch (e) {
-        debug('Method 1 failed: ' + e.message);
-      }
+      // Create a temporary link element
+      const link = document.createElement('a');
+      link.href = whatsappUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
       
-      // Method 2: Try to open in same tab
-      try {
-        window.open(whatsappUrl, '_self');
-        return true;
-      } catch (e) {
-        debug('Method 2 failed: ' + e.message);
-      }
+      // Trigger a click on the link
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
-      // Method 3: Create temporary link and click
-      try {
-        const link = document.createElement('a');
-        link.href = whatsappUrl;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        return true;
-      } catch (e) {
-        debug('Method 3 failed: ' + e.message);
-      }
-      
-      // Method 4: Change location
-      try {
-        window.location.href = whatsappUrl;
-        return true;
-      } catch (e) {
-        debug('Method 4 failed: ' + e.message);
-      }
-      
-      return false;
+      return true;
     }
 
-    // Send message - WORKING IMPLEMENTATION WITH FALLBACKS
+    // Send message - IMPROVED IMPLEMENTATION
     async function sendMessage() {
       const messageText = document.getElementById('messageText').value.trim();
       
@@ -1787,10 +1839,10 @@
       const recipients = Array.from(selectedCustomers).map(i => customers[i]);
       
       if (messageType === 'whatsapp') {
-        // Show WhatsApp links section
-        document.getElementById('whatsappLinks').style.display = 'block';
-        const linksList = document.getElementById('whatsappLinksList');
-        linksList.innerHTML = '';
+        // Show WhatsApp modal with all links
+        const whatsappModal = document.getElementById('whatsappModal');
+        const linkList = document.getElementById('whatsappLinkList');
+        linkList.innerHTML = '';
         
         // Create WhatsApp links for all recipients
         recipients.forEach((customer, index) => {
@@ -1798,36 +1850,25 @@
           const encodedMessage = encodeURIComponent(messageText);
           const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
           
-          const linkItem = document.createElement('div');
-          linkItem.className = 'whatsapp-link-item';
-          linkItem.innerHTML = `
+          const listItem = document.createElement('li');
+          listItem.className = 'whatsapp-link-item';
+          listItem.innerHTML = `
             <span>${customer.name || customer.phone} (${customer.phone})</span>
-            <div>
-              <a href="${whatsappUrl}" target="_blank" class="btn btn-sm btn-success">
-                <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
-              </a>
-              <button class="btn btn-sm btn-outline-secondary copy-btn" onclick="copyToClipboard('${whatsappUrl}')">
-                <i class="bi bi-clipboard me-1"></i>Copy Link
-              </button>
-            </div>
+            <button class="whatsapp-link-button" onclick="openWhatsApp('${phoneNumber}', '${messageText.replace(/'/g, "\\'")}')">
+              <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
+            </button>
           `;
-          linksList.appendChild(linkItem);
+          linkList.appendChild(listItem);
           
           // Update last contact
           const originalIndex = customers.findIndex(c => c.phone === customer.phone);
           customers[originalIndex].lastContact = nowStr();
         });
         
-        showToast(`WhatsApp links created! Click on any link to open WhatsApp with pre-filled message.`);
+        // Show the modal
+        whatsappModal.style.display = 'flex';
         
-        // Try to open first WhatsApp automatically
-        if (recipients.length > 0) {
-          const firstCustomer = recipients[0];
-          const phoneNumber = firstCustomer.phone.replace(/[^\d]/g, '');
-          if (openWhatsApp(phoneNumber, messageText)) {
-            showToast(`Opening WhatsApp for ${firstCustomer.name || firstCustomer.phone}...`);
-          }
-        }
+        showToast(`WhatsApp links created! Click on any link to open WhatsApp with pre-filled message.`);
       } else {
         // SMS - Copy phone numbers to clipboard
         const phoneNumbers = recipients.map(c => c.phone).join('\n');
@@ -1857,7 +1898,7 @@
         const modal = bootstrap.Modal.getInstance(document.getElementById('messageModal'));
         modal.hide();
         render();
-      }, 5000);
+      }, 2000);
     }
 
     // Copy to clipboard function
@@ -1884,7 +1925,7 @@
       // Clean phone number
       const phoneNumber = customer.phone.replace(/[^\d]/g, '');
       
-      // Try multiple methods to open WhatsApp
+      // Open WhatsApp with empty message
       if (openWhatsApp(phoneNumber, '')) {
         // Update last contact
         const originalIndex = customers.findIndex(c => c.phone === customer.phone);
