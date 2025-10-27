@@ -14,6 +14,7 @@
       --danger-color: #dc3545;
       --whatsapp-color: #25D366;
       --sms-color: #007BFF;
+      --ai-gradient: linear-gradient(135deg, #667eea, #764ba2);
     }
 
     body {
@@ -570,6 +571,202 @@
       margin-top: 5px;
     }
 
+    .ai-section {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 2px solid #dee2e6;
+    }
+
+    .ai-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .ai-icon {
+      font-size: 2rem;
+      background: var(--ai-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-right: 10px;
+    }
+
+    .ai-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      background: var(--ai-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .ai-prompt-input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .ai-prompt-input:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      outline: none;
+    }
+
+    .ai-generate-btn {
+      background: var(--ai-gradient);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .ai-generate-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .ai-generate-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .ai-loading {
+      display: none;
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    .ai-loading-spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .ai-generated-content {
+      margin-top: 15px;
+      padding: 15px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #dee2e6;
+    }
+
+    .ai-generated-text {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .ai-generated-image {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+
+    .ai-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .ai-action-btn {
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .ai-use-btn {
+      background: #28a745;
+      color: white;
+    }
+
+    .ai-regenerate-btn {
+      background: #ffc107;
+      color: #212529;
+    }
+
+    .ai-action-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .message-history {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+    }
+
+    .message-history-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: white;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .message-history-time {
+      font-size: 0.8rem;
+      color: #6c757d;
+    }
+
+    .message-history-text {
+      margin-top: 5px;
+    }
+
+    .image-upload-section {
+      margin-top: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border: 2px dashed #dee2e6;
+    }
+
+    .image-upload-label {
+      display: block;
+      text-align: center;
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .image-upload-label:hover {
+      background: #e9ecef;
+    }
+
+    .image-preview {
+      margin-top: 10px;
+      max-width: 100%;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .last-message-display {
+      margin-top: 10px;
+      padding: 10px;
+      background: #e7f3ff;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
     @media (max-width: 768px) {
       .card-metric h2 {
         font-size: 2rem;
@@ -809,6 +1006,7 @@
                 Last Contact <i class="bi bi-arrow-down-up"></i>
               </th>
               <th>Message Status</th>
+              <th>Last Message</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -875,7 +1073,7 @@
 
   <!-- Message Modal -->
   <div class="modal fade" id="messageModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title"><i class="bi bi-send me-2"></i>Send Message</h5>
@@ -886,6 +1084,34 @@
           <div class="rate-limit-warning">
             <i class="bi bi-info-circle me-2"></i>
             <strong>Rate Limiting:</strong> Customers can only receive one message per day to prevent spam.
+          </div>
+
+          <!-- AI-Powered Message Generation -->
+          <div class="ai-section">
+            <div class="ai-header">
+              <i class="bi bi-cpu ai-icon"></i>
+              <h5 class="ai-title">AI-Powered Message Generation</h5>
+            </div>
+            <textarea class="ai-prompt-input" id="aiPrompt" placeholder="Describe the message you want to generate (e.g., 'Create a promotional message for weekend special offer with 20% discount')" rows="3"></textarea>
+            <div class="ai-loading" id="aiLoading">
+              <div class="ai-loading-spinner"></div>
+              <span>Generating message...</span>
+            </div>
+            <button class="ai-generate-btn" id="aiGenerateBtn" onclick="generateAIMessage()">
+              <i class="bi bi-magic me-2"></i>Generate Message with AI
+            </button>
+            <div class="ai-generated-content" id="aiGeneratedContent" style="display: none;">
+              <div class="ai-generated-text" id="aiGeneratedText"></div>
+              <img class="ai-generated-image" id="aiGeneratedImage" style="display: none;">
+              <div class="ai-actions">
+                <button class="ai-action-btn ai-use-btn" onclick="useAIMessage()">
+                  <i class="bi bi-check me-1"></i>Use This Message
+                </button>
+                <button class="ai-action-btn ai-regenerate-btn" onclick="regenerateAIMessage()">
+                  <i class="bi bi-arrow-clockwise me-1"></i>Regenerate
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Message Type Selection -->
@@ -980,6 +1206,16 @@
                 <p class="mb-1">Write your own custom message...</p>
               </div>
             </div>
+          </div>
+
+          <!-- Image Upload Section -->
+          <div class="image-upload-section">
+            <label for="imageUpload" class="image-upload-label">
+              <i class="bi bi-image me-2"></i>
+              <span id="imageUploadText">Click to upload an image (optional)</span>
+            </label>
+            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
+            <img id="imagePreview" class="image-preview" alt="Image preview">
           </div>
 
           <!-- Message Composition -->
@@ -1253,6 +1489,9 @@
     let selectedBranches = new Set();
     let messageType = 'whatsapp';
     let selectedTemplate = -1;
+    let uploadedImage = null;
+    let aiGeneratedMessage = null;
+    let lastSavedMessage = null;
 
     // Message templates
     const messageTemplates = [
@@ -1301,6 +1540,163 @@
       return lastMessageDate.getTime() < today.getTime();
     }
 
+    // Generate AI-powered message
+    async function generateAIMessage() {
+      const prompt = document.getElementById('aiPrompt').value.trim();
+      if (!prompt) {
+        showToast('Please enter a description for the message you want to generate.', 'error');
+        return;
+      }
+
+      const loadingDiv = document.getElementById('aiLoading');
+      const generateBtn = document.getElementById('aiGenerateBtn');
+      const contentDiv = document.getElementById('aiGeneratedContent');
+      
+      // Show loading state
+      loadingDiv.style.display = 'flex';
+      generateBtn.disabled = true;
+      contentDiv.style.display = 'none';
+
+      try {
+        // Simulate AI API call (replace with actual AI service)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Generate mock AI response
+        const aiResponse = await simulateAIResponse(prompt);
+        
+        // Display generated content
+        document.getElementById('aiGeneratedText').textContent = aiResponse.text;
+        
+        if (aiResponse.imageUrl) {
+          const img = document.getElementById('aiGeneratedImage');
+          img.src = aiResponse.imageUrl;
+          img.style.display = 'block';
+        } else {
+          document.getElementById('aiGeneratedImage').style.display = 'none';
+        }
+        
+        aiGeneratedMessage = aiResponse;
+        contentDiv.style.display = 'block';
+        
+        showToast('Message generated successfully!');
+      } catch (error) {
+        showToast('Failed to generate message. Please try again.', 'error');
+        console.error('AI generation error:', error);
+      } finally {
+        loadingDiv.style.display = 'none';
+        generateBtn.disabled = false;
+      }
+    }
+
+    // Simulate AI response (replace with actual AI service)
+    async function simulateAIResponse(prompt) {
+      // This is a mock implementation
+      // Replace with actual AI service like OpenAI, Claude, etc.
+      const responses = {
+        'promotional': '🎉 SPECIAL OFFER! Get 20% OFF on all services this weekend! Use code: WEEKEND20. Limited time only. Book now! 📞 +971501882206',
+        'welcome': '🌟 Welcome to our family! We\'re thrilled to have you with us. Enjoy 10% OFF your first service with code: WELCOME10. Looking forward to serving you! 😊',
+        'reminder': '📅 Friendly Reminder: Your appointment is coming up! Don\'t forget to confirm. Need to reschedule? Just give us a call! 📞 +971501882206',
+        'followup': '💝 How was your recent experience? We\'d love to hear your feedback! Rate us and get 5% OFF your next visit. Your opinion matters! ⭐',
+        'default': '✨ Thank you for being our valued customer! We have exciting updates just for you. Visit us or call to learn more! 📞 +971501882206'
+      };
+
+      let text = responses.default;
+      if (prompt.toLowerCase().includes('promotional') || prompt.toLowerCase().includes('offer') || prompt.toLowerCase().includes('discount')) {
+        text = responses.promotional;
+      } else if (prompt.toLowerCase().includes('welcome') || prompt.toLowerCase().includes('new')) {
+        text = responses.welcome;
+      } else if (prompt.toLowerCase().includes('reminder') || prompt.toLowerCase().includes('appointment')) {
+        text = responses.reminder;
+      } else if (prompt.toLowerCase().includes('feedback') || prompt.toLowerCase().includes('review')) {
+        text = responses.followup;
+      }
+
+      // Generate a random image for demonstration
+      const imageSeeds = ['business', 'promotion', 'service', 'offer', 'welcome'];
+      const randomSeed = imageSeeds[Math.floor(Math.random() * imageSeeds.length)];
+      const imageUrl = `https://picsum.photos/seed/${randomSeed}-${Date.now()}/400/200.jpg`;
+
+      return {
+        text: text,
+        imageUrl: prompt.toLowerCase().includes('image') ? imageUrl : null
+      };
+    }
+
+    // Use AI-generated message
+    function useAIMessage() {
+      if (!aiGeneratedMessage) return;
+      
+      document.getElementById('messageText').value = aiGeneratedMessage.text;
+      updateMessagePreview();
+      updateCharCount();
+      
+      if (aiGeneratedMessage.imageUrl) {
+        uploadedImage = aiGeneratedMessage.imageUrl;
+        const preview = document.getElementById('imagePreview');
+        preview.src = uploadedImage;
+        preview.style.display = 'block';
+        document.getElementById('imageUploadText').textContent = 'AI-generated image attached';
+      }
+      
+      showToast('AI-generated message applied!');
+    }
+
+    // Regenerate AI message
+    function regenerateAIMessage() {
+      generateAIMessage();
+    }
+
+    // Handle image upload
+    function handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          uploadedImage = e.target.result;
+          const preview = document.getElementById('imagePreview');
+          preview.src = uploadedImage;
+          preview.style.display = 'block';
+          document.getElementById('imageUploadText').textContent = file.name;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // Save last message
+    function saveLastMessage(messageText, imageUrl, recipients) {
+      lastSavedMessage = {
+        text: messageText,
+        image: imageUrl,
+        recipients: recipients.map(r => r.phone),
+        timestamp: new Date().toISOString(),
+        type: messageType
+      };
+      
+      // Save to localStorage
+      localStorage.setItem('lastSavedMessage', JSON.stringify(lastSavedMessage));
+      
+      // Also add to message history
+      const messageRecord = {
+        type: messageType,
+        text: messageText,
+        image: imageUrl,
+        recipients: recipients,
+        timestamp: new Date().toISOString(),
+        status: 'sent'
+      };
+      
+      messageHistory.push(messageRecord);
+      saveToLocalStorage();
+    }
+
+    // Load last saved message
+    function loadLastSavedMessage() {
+      const saved = localStorage.getItem('lastSavedMessage');
+      if (saved) {
+        lastSavedMessage = JSON.parse(saved);
+      }
+    }
+
     // Debug function
     function debug(message) {
       console.log(message);
@@ -1341,7 +1737,8 @@
         status: 'Active',
         addedDate: now.toISOString(),
         lastContact: now.toLocaleString(),
-        lastMessageDate: null // Track when customer was last messaged
+        lastMessageDate: null, // Track when customer was last messaged
+        lastMessageContent: null // Store last message content
       }));
       
       // Save to localStorage
@@ -1428,7 +1825,7 @@
       tbody.innerHTML = '';
       
       if (filteredCustomers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No customers found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">No customers found</td></tr>';
         hideLoading();
         return;
       }
@@ -1461,6 +1858,14 @@
              <span class="message-status ${canSend ? 'message-can-send' : 'message-sent-today'}">
                ${canSend ? 'Can Message' : 'Messaged Today'}
              </span>
+           </td>
+           <td>
+             <div class="last-message-display">
+               ${c.lastMessageContent ? 
+                 `<small class="text-muted">${c.lastMessageContent.substring(0, 30)}...</small>` : 
+                 '<small class="text-muted">No messages sent</small>'
+               }
+             </div>
            </td>
            <td class="table-actions">
              <button class="btn btn-sm btn-success btn-action" onclick="quickMessage(${globalIndex})" title="Send Message" ${!canSend ? 'disabled' : ''}>
@@ -1585,7 +1990,8 @@
           c.phone.toLowerCase().includes(searchTerm) ||
           (c.name && c.name.toLowerCase().includes(searchTerm)) ||
           (c.branch && c.branch.toLowerCase().includes(searchTerm)) ||
-          c.status.toLowerCase().includes(searchTerm)
+          c.status.toLowerCase().includes(searchTerm) ||
+          (c.lastMessageContent && c.lastMessageContent.toLowerCase().includes(searchTerm))
         );
       }
       
@@ -1633,7 +2039,8 @@
           status,
           addedDate: new Date().toISOString(),
           lastContact: nowStr(),
-          lastMessageDate: null
+          lastMessageDate: null,
+          lastMessageContent: null
         });
         showToast("New customer added successfully!");
       }
@@ -1712,10 +2119,10 @@
         return;
       }
       
-      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact,Last Message Date\n';
+      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact,Last Message Date,Last Message Content\n';
       
       customers.forEach(c => {
-        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}","${c.lastMessageDate || ''}"\n`;
+        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}","${c.lastMessageDate || ''}","${c.lastMessageContent || ''}"\n`;
       });
       
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -1771,7 +2178,11 @@
       selectedBranches.clear();
       selectedTemplate = -1;
       messageType = 'whatsapp';
+      uploadedImage = null;
+      aiGeneratedMessage = null;
+      
       document.getElementById('messageText').value = '';
+      document.getElementById('aiPrompt').value = '';
       document.getElementById('messagePreview').innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
       document.getElementById('selectAllRadio').checked = true;
       document.getElementById('customSelection').style.display = 'none';
@@ -1780,6 +2191,24 @@
       document.getElementById('progressList').innerHTML = '';
       document.getElementById('whatsappLinks').style.display = 'none';
       document.getElementById('whatsappLinksList').innerHTML = '';
+      document.getElementById('aiGeneratedContent').style.display = 'none';
+      document.getElementById('imagePreview').style.display = 'none';
+      document.getElementById('imageUploadText').textContent = 'Click to upload an image (optional)';
+      document.getElementById('imageUpload').value = '';
+      
+      // Load last saved message if available
+      if (lastSavedMessage) {
+        document.getElementById('messageText').value = lastSavedMessage.text;
+        if (lastSavedMessage.image) {
+          uploadedImage = lastSavedMessage.image;
+          const preview = document.getElementById('imagePreview');
+          preview.src = uploadedImage;
+          preview.style.display = 'block';
+          document.getElementById('imageUploadText').textContent = 'Last image attached';
+        }
+        updateMessagePreview();
+        updateCharCount();
+      }
       
       // Update customer checkboxes
       updateCustomerCheckboxes();
@@ -1973,17 +2402,27 @@
       const messageText = document.getElementById('messageText').value;
       const preview = document.getElementById('messagePreview');
       
-      if (messageText.trim() === '') {
+      if (messageText.trim() === '' && !uploadedImage) {
         preview.innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
       } else {
-        // Format message based on type
-        let formattedMessage = messageText;
-        if (messageType === 'whatsapp') {
-          formattedMessage = `<i class="bi bi-whatsapp text-success me-2"></i>${messageText}`;
-        } else {
-          formattedMessage = `<i class="bi bi-chat-dots text-primary me-2"></i>${messageText}`;
+        let previewContent = '';
+        
+        if (uploadedImage) {
+          previewContent += `<img src="${uploadedImage}" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;"><br>`;
         }
-        preview.innerHTML = `<p class="mb-0">${formattedMessage}</p>`;
+        
+        if (messageText.trim() !== '') {
+          // Format message based on type
+          let formattedMessage = messageText;
+          if (messageType === 'whatsapp') {
+            formattedMessage = `<i class="bi bi-whatsapp text-success me-2"></i>${messageText}`;
+          } else {
+            formattedMessage = `<i class="bi bi-chat-dots text-primary me-2"></i>${messageText}`;
+          }
+          previewContent += `<p class="mb-0">${formattedMessage}</p>`;
+        }
+        
+        preview.innerHTML = previewContent;
       }
     }
 
@@ -2029,7 +2468,7 @@
       return true;
     }
 
-    // Send message - ENHANCED WITH RATE LIMITING
+    // Send message - ENHANCED WITH IMAGE SUPPORT
     async function sendMessage() {
       const messageText = document.getElementById('messageText').value.trim();
       
@@ -2038,8 +2477,8 @@
         return;
       }
       
-      if (messageText === '') {
-        showToast("Please enter a message.", 'error');
+      if (messageText === '' && !uploadedImage) {
+        showToast("Please enter a message or upload an image.", 'error');
         return;
       }
       
@@ -2060,6 +2499,9 @@
         showToast(`${recipients.length - eligibleRecipients.length} customer(s) have already been messaged today and will be skipped.`);
       }
       
+      // Save the message for future use
+      saveLastMessage(messageText, uploadedImage, eligibleRecipients);
+      
       if (messageType === 'whatsapp') {
         // Show WhatsApp modal with all links
         const whatsappModal = document.getElementById('whatsappModal');
@@ -2069,23 +2511,31 @@
         // Create WhatsApp links for all eligible recipients
         eligibleRecipients.forEach((customer, index) => {
           const phoneNumber = customer.phone.replace(/[^\d]/g, '');
-          const encodedMessage = encodeURIComponent(messageText);
+          
+          // Combine message text and image
+          let fullMessage = messageText;
+          if (uploadedImage) {
+            fullMessage = messageText + '\n\n[Image attached]';
+          }
+          
+          const encodedMessage = encodeURIComponent(fullMessage);
           const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
           
           const listItem = document.createElement('li');
           listItem.className = 'whatsapp-link-item';
           listItem.innerHTML = `
             <span>${customer.name || customer.phone} (${customer.phone})</span>
-            <button class="whatsapp-link-button" onclick="openWhatsApp('${phoneNumber}', '${messageText.replace(/'/g, "\\'")}')">
+            <button class="whatsapp-link-button" onclick="openWhatsApp('${phoneNumber}', '${fullMessage.replace(/'/g, "\\'")}')">
               <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
             </button>
           `;
           linkList.appendChild(listItem);
           
-          // Update last message date
+          // Update customer record
           const originalIndex = customers.findIndex(c => c.phone === customer.phone);
           customers[originalIndex].lastMessageDate = new Date().toISOString();
           customers[originalIndex].lastContact = nowStr();
+          customers[originalIndex].lastMessageContent = messageText;
         });
         
         // Show the modal
@@ -2103,11 +2553,12 @@
           showToast('Failed to copy phone numbers. Please try again.', 'error');
         }
         
-        // Update last message date for SMS recipients
+        // Update customer records for SMS recipients
         eligibleRecipients.forEach(customer => {
           const originalIndex = customers.findIndex(c => c.phone === customer.phone);
           customers[originalIndex].lastMessageDate = new Date().toISOString();
           customers[originalIndex].lastContact = nowStr();
+          customers[originalIndex].lastMessageContent = messageText;
         });
       }
       
@@ -2115,6 +2566,7 @@
       const messageRecord = {
         type: messageType,
         text: messageText,
+        image: uploadedImage,
         recipients: eligibleRecipients,
         timestamp: new Date().toISOString(),
         status: 'sent'
@@ -2161,12 +2613,19 @@
       // Clean phone number
       const phoneNumber = customer.phone.replace(/[^\d]/g, '');
       
-      // Open WhatsApp with empty message
-      if (openWhatsApp(phoneNumber, '')) {
-        // Update last message date
+      // Use last saved message if available
+      let messageText = '';
+      if (lastSavedMessage) {
+        messageText = lastSavedMessage.text;
+      }
+      
+      // Open WhatsApp with message
+      if (openWhatsApp(phoneNumber, messageText)) {
+        // Update customer record
         const originalIndex = customers.findIndex(c => c.phone === customer.phone);
         customers[originalIndex].lastMessageDate = new Date().toISOString();
         customers[originalIndex].lastContact = nowStr();
+        customers[originalIndex].lastMessageContent = messageText;
         saveToLocalStorage();
         render();
         
@@ -2194,6 +2653,7 @@
     // Initialize the application
     document.addEventListener('DOMContentLoaded', function() {
       debug('DOM loaded, initializing...');
+      loadLastSavedMessage();
       initializeCustomers();
       updateLastUpdatedTime();
       render();
