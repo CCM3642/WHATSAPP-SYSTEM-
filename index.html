@@ -2,148 +2,315 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Customer Management Dashboard</title>
+  <title>Advanced Customer Management System</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
   <style>
     :root {
       --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      --success-color: #28a745;
-      --warning-color: #ffc107;
-      --danger-color: #dc3545;
-      --whatsapp-color: #25D366;
-      --sms-color: #007BFF;
-      --ai-gradient: linear-gradient(135deg, #667eea, #764ba2);
+      --success-gradient: linear-gradient(135deg, #28a745, #20c997);
+      --warning-gradient: linear-gradient(135deg, #ffc107, #ff9800);
+      --danger-gradient: linear-gradient(135deg, #dc3545, #fd7e14);
+      --info-gradient: linear-gradient(135deg, #17a2b8, #6c757d);
+      --dark-gradient: linear-gradient(135deg, #343a40, #495057);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      padding: 20px;
-      background-color: #f8f9fa;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      min-height: 100vh;
     }
 
-    .dashboard-header {
+    /* Sidebar Navigation */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 250px;
+      background: var(--dark-gradient);
+      color: white;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar.collapsed {
+      transform: translateX(-250px);
+    }
+
+    .sidebar-header {
+      padding: 20px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      margin-bottom: 20px;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar-menu li {
+      margin-bottom: 10px;
+    }
+
+    .sidebar-menu a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      padding: 12px 15px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      transition: all 0.3s;
+    }
+
+    .sidebar-menu a:hover,
+    .sidebar-menu a.active {
+      background: rgba(255,255,255,0.1);
+      color: white;
+    }
+
+    .sidebar-menu i {
+      margin-right: 10px;
+      font-size: 1.2rem;
+    }
+
+    /* Main Content */
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-content.expanded {
+      margin-left: 0;
+    }
+
+    /* Header */
+    .header {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .menu-toggle {
       background: var(--primary-gradient);
       color: white;
-      padding: 30px;
-      border-radius: 15px;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .dashboard-header::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      right: -10%;
-      width: 50%;
-      height: 200%;
-      background: rgba(255,255,255,0.05);
-      transform: rotate(35deg);
-    }
-
-    .card-metric {
-      text-align: center;
-      padding: 25px;
-      border-radius: 15px;
-      transition: all 0.3s ease;
       border: none;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+      border-radius: 10px;
+      padding: 10px 15px;
+      margin-right: 15px;
+      cursor: pointer;
+    }
+
+    /* Stats Cards */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      transition: all 0.3s;
       position: relative;
       overflow: hidden;
     }
 
-    .card-metric::before {
+    .stat-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, var(--primary-gradient));
+      background: var(--primary-gradient);
     }
 
-    .card-metric:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.12);
     }
 
-    .card-metric h2 {
-      margin: 0;
-      font-size: 2.8rem;
+    .stat-value {
+      font-size: 2rem;
       font-weight: 700;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: var(--primary-gradient);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
-    .card-metric p {
-      margin: 10px 0 0 0;
+    .stat-label {
       color: #6c757d;
       font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
       font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
     }
 
-    .metric-icon {
+    .stat-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
       font-size: 2.5rem;
-      margin-bottom: 15px;
-      opacity: 0.8;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+      opacity: 0.1;
+      color: #667eea;
     }
 
+    /* Content Cards */
+    .content-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      margin-bottom: 25px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+
+    .card-header-custom {
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+
+    /* Forms */
+    .form-floating-custom {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .form-control-custom {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-control-custom:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+
+    /* Buttons */
+    .btn-gradient {
+      background: var(--primary-gradient);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 25px;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .btn-gradient:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    .btn-success-gradient {
+      background: var(--success-gradient);
+    }
+
+    .btn-danger-gradient {
+      background: var(--danger-gradient);
+    }
+
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table thead {
+      background: var(--primary-gradient);
+      color: white;
+    }
+
+    .data-table th {
+      padding: 15px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+    }
+
+    .data-table td {
+      padding: 15px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .data-table tbody tr {
+      transition: all 0.2s;
+    }
+
+    .data-table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    /* Status Badges */
     .status-badge {
-      padding: 6px 12px;
-      border-radius: 25px;
+      padding: 5px 12px;
+      border-radius: 20px;
       font-size: 0.8rem;
       font-weight: 600;
       display: inline-block;
     }
 
     .status-active {
-      background: linear-gradient(135deg, #28a745, #20c997);
+      background: var(--success-gradient);
       color: white;
     }
 
-    .status-opt-out {
-      background: linear-gradient(135deg, #dc3545, #fd7e14);
+    .status-inactive {
+      background: var(--warning-gradient);
       color: white;
     }
 
-    .message-status {
-      padding: 4px 8px;
-      border-radius: 15px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      display: inline-block;
+    .status-optout {
+      background: var(--danger-gradient);
+      color: white;
     }
 
-    .message-sent-today {
-      background: linear-gradient(135deg, #e7f3ff, #f0f8ff);
-      color: #0066cc;
-    }
-
-    .message-can-send {
-      background: linear-gradient(135deg, #e7f9e7, #f0fff0);
-      color: #006600;
-    }
-
-    .table-actions {
-      white-space: nowrap;
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 5px;
     }
 
     .btn-action {
-      padding: 0.35rem 0.6rem;
-      margin: 0 0.15rem;
-      border-radius: 8px;
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      font-size: 0.9rem;
       transition: all 0.2s;
     }
 
@@ -151,31 +318,76 @@
       transform: scale(1.1);
     }
 
-    .search-container {
-      position: relative;
+    /* Import/Export Section */
+    .import-export-section {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
     }
 
-    .search-icon {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: #6c757d;
-      z-index: 10;
-    }
-
-    .search-input {
-      padding-left: 45px;
-      border-radius: 25px;
-      border: 2px solid #e9ecef;
+    .file-upload-area {
+      border: 2px dashed #dee2e6;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
       transition: all 0.3s;
+      cursor: pointer;
     }
 
-    .search-input:focus {
+    .file-upload-area:hover {
       border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      background: #f0f4ff;
     }
 
+    .file-upload-area.dragover {
+      border-color: #667eea;
+      background: #e7f3ff;
+    }
+
+    /* Advanced Filters */
+    .filter-section {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      margin-bottom: 15px;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    /* Charts */
+    .chart-container {
+      position: relative;
+      height: 300px;
+      margin-bottom: 20px;
+    }
+
+    /* Modal Customizations */
+    .modal-content {
+      border-radius: 20px;
+      border: none;
+    }
+
+    .modal-header {
+      background: var(--primary-gradient);
+      color: white;
+      border-radius: 20px 20px 0 0;
+      border: none;
+    }
+
+    .modal-header .btn-close {
+      filter: brightness(0) invert(1);
+    }
+
+    /* Loading Spinner */
     .loading-overlay {
       position: fixed;
       top: 0;
@@ -187,30 +399,13 @@
       justify-content: center;
       align-items: center;
       z-index: 9999;
-      backdrop-filter: blur(5px);
     }
 
-    .spinner-border {
-      width: 3.5rem;
-      height: 3.5rem;
-      border-width: 0.3em;
-    }
-
-    .fade-in {
-      animation: fadeIn 0.6s ease-in;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .pagination-container {
+    .loading-overlay.active {
       display: flex;
-      justify-content: center;
-      margin-top: 30px;
     }
 
+    /* Toast Notifications */
     .toast-container {
       position: fixed;
       top: 20px;
@@ -219,712 +414,357 @@
     }
 
     .custom-toast {
-      min-width: 350px;
-      border-radius: 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-    }
-
-    .message-template {
-      cursor: pointer;
-      transition: all 0.3s;
-      border-radius: 10px;
-    }
-
-    .message-template:hover {
-      background-color: #f8f9fa;
-      transform: translateX(5px);
-    }
-
-    .message-template.active {
-      background: linear-gradient(135deg, #e7f3ff, #f0f8ff);
-      border-left: 4px solid #007bff;
-    }
-
-    .customer-checkbox {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    }
-
-    .message-type-btn {
-      border-radius: 25px;
-      padding: 10px 25px;
-      margin: 0 8px;
-      transition: all 0.3s;
-      font-weight: 600;
-    }
-
-    .message-type-btn.active {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    }
-
-    .message-preview {
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      min-width: 300px;
       border-radius: 15px;
-      padding: 20px;
-      min-height: 120px;
-      border: 2px solid #dee2e6;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
     }
 
-    .message-stats {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 25px;
-      padding: 20px;
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-      border-radius: 15px;
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-250px);
+      }
+      
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      
+      .main-content {
+        margin-left: 0;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
 
-    .stat-item {
-      text-align: center;
+    /* Animations */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .stat-number {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
     }
 
-    .stat-label {
-      font-size: 0.85rem;
-      color: #6c757d;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .company-info {
-      background: linear-gradient(135deg, #e9ecef, #f8f9fa);
-      padding: 15px 20px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
-    }
-
-    .branch-badge {
-      font-size: 0.75rem;
-      padding: 4px 10px;
-      border-radius: 15px;
-      background: linear-gradient(135deg, #e9ecef, #dee2e6);
-      color: #495057;
-      font-weight: 600;
-    }
-
-    .debug-info {
-      position: fixed;
-      bottom: 15px;
-      left: 15px;
-      background: rgba(0,0,0,0.8);
-      color: white;
-      padding: 8px 15px;
-      border-radius: 8px;
-      font-size: 12px;
-      z-index: 1000;
-      font-family: monospace;
-    }
-
-    .send-progress {
-      margin-top: 15px;
-      display: none;
-    }
-
-    .progress-item {
-      padding: 8px;
-      margin: 3px 0;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-    }
-
-    .progress-sending {
-      background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-      color: #856404;
-    }
-
-    .progress-sent {
-      background: linear-gradient(135deg, #d4edda, #a8e6cf);
-      color: #155724;
-    }
-
-    .progress-failed {
-      background: linear-gradient(135deg, #f8d7da, #fab1a0);
-      color: #721c24;
-    }
-
-    .whatsapp-links {
-      margin-top: 15px;
-      max-height: 250px;
-      overflow-y: auto;
-    }
-
-    .whatsapp-link-item {
-      padding: 12px;
-      margin: 8px 0;
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: all 0.3s;
-    }
-
-    .whatsapp-link-item:hover {
-      transform: translateX(5px);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-    }
-
-    .whatsapp-link-item a {
-      color: #25D366;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .whatsapp-link-item a:hover {
-      text-decoration: underline;
-    }
-
-    .copy-btn {
-      font-size: 0.8rem;
-      padding: 4px 10px;
-      border-radius: 6px;
-    }
-
-    .table {
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-    }
-
-    .table thead th {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      font-weight: 600;
-      text-transform: uppercase;
-      font-size: 0.85rem;
-      letter-spacing: 1px;
-      border: none;
-      padding: 15px;
-    }
-
-    .table tbody tr {
-      transition: all 0.2s;
-    }
-
-    .table tbody tr:hover {
-      background-color: #f8f9fa;
-      transform: scale(1.01);
-    }
-
-    .table td {
-      padding: 15px;
-      vertical-align: middle;
-    }
-
-    .card {
-      border: none;
-      border-radius: 15px;
-      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-    }
-
-    .card-header {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white;
-      border-radius: 15px 15px 0 0 !important;
-      border: none;
-      padding: 20px;
-      font-weight: 600;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      border: none;
-      border-radius: 8px;
-      font-weight: 600;
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(135deg, #5a6fd8, #6a4190);
-      transform: translateY(-2px);
-    }
-
-    .data-status {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      background: linear-gradient(135deg, #28a745, #20c997);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      z-index: 1000;
-      display: none;
-    }
-
-    .whatsapp-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0,0,0,0.5);
-      z-index: 10000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .whatsapp-modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 15px;
-      width: 80%;
-      max-width: 600px;
-      max-height: 80vh;
-      overflow-y: auto;
-    }
-
-    .whatsapp-modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .whatsapp-modal-title {
-      color: #25D366;
-      font-weight: bold;
-      font-size: 1.5rem;
-    }
-
-    .whatsapp-link-list {
-      list-style-type: none;
-      padding: 0;
-    }
-
-    .whatsapp-link-item {
-      padding: 10px;
-      margin: 5px 0;
-      border-radius: 8px;
-      background-color: #f8f9fa;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .whatsapp-link-button {
-      background-color: #25D366;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .branch-selector {
-      margin-bottom: 15px;
-    }
-
-    .branch-checkbox {
-      margin-right: 10px;
-    }
-
-    .branch-stats {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-      padding: 10px;
-      background-color: #f8f9fa;
-      border-radius: 8px;
-    }
-
-    .branch-stat {
-      text-align: center;
-    }
-
-    .branch-stat-number {
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .branch-stat-label {
-      font-size: 0.8rem;
-      color: #6c757d;
-    }
-
-    .rate-limit-warning {
-      background-color: #fff3cd;
-      border: 1px solid #ffeeba;
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 15px;
-      color: #856404;
-    }
-
-    .customer-message-status {
-      font-size: 0.8rem;
-      margin-top: 5px;
-    }
-
-    .ai-section {
-      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-      border-radius: 15px;
-      padding: 20px;
-      margin-bottom: 20px;
-      border: 2px solid #dee2e6;
-    }
-
-    .ai-header {
-      display: flex;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    .ai-icon {
-      font-size: 2rem;
-      background: var(--ai-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      margin-right: 10px;
-    }
-
-    .ai-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      background: var(--ai-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-
-    .ai-prompt-input {
-      width: 100%;
-      padding: 12px;
-      border: 2px solid #e9ecef;
-      border-radius: 10px;
-      font-size: 1rem;
-      transition: all 0.3s;
-    }
-
-    .ai-prompt-input:focus {
-      border-color: #667eea;
-      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-      outline: none;
-    }
-
-    .ai-generate-btn {
-      background: var(--ai-gradient);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      transition: all 0.3s;
-      margin-top: 10px;
-    }
-
-    .ai-generate-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-    }
-
-    .ai-generate-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .ai-loading {
-      display: none;
-      align-items: center;
-      margin-top: 10px;
-    }
-
-    .ai-loading-spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid #f3f3f3;
-      border-top: 2px solid #667eea;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 10px;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    .ai-generated-content {
-      margin-top: 15px;
-      padding: 15px;
-      background: white;
-      border-radius: 10px;
-      border: 1px solid #dee2e6;
-    }
-
-    .ai-generated-text {
-      margin-bottom: 10px;
-      line-height: 1.6;
-    }
-
-    .ai-generated-image {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-top: 10px;
-    }
-
-    .ai-actions {
+    /* Quick Actions */
+    .quick-actions {
       display: flex;
       gap: 10px;
-      margin-top: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
-    .ai-action-btn {
-      padding: 5px 10px;
-      border-radius: 5px;
-      border: none;
-      font-size: 0.9rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-
-    .ai-use-btn {
-      background: #28a745;
-      color: white;
-    }
-
-    .ai-regenerate-btn {
-      background: #ffc107;
-      color: #212529;
-    }
-
-    .ai-action-btn:hover {
-      transform: translateY(-1px);
-    }
-
-    .message-history {
-      margin-top: 20px;
-      padding: 15px;
-      background: #f8f9fa;
+    .quick-action-btn {
+      padding: 10px 20px;
       border-radius: 10px;
-    }
-
-    .message-history-item {
-      padding: 10px;
-      margin: 5px 0;
+      border: 2px solid #e9ecef;
       background: white;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-    }
-
-    .message-history-time {
-      font-size: 0.8rem;
-      color: #6c757d;
-    }
-
-    .message-history-text {
-      margin-top: 5px;
-    }
-
-    .image-upload-section {
-      margin-top: 15px;
-      padding: 15px;
-      background: #f8f9fa;
-      border-radius: 10px;
-      border: 2px dashed #dee2e6;
-    }
-
-    .image-upload-label {
-      display: block;
-      text-align: center;
-      padding: 20px;
-      cursor: pointer;
       transition: all 0.3s;
+      cursor: pointer;
     }
 
-    .image-upload-label:hover {
-      background: #e9ecef;
+    .quick-action-btn:hover {
+      border-color: #667eea;
+      background: #f0f4ff;
     }
 
-    .image-preview {
-      margin-top: 10px;
-      max-width: 100%;
-      border-radius: 8px;
+    .quick-action-btn.active {
+      background: var(--primary-gradient);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* Data Validation */
+    .is-invalid {
+      border-color: #dc3545 !important;
+    }
+
+    .invalid-feedback {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Bulk Operations */
+    .bulk-actions {
+      background: #fff3cd;
+      border: 1px solid #ffeaa7;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
       display: none;
     }
 
-    .last-message-display {
-      margin-top: 10px;
-      padding: 10px;
-      background: #e7f3ff;
-      border-radius: 8px;
-      font-size: 0.9rem;
+    .bulk-actions.active {
+      display: block;
     }
 
-    @media (max-width: 768px) {
-      .card-metric h2 {
-        font-size: 2rem;
-      }
-      
-      .table-responsive {
-        font-size: 0.85rem;
-      }
-      
-      .dashboard-header {
-        padding: 20px;
-      }
+    /* Customer Tags */
+    .customer-tags {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      margin-top: 5px;
+    }
+
+    .tag {
+      padding: 3px 8px;
+      background: #e9ecef;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .tag.premium {
+      background: var(--warning-gradient);
+      color: white;
+    }
+
+    .tag.vip {
+      background: var(--primary-gradient);
+      color: white;
     }
   </style>
 </head>
 <body>
-  <!-- Data Status Indicator -->
-  <div class="data-status" id="dataStatus">
-    <i class="bi bi-check-circle me-2"></i>
-    <span id="dataStatusText">Loading data...</span>
-  </div>
-
-  <!-- Loading Overlay -->
-  <div class="loading-overlay" id="loadingOverlay">
-    <div class="text-center">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="mt-3 text-primary">Loading Customer Data...</p>
+  <!-- Sidebar Navigation -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h4><i class="bi bi-people-fill me-2"></i>CRM System</h4>
     </div>
-  </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+      <li><a href="#" onclick="showSection('customers')"><i class="bi bi-people"></i> Customers</a></li>
+      <li><a href="#" onclick="showSection('add-customer')"><i class="bi bi-person-plus"></i> Add Customer</a></li>
+      <li><a href="#" onclick="showSection('bulk-import')"><i class="bi bi-upload"></i> Bulk Import</a></li>
+      <li><a href="#" onclick="showSection('messaging')"><i class="bi bi-chat-dots"></i> Messaging</a></li>
+      <li><a href="#" onclick="showSection('analytics')"><i class="bi bi-graph-up"></i> Analytics</a></li>
+      <li><a href="#" onclick="showSection('settings')"><i class="bi bi-gear"></i> Settings</a></li>
+    </ul>
+  </nav>
 
-  <!-- Toast Container -->
-  <div class="toast-container"></div>
-
-  <!-- Debug Info -->
-  <div class="debug-info" id="debugInfo">
-    Debug: Initializing...
-  </div>
-
-  <!-- WhatsApp Modal -->
-  <div class="whatsapp-modal" id="whatsappModal">
-    <div class="whatsapp-modal-content">
-      <div class="whatsapp-modal-header">
-        <h3 class="whatsapp-modal-title">
-          <i class="bi bi-whatsapp me-2"></i>WhatsApp Links
-        </h3>
-        <button class="btn-close" onclick="closeWhatsAppModal()"></button>
-      </div>
-      <div class="whatsapp-modal-body">
-        <p>Click on any link to open WhatsApp with pre-filled message:</p>
-        <ul class="whatsapp-link-list" id="whatsappLinkList"></ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
+  <!-- Main Content -->
+  <main class="main-content" id="mainContent">
     <!-- Header -->
-    <div class="dashboard-header">
-      <div class="row align-items-center position-relative">
-        <div class="col-md-8">
-          <h1 class="mb-0 display-5">
-            <i class="bi bi-people-fill me-3"></i>Customer Management Dashboard
-          </h1>
-          <p class="mb-0 mt-3 opacity-75 fs-5">Manage your customer relationships efficiently</p>
+    <div class="header">
+      <div class="header-top">
+        <div style="display: flex; align-items: center;">
+          <button class="menu-toggle" onclick="toggleSidebar()">
+            <i class="bi bi-list"></i>
+          </button>
+          <h2 class="mb-0">Customer Management System</h2>
         </div>
-        <div class="col-md-4 text-md-end mt-3 mt-md-0">
-          <button class="btn btn-light btn-lg me-2" onclick="exportToCSV()">
-            <i class="bi bi-download me-2"></i>Export CSV
+        <div>
+          <button class="btn btn-gradient me-2" onclick="exportData()">
+            <i class="bi bi-download me-2"></i>Export
           </button>
-          <button class="btn btn-success btn-lg me-2" onclick="openMessageModal()">
-            <i class="bi bi-send me-2"></i>Send Message
-          </button>
-          <button class="btn btn-outline-light btn-lg" onclick="clearAllData()">
-            <i class="bi bi-trash me-2"></i>Clear All
+          <button class="btn btn-success-gradient" onclick="quickAddCustomer()">
+            <i class="bi bi-plus-circle me-2"></i>Quick Add
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Company Info -->
-    <div class="company-info">
-      <div class="row align-items-center">
-        <div class="col-md-6">
-          <i class="bi bi-telephone-fill text-primary me-2"></i>
-          <strong>Company Number:</strong> +971501882206
+    <!-- Dashboard Section -->
+    <div id="dashboard-section" class="section">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="totalCustomers">0</div>
+          <div class="stat-label">Total Customers</div>
+          <i class="bi bi-people stat-icon"></i>
         </div>
-        <div class="col-md-6 text-md-end">
-          <i class="bi bi-calendar-check text-primary me-2"></i>
-          <strong>Last Updated:</strong> <span id="lastUpdated"></span>
+        <div class="stat-card">
+          <div class="stat-value" id="activeCustomers">0</div>
+          <div class="stat-label">Active</div>
+          <i class="bi bi-person-check stat-icon"></i>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="newThisMonth">0</div>
+          <div class="stat-label">New This Month</div>
+          <i class="bi bi-calendar-plus stat-icon"></i>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="messagesSent">0</div>
+          <div class="stat-label">Messages Sent</div>
+          <i class="bi bi-send stat-icon"></i>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="content-card">
+        <h4 class="mb-3">Quick Actions</h4>
+        <div class="quick-actions">
+          <button class="quick-action-btn" onclick="showSection('add-customer')">
+            <i class="bi bi-person-plus me-2"></i>Add Customer
+          </button>
+          <button class="quick-action-btn" onclick="showSection('bulk-import')">
+            <i class="bi bi-upload me-2"></i>Import CSV
+          </button>
+          <button class="quick-action-btn" onclick="showSection('messaging')">
+            <i class="bi bi-chat-dots me-2"></i>Send Message
+          </button>
+          <button class="quick-action-btn" onclick="generateReport()">
+            <i class="bi bi-file-earmark-text me-2"></i>Generate Report
+          </button>
+          <button class="quick-action-btn" onclick="backupData()">
+            <i class="bi bi-cloud-download me-2"></i>Backup Data
+          </button>
+        </div>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="content-card">
+        <h4 class="mb-3">Recent Activity</h4>
+        <div id="recentActivity">
+          <p class="text-muted">No recent activity</p>
         </div>
       </div>
     </div>
 
-    <!-- Metrics -->
-    <div class="row mb-4">
-      <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card card-metric">
-          <div class="metric-icon"><i class="bi bi-people"></i></div>
-          <h2 id="metricTotal">0</h2>
-          <p>Total Customers</p>
+    <!-- Customers Section -->
+    <div id="customers-section" class="section" style="display: none;">
+      <!-- Advanced Filters -->
+      <div class="filter-section">
+        <h5 class="mb-3">Filters</h5>
+        <div class="row">
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Status</label>
+              <select class="form-control-custom" id="filterStatus" onchange="applyFilters()">
+                <option value="">All Status</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Opt-Out">Opt-Out</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Branch</label>
+              <select class="form-control-custom" id="filterBranch" onchange="applyFilters()">
+                <option value="">All Branches</option>
+                <option value="Hamdan">Hamdan</option>
+                <option value="Muroor">Muroor</option>
+                <option value="Shabiya 11">Shabiya 11</option>
+                <option value="Al Barsha">Al Barsha</option>
+                <option value="Al Rigga">Al Rigga</option>
+                <option value="Khalidiya">Khalidiya</option>
+                <option value="Al Satwa">Al Satwa</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Date Added</label>
+              <input type="date" class="form-control-custom" id="filterDate" onchange="applyFilters()">
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="filter-group">
+              <label class="filter-label">Search</label>
+              <input type="text" class="form-control-custom" id="searchCustomers" placeholder="Search..." onkeyup="applyFilters()">
+            </div>
+          </div>
         </div>
       </div>
-      <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card card-metric">
-          <div class="metric-icon"><i class="bi bi-person-plus"></i></div>
-          <h2 id="metricNewToday">0</h2>
-          <p>New Today</p>
+
+      <!-- Bulk Actions -->
+      <div class="bulk-actions" id="bulkActions">
+        <div class="d-flex justify-content-between align-items-center">
+          <span id="selectedCount">0 customers selected</span>
+          <div>
+            <button class="btn btn-gradient me-2" onclick="bulkMessage()">
+              <i class="bi bi-send me-1"></i>Send Message
+            </button>
+            <button class="btn btn-danger-gradient" onclick="bulkDelete()">
+              <i class="bi bi-trash me-1"></i>Delete
+            </button>
+          </div>
         </div>
       </div>
-      <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card card-metric">
-          <div class="metric-icon"><i class="bi bi-person-x"></i></div>
-          <h2 id="metricOptOut">0</h2>
-          <p>Opt-Outs</p>
+
+      <!-- Customers Table -->
+      <div class="content-card">
+        <div class="card-header-custom">
+          <h4 class="mb-0">Customer List</h4>
+          <div>
+            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+            <label for="selectAll">Select All</label>
+          </div>
         </div>
-      </div>
-      <div class="col-md-3 col-sm-6 mb-3">
-        <div class="card card-metric">
-          <div class="metric-icon"><i class="bi bi-clock-history"></i></div>
-          <h2 id="metricNoContact60">0</h2>
-          <p>Not Contacted 60+ Days</p>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th><input type="checkbox" id="headerCheckbox" onchange="toggleSelectAll()"></th>
+                <th onclick="sortTable('name')">Name <i class="bi bi-arrow-down-up"></i></th>
+                <th onclick="sortTable('phone')">Phone <i class="bi bi-arrow-down-up"></i></th>
+                <th onclick="sortTable('email')">Email <i class="bi bi-arrow-down-up"></i></th>
+                <th onclick="sortTable('branch')">Branch <i class="bi bi-arrow-down-up"></i></th>
+                <th onclick="sortTable('status')">Status <i class="bi bi-arrow-down-up"></i></th>
+                <th onclick="sortTable('addedDate')">Added <i class="bi bi-arrow-down-up"></i></th>
+                <th>Tags</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="customersTableBody">
+              <!-- Table rows will be dynamically added -->
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- Add / Update Form -->
-    <div class="card mb-4 fade-in">
-      <div class="card-header">
-        <h5 class="mb-0">
-          <i class="bi bi-person-plus-fill me-2"></i>Add / Update Customer
-        </h5>
-      </div>
-      <div class="card-body">
-        <form id="customerForm">
+    <!-- Add Customer Section -->
+    <div id="add-customer-section" class="section" style="display: none;">
+      <div class="content-card">
+        <h4 class="mb-4">Add New Customer</h4>
+        <form id="addCustomerForm">
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="phone" class="form-label fw-bold">Phone Number *</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
-                <input type="tel" class="form-control form-control-lg" id="phone" placeholder="+9715xxxxxxx" required>
-                <div class="invalid-feedback">Please provide a valid phone number</div>
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">First Name *</label>
+                <input type="text" class="form-control-custom" id="firstName" required>
+                <div class="invalid-feedback">Please enter first name</div>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="name" class="form-label fw-bold">Customer Name</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" class="form-control form-control-lg" id="name" placeholder="Enter name">
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Last Name</label>
+                <input type="text" class="form-control-custom" id="lastName">
               </div>
             </div>
           </div>
           <div class="row">
-            <div class="col-md-6 mb-3">
-              <label for="branch" class="form-label fw-bold">Branch</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
-                <select class="form-select form-select-lg" id="branch">
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Phone Number *</label>
+                <input type="tel" class="form-control-custom" id="phoneNumber" required>
+                <div class="invalid-feedback">Please enter a valid phone number</div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Email</label>
+                <input type="email" class="form-control-custom" id="email">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Branch *</label>
+                <select class="form-control-custom" id="branch" required>
+                  <option value="">Select Branch</option>
                   <option value="Hamdan">Hamdan</option>
                   <option value="Muroor">Muroor</option>
                   <option value="Shabiya 11">Shabiya 11</option>
@@ -935,849 +775,1295 @@
                 </select>
               </div>
             </div>
-            <div class="col-md-6 mb-3">
-              <label for="status" class="form-label fw-bold">Status</label>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-toggle-on"></i></span>
-                <select class="form-select form-select-lg" id="status">
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Status</label>
+                <select class="form-control-custom" id="status">
                   <option value="Active">Active</option>
-                  <option value="Opt-Out">Opt-Out</option>
+                  <option value="Inactive">Inactive</option>
                 </select>
               </div>
             </div>
           </div>
-          <div class="d-flex justify-content-between">
-            <button type="submit" class="btn btn-primary btn-lg">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Date of Birth</label>
+                <input type="date" class="form-control-custom" id="dob">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating-custom">
+                <label class="filter-label">Anniversary</label>
+                <input type="date" class="form-control-custom" id="anniversary">
+              </div>
+            </div>
+          </div>
+          <div class="form-floating-custom">
+            <label class="filter-label">Address</label>
+            <textarea class="form-control-custom" id="address" rows="3"></textarea>
+          </div>
+          <div class="form-floating-custom">
+            <label class="filter-label">Notes</label>
+            <textarea class="form-control-custom" id="notes" rows="3"></textarea>
+          </div>
+          <div class="form-floating-custom">
+            <label class="filter-label">Tags (comma separated)</label>
+            <input type="text" class="form-control-custom" id="tags" placeholder="e.g., VIP, Premium, Regular">
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button type="submit" class="btn btn-gradient">
               <i class="bi bi-save me-2"></i>Save Customer
             </button>
-            <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">
-              <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">
+              <i class="bi bi-arrow-clockwise me-2"></i>Reset
             </button>
           </div>
         </form>
       </div>
     </div>
 
-    <!-- Customer List Table -->
-    <div class="card fade-in">
-      <div class="card-header">
-        <div class="row align-items-center">
-          <div class="col-md-6">
-            <h5 class="mb-0">
-              <i class="bi bi-list-ul me-2"></i>Customer List
-            </h5>
+    <!-- Bulk Import Section -->
+    <div id="bulk-import-section" class="section" style="display: none;">
+      <div class="content-card">
+        <h4 class="mb-4">Bulk Import Customers</h4>
+        
+        <!-- Download Template -->
+        <div class="import-export-section">
+          <h5>Step 1: Download Template</h5>
+          <p>Download our CSV template and fill it with your customer data.</p>
+          <button class="btn btn-gradient" onclick="downloadTemplate()">
+            <i class="bi bi-download me-2"></i>Download CSV Template
+          </button>
+        </div>
+
+        <!-- Upload File -->
+        <div class="import-export-section">
+          <h5>Step 2: Upload File</h5>
+          <div class="file-upload-area" id="fileUploadArea" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <i class="bi bi-cloud-upload" style="font-size: 3rem; color: #667eea;"></i>
+            <p class="mt-3">Drag and drop your CSV file here or click to browse</p>
+            <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="handleFileSelect(event)">
+            <button class="btn btn-gradient mt-2" onclick="document.getElementById('csvFile').click()">
+              Choose File
+            </button>
           </div>
+          <div id="fileInfo" class="mt-3" style="display: none;">
+            <p><strong>Selected file:</strong> <span id="fileName"></span></p>
+            <button class="btn btn-success-gradient" onclick="processCSV()">
+              <i class="bi bi-upload me-2"></i>Import Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Import Preview -->
+        <div id="importPreview" style="display: none;">
+          <h5>Step 3: Preview & Confirm</h5>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Branch</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="previewTableBody">
+                <!-- Preview rows will be added here -->
+              </tbody>
+            </table>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-success-gradient" onclick="confirmImport()">
+              <i class="bi bi-check-circle me-2"></i>Confirm Import
+            </button>
+            <button class="btn btn-secondary" onclick="cancelImport()">
+              <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messaging Section -->
+    <div id="messaging-section" class="section" style="display: none;">
+      <div class="content-card">
+        <h4 class="mb-4">Send Messages</h4>
+        
+        <!-- Message Type Selection -->
+        <div class="row mb-4">
+          <div class="col-md-12">
+            <label class="filter-label">Message Type</label>
+            <div class="btn-group w-100" role="group">
+              <input type="radio" class="btn-check" name="msgType" id="msgWhatsApp" value="whatsapp" checked>
+              <label class="btn btn-outline-success" for="msgWhatsApp">
+                <i class="bi bi-whatsapp me-2"></i>WhatsApp
+              </label>
+              <input type="radio" class="btn-check" name="msgType" id="msgSMS" value="sms">
+              <label class="btn btn-outline-primary" for="msgSMS">
+                <i class="bi bi-chat-dots me-2"></i>SMS
+              </label>
+              <input type="radio" class="btn-check" name="msgType" id="msgEmail" value="email">
+              <label class="btn btn-outline-info" for="msgEmail">
+                <i class="bi bi-envelope me-2"></i>Email
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recipients Selection -->
+        <div class="row mb-4">
           <div class="col-md-6">
-            <div class="d-flex align-items-center justify-content-end">
-              <div class="form-check me-3">
-                <input class="form-check-input" type="checkbox" id="selectAll" onchange="toggleSelectAll()">
-                <label class="form-check-label text-white" for="selectAll">
-                  Select All
-                </label>
+            <label class="filter-label">Select Recipients</label>
+            <select class="form-control-custom" id="recipientType" onchange="updateRecipients()">
+              <option value="all">All Active Customers</option>
+              <option value="branch">By Branch</option>
+              <option value="tags">By Tags</option>
+              <option value="custom">Custom Selection</option>
+            </select>
+          </div>
+          <div class="col-md-6" id="branchSelection" style="display: none;">
+            <label class="filter-label">Select Branch</label>
+            <select class="form-control-custom" id="msgBranch" onchange="updateRecipients()">
+              <option value="Hamdan">Hamdan</option>
+              <option value="Muroor">Muroor</option>
+              <option value="Shabiya 11">Shabiya 11</option>
+              <option value="Al Barsha">Al Barsha</option>
+              <option value="Al Rigga">Al Rigga</option>
+              <option value="Khalidiya">Khalidiya</option>
+              <option value="Al Satwa">Al Satwa</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Message Templates -->
+        <div class="mb-4">
+          <label class="filter-label">Message Template</label>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-floating-custom">
+                <select class="form-control-custom" id="msgTemplate" onchange="loadTemplate()">
+                  <option value="">Select Template</option>
+                  <option value="welcome">Welcome Message</option>
+                  <option value="promotion">Special Promotion</option>
+                  <option value="reminder">Appointment Reminder</option>
+                  <option value="feedback">Feedback Request</option>
+                  <option value="custom">Custom Message</option>
+                </select>
               </div>
-              <div class="search-container">
-                <i class="bi bi-search search-icon"></i>
-                <input type="text" class="form-control form-control-sm search-input" id="searchInput" placeholder="Search customers..." style="width: 300px;">
+            </div>
+            <div class="col-md-9">
+              <div class="form-floating-custom">
+                <textarea class="form-control-custom" id="msgText" rows="4" placeholder="Type your message here..."></textarea>
               </div>
             </div>
           </div>
         </div>
+
+        <!-- Recipients Preview -->
+        <div class="mb-4">
+          <label class="filter-label">Recipients (<span id="recipientCount">0</span>)</label>
+          <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
+            <div id="recipientsList"></div>
+          </div>
+        </div>
+
+        <!-- Send Button -->
+        <button class="btn btn-success-gradient btn-lg" onclick="sendMessages()">
+          <i class="bi bi-send me-2"></i>Send Messages
+        </button>
       </div>
-      <div class="card-body table-responsive">
-        <table class="table table-hover" id="customerTable">
-          <thead>
-            <tr>
-              <th width="50">
-                <input type="checkbox" class="form-check-input" id="headerCheckbox" onchange="toggleSelectAll()">
-              </th>
-              <th onclick="sortTable('phone')" style="cursor: pointer;">
-                Phone <i class="bi bi-arrow-down-up"></i>
-              </th>
-              <th onclick="sortTable('name')" style="cursor: pointer;">
-                Name <i class="bi bi-arrow-down-up"></i>
-              </th>
-              <th onclick="sortTable('branch')" style="cursor: pointer;">
-                Branch <i class="bi bi-arrow-down-up"></i>
-              </th>
-              <th onclick="sortTable('status')" style="cursor: pointer;">
-                Status <i class="bi bi-arrow-down-up"></i>
-              </th>
-              <th onclick="sortTable('lastContact')" style="cursor: pointer;">
-                Last Contact <i class="bi bi-arrow-down-up"></i>
-              </th>
-              <th>Message Status</th>
-              <th>Last Message</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+    </div>
+
+    <!-- Analytics Section -->
+    <div id="analytics-section" class="section" style="display: none;">
+      <div class="content-card">
+        <h4 class="mb-4">Analytics Dashboard</h4>
         
-        <!-- Pagination -->
-        <div class="pagination-container">
-          <nav>
-            <ul class="pagination" id="pagination"></ul>
-          </nav>
+        <!-- Chart Containers -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="chart-container">
+              <canvas id="customerGrowthChart"></canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="chart-container">
+              <canvas id="branchDistributionChart"></canvas>
+            </div>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <div class="chart-container">
+              <canvas id="messageStatsChart"></canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="chart-container">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Settings Section -->
+    <div id="settings-section" class="section" style="display: none;">
+      <div class="content-card">
+        <h4 class="mb-4">Settings</h4>
+        
+        <!-- General Settings -->
+        <div class="mb-4">
+          <h5>General Settings</h5>
+          <div class="form-floating-custom">
+            <label class="filter-label">Company Name</label>
+            <input type="text" class="form-control-custom" id="companyName" value="Your Company">
+          </div>
+          <div class="form-floating-custom">
+            <label class="filter-label">Company Phone</label>
+            <input type="tel" class="form-control-custom" id="companyPhone" value="+971501882206">
+          </div>
+          <div class="form-floating-custom">
+            <label class="filter-label">Company Email</label>
+            <input type="email" class="form-control-custom" id="companyEmail" value="info@company.com">
+          </div>
+        </div>
+
+        <!-- Message Settings -->
+        <div class="mb-4">
+          <h5>Message Settings</h5>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="enableRateLimit" checked>
+            <label class="form-check-label" for="enableRateLimit">
+              Enable rate limiting (1 message per customer per day)
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="enableDeliveryReport" checked>
+            <label class="form-check-label" for="enableDeliveryReport">
+              Enable delivery reports
+            </label>
+          </div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="mb-4">
+          <h5>Data Management</h5>
+          <button class="btn btn-gradient me-2" onclick="backupData()">
+            <i class="bi bi-cloud-download me-2"></i>Backup All Data
+          </button>
+          <button class="btn btn-danger-gradient" onclick="clearAllData()">
+            <i class="bi bi-trash me-2"></i>Clear All Data
+          </button>
+        </div>
+
+        <button class="btn btn-success-gradient" onclick="saveSettings()">
+          <i class="bi bi-save me-2"></i>Save Settings
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="text-center">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-3">Processing...</p>
+    </div>
   </div>
 
-  <!-- Edit Modal -->
-  <div class="modal fade" id="editModal" tabindex="-1">
-    <div class="modal-dialog">
+  <!-- Toast Container -->
+  <div class="toast-container"></div>
+
+  <!-- Edit Customer Modal -->
+  <div class="modal fade" id="editCustomerModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title">Edit Customer</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <form id="editForm">
-            <input type="hidden" id="editIndex">
-            <div class="mb-3">
-              <label for="editPhone" class="form-label">Phone Number</label>
-              <input type="tel" class="form-control" id="editPhone" readonly>
-            </div>
-            <div class="mb-3">
-              <label for="editName" class="form-label">Customer Name</label>
-              <input type="text" class="form-control" id="editName">
-            </div>
-            <div class="mb-3">
-              <label for="editBranch" class="form-label">Branch</label>
-              <select class="form-select" id="editBranch">
-                <option value="Hamdan">Hamdan</option>
-                <option value="Muroor">Muroor</option>
-                <option value="Shabiya 11">Shabiya 11</option>
-                <option value="Al Barsha">Al Barsha</option>
-                <option value="Al Rigga">Al Rigga</option>
-                <option value="Khalidiya">Khalidiya</option>
-                <option value="Al Satwa">Al Satwa</option>
-              </select>
-            </div>
-            <div class="mb-3">
-              <label for="editStatus" class="form-label">Status</label>
-              <select class="form-select" id="editStatus">
-                <option value="Active">Active</option>
-                <option value="Opt-Out">Opt-Out</option>
-              </select>
-            </div>
+          <form id="editCustomerForm">
+            <input type="hidden" id="editCustomerId">
+            <!-- Form fields will be populated dynamically -->
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-primary" onclick="saveEdit()">Save Changes</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Message Modal -->
-  <div class="modal fade" id="messageModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title"><i class="bi bi-send me-2"></i>Send Message</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Rate Limiting Notice -->
-          <div class="rate-limit-warning">
-            <i class="bi bi-info-circle me-2"></i>
-            <strong>Rate Limiting:</strong> Customers can only receive one message per day to prevent spam.
-          </div>
-
-          <!-- AI-Powered Message Generation -->
-          <div class="ai-section">
-            <div class="ai-header">
-              <i class="bi bi-cpu ai-icon"></i>
-              <h5 class="ai-title">AI-Powered Message Generation</h5>
-            </div>
-            <textarea class="ai-prompt-input" id="aiPrompt" placeholder="Describe the message you want to generate (e.g., 'Create a promotional message for weekend special offer with 20% discount')" rows="3"></textarea>
-            <div class="ai-loading" id="aiLoading">
-              <div class="ai-loading-spinner"></div>
-              <span>Generating message...</span>
-            </div>
-            <button class="ai-generate-btn" id="aiGenerateBtn" onclick="generateAIMessage()">
-              <i class="bi bi-magic me-2"></i>Generate Message with AI
-            </button>
-            <div class="ai-generated-content" id="aiGeneratedContent" style="display: none;">
-              <div class="ai-generated-text" id="aiGeneratedText"></div>
-              <img class="ai-generated-image" id="aiGeneratedImage" style="display: none;">
-              <div class="ai-actions">
-                <button class="ai-action-btn ai-use-btn" onclick="useAIMessage()">
-                  <i class="bi bi-check me-1"></i>Use This Message
-                </button>
-                <button class="ai-action-btn ai-regenerate-btn" onclick="regenerateAIMessage()">
-                  <i class="bi bi-arrow-clockwise me-1"></i>Regenerate
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Message Type Selection -->
-          <div class="text-center mb-4">
-            <button class="btn message-type-btn active btn-success" id="whatsappBtn" onclick="selectMessageType('whatsapp')">
-              <i class="bi bi-whatsapp me-2"></i>WhatsApp
-            </button>
-            <button class="btn message-type-btn btn-outline-primary" id="smsBtn" onclick="selectMessageType('sms')">
-              <i class="bi bi-chat-dots me-2"></i>SMS
-            </button>
-          </div>
-
-          <!-- Customer Selection -->
-          <div class="mb-4">
-            <h6><i class="bi bi-people me-2"></i>Select Customers</h6>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="selectionType" id="selectAllRadio" value="all" checked onchange="updateCustomerSelection()">
-                  <label class="form-check-label" for="selectAllRadio">
-                    Send to all active customers
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="selectionType" id="selectBranchRadio" value="branch" onchange="updateCustomerSelection()">
-                  <label class="form-check-label" for="selectBranchRadio">
-                    Send by branch
-                  </label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="selectionType" id="selectCustomRadio" value="custom" onchange="updateCustomerSelection()">
-                  <label class="form-check-label" for="selectCustomRadio">
-                    Select specific customers
-                  </label>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div id="selectedCount" class="text-muted">
-                  <i class="bi bi-info-circle me-1"></i>
-                  <span id="selectedCountText">0 customers selected</span>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Branch Selection -->
-            <div id="branchSelection" class="mt-3" style="display: none;">
-              <div class="border rounded p-3">
-                <h6>Select Branches</h6>
-                <div id="branchCheckboxes"></div>
-                <div class="branch-stats mt-3" id="branchStats"></div>
-              </div>
-            </div>
-            
-            <!-- Custom Customer Selection -->
-            <div id="customSelection" class="mt-3" style="display: none;">
-              <div class="border rounded p-3" style="max-height: 200px; overflow-y: auto;">
-                <div id="customerCheckboxes"></div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Message Templates -->
-          <div class="mb-4">
-            <h6><i class="bi bi-file-text me-2"></i>Message Templates</h6>
-            <div class="list-group" id="templateList">
-              <div class="list-group-item message-template" onclick="selectTemplate(0)">
-                <div class="d-flex w-100 justify-content-between">
-                  <h6 class="mb-1">Welcome Message</h6>
-                  <small>Promotional</small>
-                </div>
-                <p class="mb-1">Welcome to our service! We're excited to have you with us.</p>
-              </div>
-              <div class="list-group-item message-template" onclick="selectTemplate(1)">
-                <div class="d-flex w-100 justify-content-between">
-                  <h6 class="mb-1">Special Offer</h6>
-                  <small>Promotional</small>
-                </div>
-                <p class="mb-1">Special offer just for you! Get 20% off on your next order.</p>
-              </div>
-              <div class="list-group-item message-template" onclick="selectTemplate(2)">
-                <div class="d-flex w-100 justify-content-between">
-                  <h6 class="mb-1">Follow-up</h6>
-                  <small>Reminder</small>
-                </div>
-                <p class="mb-1">Just checking in. How was your recent experience with us?</p>
-              </div>
-              <div class="list-group-item message-template" onclick="selectTemplate(3)">
-                <div class="d-flex w-100 justify-content-between">
-                  <h6 class="mb-1">Custom Message</h6>
-                  <small>Custom</small>
-                </div>
-                <p class="mb-1">Write your own custom message...</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Image Upload Section -->
-          <div class="image-upload-section">
-            <label for="imageUpload" class="image-upload-label">
-              <i class="bi bi-image me-2"></i>
-              <span id="imageUploadText">Click to upload an image (optional)</span>
-            </label>
-            <input type="file" id="imageUpload" accept="image/*" style="display: none;" onchange="handleImageUpload(event)">
-            <img id="imagePreview" class="image-preview" alt="Image preview">
-          </div>
-
-          <!-- Message Composition -->
-          <div class="mb-4">
-            <h6><i class="bi bi-pencil me-2"></i>Compose Message</h6>
-            <textarea class="form-control" id="messageText" rows="4" placeholder="Type your message here..." maxlength="500"></textarea>
-            <div class="text-end mt-1">
-              <small class="text-muted"><span id="charCount">0</span>/500 characters</small>
-            </div>
-          </div>
-
-          <!-- Message Preview -->
-          <div class="mb-4">
-            <h6><i class="bi bi-eye me-2"></i>Preview</h6>
-            <div class="message-preview" id="messagePreview">
-              <p class="text-muted mb-0">Your message will appear here...</p>
-            </div>
-          </div>
-
-          <!-- Send Progress -->
-          <div class="send-progress" id="sendProgress">
-            <h6><i class="bi bi-activity me-2"></i>Sending Progress</h6>
-            <div id="progressList"></div>
-          </div>
-
-          <!-- WhatsApp Links Section -->
-          <div class="whatsapp-links" id="whatsappLinks" style="display: none;">
-            <h6><i class="bi bi-link-45deg me-2"></i>WhatsApp Links</h6>
-            <p class="text-muted small">Click on any link to open WhatsApp with pre-filled message</p>
-            <div id="whatsappLinksList"></div>
-          </div>
-
-          <!-- Message Statistics -->
-          <div class="message-stats">
-            <div class="stat-item">
-              <div class="stat-number" id="totalMessages">0</div>
-              <div class="stat-label">Total Messages</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="whatsappCount">0</div>
-              <div class="stat-label">WhatsApp</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="smsCount">0</div>
-              <div class="stat-label">SMS</div>
-            </div>
-            <div class="stat-item">
-              <div class="stat-number" id="estimatedCost">$0.00</div>
-              <div class="stat-label">Est. Cost</div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="button" class="btn btn-success" onclick="sendMessage()">
-            <i class="bi bi-send me-2"></i>Send Message
-          </button>
+          <button type="button" class="btn btn-gradient" onclick="saveEditedCustomer()">Save Changes</button>
         </div>
       </div>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
-    // Company information
-    const companyNumber = '+971501882206';
-    
-    // Customer data provided
-    const customerData = [
-      { branch: 'Hamdan', mobile: '564394125', name: 'CHRISTINE' },
-      { branch: 'Muroor', mobile: '527186938', name: 'REN' },
-      { branch: 'Shabiya 11', mobile: '501320863', name: 'FARDUS' },
-      { branch: 'Shabiya 11', mobile: '504007898', name: 'JUMANA' },
-      { branch: 'Al Barsha', mobile: '567578678', name: 'CAMILLE' },
-      { branch: 'Al Rigga', mobile: '569307444', name: 'ROSE' },
-      { branch: 'Hamdan', mobile: '501989046', name: 'MUSTAFA' },
-      { branch: 'Hamdan', mobile: '505916622', name: 'ABDO' },
-      { branch: 'Hamdan', mobile: '507913592', name: 'MOHAMMED' },
-      { branch: 'Hamdan', mobile: '561380830', name: 'MOHAMMED' },
-      { branch: 'Al Rigga', mobile: '555602882', name: 'AHMED' },
-      { branch: 'Al Rigga', mobile: '526988212', name: 'AHMED' },
-      { branch: 'Khalidiya', mobile: '505028089', name: 'YOUSEF' },
-      { branch: 'Khalidiya', mobile: '509739438', name: 'YOUSEF' },
-      { branch: 'Khalidiya', mobile: '508893856', name: 'IMAN' },
-      { branch: 'Al Barsha', mobile: '502303812', name: 'GRACE' },
-      { branch: 'Shabiya 11', mobile: '545946188', name: 'METO' },
-      { branch: 'Shabiya 11', mobile: '526334675', name: 'VALANTINE' },
-      { branch: 'Hamdan', mobile: '554823068', name: 'JOVY' },
-      { branch: 'Muroor', mobile: '506713519', name: 'AYAZ' },
-      { branch: 'Shabiya 11', mobile: '552548908', name: 'Mohamad' },
-      { branch: 'Khalidiya', mobile: '506713519', name: 'AJIN' },
-      { branch: 'Hamdan', mobile: '528297700', name: 'MALIY' },
-      { branch: 'Khalidiya', mobile: '545626243', name: 'LORI' },
-      { branch: 'Shabiya 11', mobile: '563560162', name: 'AISHA' },
-      { branch: 'Hamdan', mobile: '507336642', name: 'ANU' },
-      { branch: 'Hamdan', mobile: '543534143', name: 'KLEVIN' },
-      { branch: 'Hamdan', mobile: '558297721', name: 'RHEA' },
-      { branch: 'Khalidiya', mobile: '507024996', name: 'RAHMA' },
-      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
-      { branch: 'Hamdan', mobile: '568877380', name: 'MIRA' },
-      { branch: 'Shabiya 11', mobile: '529840203', name: 'SHIJU' },
-      { branch: 'Khalidiya', mobile: '523107089', name: 'SONIYA' },
-      { branch: 'Muroor', mobile: '508580082', name: 'TASNIMA' },
-      { branch: 'Hamdan', mobile: '562575749', name: 'TERESA' },
-      { branch: 'Khalidiya', mobile: '503019353', name: 'JOSH' },
-      { branch: 'Hamdan', mobile: '502863604', name: 'BETH' },
-      { branch: 'Al Rigga', mobile: '565405682', name: 'PIOLO' },
-      { branch: 'Khalidiya', mobile: '565107419', name: 'DEXTER' },
-      { branch: 'Hamdan', mobile: '568741270', name: 'CIELO' },
-      { branch: 'Hamdan', mobile: '547954507', name: 'ZAYED' },
-      { branch: 'Hamdan', mobile: '553192458', name: 'MICHELLE' },
-      { branch: 'Shabiya 11', mobile: '554430260', name: 'NIDHIN' },
-      { branch: 'Muroor', mobile: '555584918', name: 'SUFIYAN' },
-      { branch: 'Hamdan', mobile: '527565425', name: 'JOHN' },
-      { branch: 'Khalidiya', mobile: '565724773', name: 'ROSAN' },
-      { branch: 'Shabiya 11', mobile: '586549821', name: 'NITIN' },
-      { branch: 'Al Barsha', mobile: '505147354', name: 'MUHAMMMAD' },
-      { branch: 'Al Barsha', mobile: '543536153', name: 'MARIN' },
-      { branch: 'Hamdan', mobile: '545835702', name: 'SARA' },
-      { branch: 'Shabiya 11', mobile: '561992001', name: 'JITHIN' },
-      { branch: 'Khalidiya', mobile: '565788498', name: 'DALA' },
-      { branch: 'Hamdan', mobile: '567090818', name: 'DEVIKA' },
-      { branch: 'Shabiya 11', mobile: '545617576', name: 'AJMAL' },
-      { branch: 'Khalidiya', mobile: '507724753', name: 'SANA' },
-      { branch: 'Hamdan', mobile: '502815217', name: 'RENELYN' },
-      { branch: 'Hamdan', mobile: '501492750', name: 'DEXTER' },
-      { branch: 'Shabiya 11', mobile: '566318838', name: 'LAXMI' },
-      { branch: 'Shabiya 11', mobile: '502530369', name: 'SANTOSH' },
-      { branch: 'Al Barsha', mobile: '529066607', name: 'DENAB' },
-      { branch: 'Khalidiya', mobile: '569053528', name: 'MONA' },
-      { branch: 'Khalidiya', mobile: '502214804', name: 'HIZRA' },
-      { branch: 'Hamdan', mobile: '568447261', name: 'ANWAR' },
-      { branch: 'Hamdan', mobile: '551407910', name: 'FERDINAND' },
-      { branch: 'Shabiya 11', mobile: '564011493', name: 'ANGEL' },
-      { branch: 'Hamdan', mobile: '589301919', name: 'ANABEL' },
-      { branch: 'Khalidiya', mobile: '507363128', name: 'KATER' },
-      { branch: 'Al Barsha', mobile: '581177457', name: 'DANISH' },
-      { branch: 'Shabiya 11', mobile: '503756368', name: 'MOHAMMAD' },
-      { branch: 'Khalidiya', mobile: '503251268', name: 'EMELDA' },
-      { branch: 'Muroor', mobile: '582093916', name: 'AMJED' },
-      { branch: 'Khalidiya', mobile: '585870654', name: 'BADF' },
-      { branch: 'Hamdan', mobile: '589664200', name: 'AMEER' },
-      { branch: 'Al Barsha', mobile: '525064488', name: 'MAI MD' },
-      { branch: 'Al Barsha', mobile: '562360831', name: 'HALIN' },
-      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
-      { branch: 'Muroor', mobile: '559806470', name: 'JOSEPH' },
-      { branch: 'Hamdan', mobile: '508434230', name: 'MANOJ' },
-      { branch: 'Muroor', mobile: '563229319', name: 'ABIR' },
-      { branch: 'Khalidiya', mobile: '582093916', name: 'ANA' },
-      { branch: 'Al Barsha', mobile: '504236876', name: 'SUPTHI' },
-      { branch: 'Muroor', mobile: '562840716', name: 'EUNICE' },
-      { branch: 'Khalidiya', mobile: '501603113', name: 'INA' },
-      { branch: 'Hamdan', mobile: '507629296', name: 'OMER' },
-      { branch: 'Shabiya 11', mobile: '526774551', name: 'ABDUL' },
-      { branch: 'Shabiya 11', mobile: '502743880', name: 'ALI' },
-      { branch: 'Hamdan', mobile: '506967108', name: 'RABAB' },
-      { branch: 'Al Rigga', mobile: '523961724', name: 'AASHAM' },
-      { branch: 'Khalidiya', mobile: '553775627', name: 'ROCHELLE' },
-      { branch: 'Al Satwa', mobile: '552466774', name: 'BABY' },
-      { branch: 'Khalidiya', mobile: '527426680', name: 'LIGO' },
-      { branch: 'Hamdan', mobile: '558718744', name: 'MAYA' },
-      { branch: 'Shabiya 11', mobile: '506072378', name: 'ISRAD' },
-      { branch: 'Shabiya 11', mobile: '557184725', name: 'SANTOS' },
-      { branch: 'Shabiya 11', mobile: '589023557', name: 'AMJAD' },
-      { branch: 'Hamdan', mobile: '557918114', name: 'UNIS' },
-      { branch: 'Shabiya 11', mobile: '505253250', name: 'NOUSHAD' },
-      { branch: 'Hamdan', mobile: '564628011', name: 'AYHAM' },
-      { branch: 'Hamdan', mobile: '544755895', name: 'MARIVIC' },
-      { branch: 'Al Satwa', mobile: '504246316', name: 'NOEL' },
-      { branch: 'Hamdan', mobile: '503822598', name: 'EMELY' },
-      { branch: 'Khalidiya', mobile: '552293714', name: 'ABDULLAH' },
-      { branch: 'Hamdan', mobile: '529921915', name: 'RISSA' },
-      { branch: 'Khalidiya', mobile: '554304756', name: 'SELENA' },
-      { branch: 'Al Satwa', mobile: '568805262', name: 'MONICA' },
-      { branch: 'Khalidiya', mobile: '558334849', name: 'BINU' },
-      { branch: 'Shabiya 11', mobile: '508403439', name: 'MINU' },
-      { branch: 'Muroor', mobile: '505409310', name: 'SALEEM' },
-      { branch: 'Khalidiya', mobile: '522415255', name: 'SHERAZ' },
-      { branch: 'Hamdan', mobile: '503898614', name: 'KHALEEN' },
-      { branch: 'Hamdan', mobile: '507319957', name: 'DAISY' },
-      { branch: 'Hamdan', mobile: '526468843', name: 'LARA' },
-      { branch: 'Shabiya 11', mobile: '542415727', name: 'MARJORIE' },
-      { branch: 'Hamdan', mobile: '567978948', name: 'JUNE' },
-      { branch: 'Shabiya 11', mobile: '526774551', name: 'RIYAZ' },
-      { branch: 'Muroor', mobile: '503514614', name: 'RAJAD' },
-      { branch: 'Hamdan', mobile: '569799768', name: 'LILITH' },
-      { branch: 'Shabiya 11', mobile: '509184419', name: 'NEYA' },
-      { branch: 'Shabiya 11', mobile: '551661645', name: 'MAHESH' },
-      { branch: 'Hamdan', mobile: '545114176', name: 'JENNY' },
-      { branch: 'Hamdan', mobile: '545097366', name: 'HARSHA' },
-      { branch: 'Hamdan', mobile: '586689227', name: 'JESTON' },
-      { branch: 'Muroor', mobile: '547925889', name: 'FATHY' },
-      { branch: 'Khalidiya', mobile: '567815135', name: 'MANU' },
-      { branch: 'Al Rigga', mobile: '551522707', name: 'CJ' },
-      { branch: 'Al Satwa', mobile: '559248153', name: 'SIKANDAR' },
-      { branch: 'Khalidiya', mobile: '568780234', name: 'MOHAMMAD' },
-      { branch: 'Shabiya 11', mobile: '543652804', name: 'WENG' },
-      { branch: 'Muroor', mobile: '524400674', name: 'MAEAQYA' },
-      { branch: 'Khalidiya', mobile: '545083609', name: 'QEUL' },
-      { branch: 'Khalidiya', mobile: '508496161', name: 'SHERLY' },
-      { branch: 'Khalidiya', mobile: '501322442', name: 'ABUKHARIFA' },
-      { branch: 'Khalidiya', mobile: '526862119', name: 'MARWA' },
-      { branch: 'Al Satwa', mobile: '566917381', name: 'KAYE' },
-      { branch: 'Al Satwa', mobile: '556466009', name: 'KAN' },
-      { branch: 'Hamdan', mobile: '561085971', name: 'JOANNA MARIE' },
-      { branch: 'Khalidiya', mobile: '566825992', name: 'ERANDA' },
-      { branch: 'Al Rigga', mobile: '561509464', name: 'SARYA' },
-      { branch: 'Shabiya 11', mobile: '566252534', name: 'MUSTAFA' },
-      { branch: 'Muroor', mobile: '525311599', name: 'SHIELA' },
-      { branch: 'Al Barsha', mobile: '567376011', name: 'ARSHAN' },
-      { branch: 'Hamdan', mobile: '501457191', name: 'LUKE' },
-      { branch: 'Hamdan', mobile: '554504024', name: 'marry' },
-      { branch: 'Shabiya 11', mobile: '502394008', name: 'DARREL' },
-      { branch: 'Hamdan', mobile: '521872614', name: 'JOHNSON' },
-      { branch: 'Muroor', mobile: '545357584', name: 'REMY' },
-      { branch: 'Hamdan', mobile: '522279467', name: 'ANIL' },
-      { branch: 'Khalidiya', mobile: '551661172', name: 'BUSRA' },
-      { branch: 'Hamdan', mobile: '547327449', name: 'NIKI' },
-      { branch: 'Al Barsha', mobile: '585958703', name: 'Farag' },
-      { branch: 'Shabiya 11', mobile: '552438334', name: 'ABDU' },
-      { branch: 'Hamdan', mobile: '562585496', name: 'PRITI' },
-      { branch: 'Khalidiya', mobile: '509931008', name: 'WASHID' },
-      { branch: 'Hamdan', mobile: '563699844', name: 'NAZIH' },
-      { branch: 'Hamdan', mobile: '554525590', name: 'RALI' },
-      { branch: 'Muroor', mobile: '569033720', name: 'AHMED' },
-      { branch: 'Khalidiya', mobile: '505125294', name: 'RASSEL' },
-      { branch: 'Muroor', mobile: '503176539', name: 'AMIR' },
-      { branch: 'Shabiya 11', mobile: '506751814', name: 'ISMAIL' },
-      { branch: 'Muroor', mobile: '501801620', name: 'VELLA' },
-      { branch: 'Hamdan', mobile: '562362221', name: 'LONA' },
-      { branch: 'Shabiya 11', mobile: '569968276', name: 'KABITA' },
-      { branch: 'Al Barsha', mobile: '585107762', name: 'AYOM' },
-      { branch: 'Al Satwa', mobile: '501251665', name: 'MAJI' },
-      { branch: 'Hamdan', mobile: '505855270', name: 'MADAN KUMAR' },
-      { branch: 'Hamdan', mobile: '566050368', name: 'NOUSHAD' },
-      { branch: 'Al Barsha', mobile: '567312091', name: 'SHAMBHU' },
-      { branch: 'Al Satwa', mobile: '508226845', name: 'PRINCESS' },
-      { branch: 'Hamdan', mobile: '567117293', name: 'MOHAMMAD' },
-      { branch: 'Shabiya 11', mobile: '547212972', name: 'ANITA' },
-      { branch: 'Al Rigga', mobile: '502242169', name: 'ALI' },
-      { branch: 'Hamdan', mobile: '547104498', name: 'GULAM' },
-      { branch: 'Shabiya 11', mobile: '551823426', name: 'SABER' },
-      { branch: 'Khalidiya', mobile: '545080157', name: 'ZEN' },
-      { branch: 'Muroor', mobile: '582910029', name: 'SABIR' },
-      { branch: 'Khalidiya', mobile: '561150558', name: 'NOAH' },
-      { branch: 'Muroor', mobile: '561350792', name: 'RAJ' },
-      { branch: 'Khalidiya', mobile: '547115926', name: 'JENNY' },
-      { branch: 'Al Satwa', mobile: '565513916', name: 'SURESH' },
-      { branch: 'Khalidiya', mobile: '508442208', name: 'INAH' },
-      { branch: 'Hamdan', mobile: '558425275', name: 'HAZEM' },
-      { branch: 'Hamdan', mobile: '545097366', name: 'HARSHA' },
-      { branch: 'Hamdan', mobile: '507161463', name: 'MALOU' },
-      { branch: 'Khalidiya', mobile: '551781595', name: 'MRYNA' },
-      { branch: 'Hamdan', mobile: '559127243', name: 'JAZAR' },
-      { branch: 'Al Rigga', mobile: '526943166', name: 'BIKRAM' },
-      { branch: 'Shabiya 11', mobile: '503285513', name: 'MUHAMMED' },
-      { branch: 'Shabiya 11', mobile: '502032488', name: 'NADARE' },
-      { branch: 'Muroor', mobile: '562912512', name: 'KASIF' },
-      { branch: 'Shabiya 11', mobile: '569974544', name: 'SEJITH' }
-    ];
-
-    // Data storage with LocalStorage persistence
+    // Application State
     let customers = [];
-    let messageHistory = [];
-    let currentPage = 1;
-    const itemsPerPage = 15;
-    let sortColumn = 'lastContact';
-    let sortDirection = 'desc';
-    let filteredCustomers = [];
+    let messageLog = [];
+    let settings = {
+      companyName: 'Your Company',
+      companyPhone: '+971501882206',
+      companyEmail: 'info@company.com',
+      enableRateLimit: true,
+      enableDeliveryReport: true
+    };
     let selectedCustomers = new Set();
-    let selectedBranches = new Set();
-    let messageType = 'whatsapp';
-    let selectedTemplate = -1;
-    let uploadedImage = null;
-    let aiGeneratedMessage = null;
-    let lastSavedMessage = null;
+    let currentSection = 'dashboard';
+    let sortColumn = 'addedDate';
+    let sortDirection = 'desc';
+    let csvData = [];
 
-    // Message templates
-    const messageTemplates = [
-      {
-        name: 'Welcome Message',
-        category: 'Promotional',
-        text: 'Welcome to our service! We\'re excited to have you with us. Use code WELCOME10 for 10% off your first order!'
-      },
-      {
-        name: 'Special Offer',
-        category: 'Promotional',
-        text: 'Special offer just for you! Get 20% off on your next order. Valid until the end of this month. Shop now!'
-      },
-      {
-        name: 'Follow-up',
-        category: 'Reminder',
-        text: 'Just checking in. How was your recent experience with us? We value your feedback and would love to hear from you.'
-      },
-      {
-        name: 'Custom Message',
-        category: 'Custom',
-        text: ''
+    // Initialize Application
+    document.addEventListener('DOMContentLoaded', function() {
+      loadData();
+      showSection('dashboard');
+      updateMetrics();
+      renderCustomers();
+      initCharts();
+    });
+
+    // Load Data from LocalStorage
+    function loadData() {
+      const storedCustomers = localStorage.getItem('customers');
+      const storedMessageLog = localStorage.getItem('messageLog');
+      const storedSettings = localStorage.getItem('settings');
+
+      if (storedCustomers) {
+        customers = JSON.parse(storedCustomers);
+      } else {
+        // Initialize with sample data
+        initializeSampleData();
       }
-    ];
 
-    // Get all unique branches
-    function getUniqueBranches() {
-      const branches = new Set();
-      customers.forEach(customer => {
-        branches.add(customer.branch);
+      if (storedMessageLog) {
+        messageLog = JSON.parse(storedMessageLog);
+      }
+
+      if (storedSettings) {
+        settings = JSON.parse(storedSettings);
+      }
+    }
+
+    // Initialize Sample Data
+    function initializeSampleData() {
+      const sampleData = [
+        { branch: 'Hamdan', mobile: '564394125', name: 'CHRISTINE JOY', email: 'christine@email.com' },
+        { branch: 'Muroor', mobile: '527186938', name: 'REN ALVAREZ', email: 'ren@email.com' },
+        { branch: 'Shabiya 11', mobile: '501320863', name: 'FARDUS KHAN', email: 'fardus@email.com' },
+        { branch: 'Shabiya 11', mobile: '504007898', name: 'JUMANA SAEED', email: 'jumana@email.com' },
+        { branch: 'Al Barsha', mobile: '567578678', name: 'CAMILLE SANTOS', email: 'camille@email.com' }
+      ];
+
+      customers = sampleData.map((item, index) => ({
+        id: Date.now() + index,
+        firstName: item.name.split(' ')[0],
+        lastName: item.name.split(' ')[1] || '',
+        phone: `+971${item.mobile}`,
+        email: item.email,
+        branch: item.branch,
+        status: 'Active',
+        addedDate: new Date().toISOString(),
+        dob: '',
+        anniversary: '',
+        address: '',
+        notes: '',
+        tags: ['Regular']
+      }));
+
+      saveData();
+    }
+
+    // Save Data to LocalStorage
+    function saveData() {
+      localStorage.setItem('customers', JSON.stringify(customers));
+      localStorage.setItem('messageLog', JSON.stringify(messageLog));
+      localStorage.setItem('settings', JSON.stringify(settings));
+    }
+
+    // Show Section
+    function showSection(section) {
+      // Hide all sections
+      document.querySelectorAll('.section').forEach(s => {
+        s.style.display = 'none';
       });
-      return Array.from(branches);
+
+      // Show selected section
+      document.getElementById(`${section}-section`).style.display = 'block';
+
+      // Update sidebar active state
+      document.querySelectorAll('.sidebar-menu a').forEach(a => {
+        a.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      currentSection = section;
+
+      // Section-specific initialization
+      if (section === 'customers') {
+        renderCustomers();
+      } else if (section === 'analytics') {
+        updateCharts();
+      }
     }
 
-    // Check if customer can receive a message today (rate limiting)
-    function canSendMessageToday(customer) {
-      if (!customer.lastMessageDate) return true;
+    // Toggle Sidebar
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const mainContent = document.getElementById('mainContent');
       
-      const lastMessageDate = new Date(customer.lastMessageDate);
-      const today = new Date();
-      
-      // Reset time to compare only dates
-      lastMessageDate.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
-      
-      return lastMessageDate.getTime() < today.getTime();
+      sidebar.classList.toggle('collapsed');
+      mainContent.classList.toggle('expanded');
     }
 
-    // Generate AI-powered message
-    async function generateAIMessage() {
-      const prompt = document.getElementById('aiPrompt').value.trim();
-      if (!prompt) {
-        showToast('Please enter a description for the message you want to generate.', 'error');
+    // Update Metrics
+    function updateMetrics() {
+      const total = customers.length;
+      const active = customers.filter(c => c.status === 'Active').length;
+      const thisMonth = customers.filter(c => {
+        const addedDate = new Date(c.addedDate);
+        const now = new Date();
+        return addedDate.getMonth() === now.getMonth() && addedDate.getFullYear() === now.getFullYear();
+      }).length;
+      const messagesSent = messageLog.length;
+
+      document.getElementById('totalCustomers').textContent = total;
+      document.getElementById('activeCustomers').textContent = active;
+      document.getElementById('newThisMonth').textContent = thisMonth;
+      document.getElementById('messagesSent').textContent = messagesSent;
+    }
+
+    // Render Customers Table
+    function renderCustomers() {
+      const tbody = document.getElementById('customersTableBody');
+      if (!tbody) return;
+
+      tbody.innerHTML = '';
+
+      let filtered = [...customers];
+
+      // Apply filters
+      const statusFilter = document.getElementById('filterStatus')?.value;
+      const branchFilter = document.getElementById('filterBranch')?.value;
+      const searchFilter = document.getElementById('searchCustomers')?.value.toLowerCase();
+
+      if (statusFilter) {
+        filtered = filtered.filter(c => c.status === statusFilter);
+      }
+      if (branchFilter) {
+        filtered = filtered.filter(c => c.branch === branchFilter);
+      }
+      if (searchFilter) {
+        filtered = filtered.filter(c => 
+          (c.firstName && c.firstName.toLowerCase().includes(searchFilter)) ||
+          (c.lastName && c.lastName.toLowerCase().includes(searchFilter)) ||
+          c.phone.includes(searchFilter) ||
+          (c.email && c.email.toLowerCase().includes(searchFilter))
+        );
+      }
+
+      // Sort
+      filtered.sort((a, b) => {
+        let aVal = a[sortColumn] || '';
+        let bVal = b[sortColumn] || '';
+        
+        if (sortColumn === 'addedDate') {
+          aVal = new Date(aVal);
+          bVal = new Date(bVal);
+        }
+        
+        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      filtered.forEach(customer => {
+        const tr = document.createElement('tr');
+        const fullName = `${customer.firstName || ''} ${customer.lastName || ''}`.trim();
+        
+        tr.innerHTML = `
+          <td>
+            <input type="checkbox" class="customer-checkbox" data-id="${customer.id}" onchange="toggleCustomerSelection('${customer.id}')">
+          </td>
+          <td>${fullName || '-'}</td>
+          <td>${customer.phone}</td>
+          <td>${customer.email || '-'}</td>
+          <td>${customer.branch}</td>
+          <td>
+            <span class="status-badge status-${customer.status.toLowerCase()}">${customer.status}</span>
+          </td>
+          <td>${new Date(customer.addedDate).toLocaleDateString()}</td>
+          <td>
+            <div class="customer-tags">
+              ${customer.tags ? customer.tags.map(tag => `<span class="tag">${tag}</span>`).join('') : ''}
+            </div>
+          </td>
+          <td>
+            <div class="action-buttons">
+              <button class="btn-action btn-primary" onclick="editCustomer('${customer.id}')" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn-action btn-success" onclick="quickMessage('${customer.id}')" title="Send Message">
+                <i class="bi bi-send"></i>
+              </button>
+              <button class="btn-action btn-danger" onclick="deleteCustomer('${customer.id}')" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      updateBulkActions();
+    }
+
+    // Sort Table
+    function sortTable(column) {
+      if (sortColumn === column) {
+        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortColumn = column;
+        sortDirection = 'asc';
+      }
+      renderCustomers();
+    }
+
+    // Toggle Customer Selection
+    function toggleCustomerSelection(customerId) {
+      if (selectedCustomers.has(customerId)) {
+        selectedCustomers.delete(customerId);
+      } else {
+        selectedCustomers.add(customerId);
+      }
+      updateBulkActions();
+    }
+
+    // Toggle Select All
+    function toggleSelectAll() {
+      const checkboxes = document.querySelectorAll('.customer-checkbox');
+      const selectAll = document.getElementById('selectAll').checked || document.getElementById('headerCheckbox').checked;
+      
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = selectAll;
+        const customerId = checkbox.dataset.id;
+        if (selectAll) {
+          selectedCustomers.add(customerId);
+        } else {
+          selectedCustomers.delete(customerId);
+        }
+      });
+      
+      updateBulkActions();
+    }
+
+    // Update Bulk Actions
+    function updateBulkActions() {
+      const bulkActions = document.getElementById('bulkActions');
+      const selectedCount = document.getElementById('selectedCount');
+      
+      if (selectedCustomers.size > 0) {
+        bulkActions.classList.add('active');
+        selectedCount.textContent = `${selectedCustomers.size} customers selected`;
+      } else {
+        bulkActions.classList.remove('active');
+      }
+    }
+
+    // Add Customer Form Submit
+    document.getElementById('addCustomerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const phone = document.getElementById('phoneNumber').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const branch = document.getElementById('branch').value;
+      const status = document.getElementById('status').value;
+      const dob = document.getElementById('dob').value;
+      const anniversary = document.getElementById('anniversary').value;
+      const address = document.getElementById('address').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+      const tags = document.getElementById('tags').value.split(',').map(t => t.trim()).filter(t => t);
+
+      if (!firstName || !phone || !branch) {
+        showToast('Please fill in all required fields', 'error');
         return;
       }
 
-      const loadingDiv = document.getElementById('aiLoading');
-      const generateBtn = document.getElementById('aiGenerateBtn');
-      const contentDiv = document.getElementById('aiGeneratedContent');
-      
-      // Show loading state
-      loadingDiv.style.display = 'flex';
-      generateBtn.disabled = true;
-      contentDiv.style.display = 'none';
-
-      try {
-        // Simulate AI API call (replace with actual AI service)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Generate mock AI response
-        const aiResponse = await simulateAIResponse(prompt);
-        
-        // Display generated content
-        document.getElementById('aiGeneratedText').textContent = aiResponse.text;
-        
-        if (aiResponse.imageUrl) {
-          const img = document.getElementById('aiGeneratedImage');
-          img.src = aiResponse.imageUrl;
-          img.style.display = 'block';
-        } else {
-          document.getElementById('aiGeneratedImage').style.display = 'none';
-        }
-        
-        aiGeneratedMessage = aiResponse;
-        contentDiv.style.display = 'block';
-        
-        showToast('Message generated successfully!');
-      } catch (error) {
-        showToast('Failed to generate message. Please try again.', 'error');
-        console.error('AI generation error:', error);
-      } finally {
-        loadingDiv.style.display = 'none';
-        generateBtn.disabled = false;
-      }
-    }
-
-    // Simulate AI response (replace with actual AI service)
-    async function simulateAIResponse(prompt) {
-      // This is a mock implementation
-      // Replace with actual AI service like OpenAI, Claude, etc.
-      const responses = {
-        'promotional': '🎉 SPECIAL OFFER! Get 20% OFF on all services this weekend! Use code: WEEKEND20. Limited time only. Book now! 📞 +971501882206',
-        'welcome': '🌟 Welcome to our family! We\'re thrilled to have you with us. Enjoy 10% OFF your first service with code: WELCOME10. Looking forward to serving you! 😊',
-        'reminder': '📅 Friendly Reminder: Your appointment is coming up! Don\'t forget to confirm. Need to reschedule? Just give us a call! 📞 +971501882206',
-        'followup': '💝 How was your recent experience? We\'d love to hear your feedback! Rate us and get 5% OFF your next visit. Your opinion matters! ⭐',
-        'default': '✨ Thank you for being our valued customer! We have exciting updates just for you. Visit us or call to learn more! 📞 +971501882206'
+      const newCustomer = {
+        id: Date.now().toString(),
+        firstName,
+        lastName,
+        phone,
+        email,
+        branch,
+        status,
+        dob,
+        anniversary,
+        address,
+        notes,
+        tags,
+        addedDate: new Date().toISOString()
       };
 
-      let text = responses.default;
-      if (prompt.toLowerCase().includes('promotional') || prompt.toLowerCase().includes('offer') || prompt.toLowerCase().includes('discount')) {
-        text = responses.promotional;
-      } else if (prompt.toLowerCase().includes('welcome') || prompt.toLowerCase().includes('new')) {
-        text = responses.welcome;
-      } else if (prompt.toLowerCase().includes('reminder') || prompt.toLowerCase().includes('appointment')) {
-        text = responses.reminder;
-      } else if (prompt.toLowerCase().includes('feedback') || prompt.toLowerCase().includes('review')) {
-        text = responses.followup;
+      customers.push(newCustomer);
+      saveData();
+      
+      showToast('Customer added successfully!', 'success');
+      this.reset();
+      
+      if (currentSection === 'customers') {
+        renderCustomers();
       }
+      updateMetrics();
+    });
 
-      // Generate a random image for demonstration
-      const imageSeeds = ['business', 'promotion', 'service', 'offer', 'welcome'];
-      const randomSeed = imageSeeds[Math.floor(Math.random() * imageSeeds.length)];
-      const imageUrl = `https://picsum.photos/seed/${randomSeed}-${Date.now()}/400/200.jpg`;
+    // Edit Customer
+    function editCustomer(customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
 
-      return {
-        text: text,
-        imageUrl: prompt.toLowerCase().includes('image') ? imageUrl : null
-      };
+      // Populate edit form
+      document.getElementById('editCustomerId').value = customer.id;
+      
+      const form = document.getElementById('editCustomerForm');
+      form.innerHTML = `
+        <input type="hidden" id="editCustomerId" value="${customer.id}">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">First Name *</label>
+              <input type="text" class="form-control-custom" id="editFirstName" value="${customer.firstName || ''}" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Last Name</label>
+              <input type="text" class="form-control-custom" id="editLastName" value="${customer.lastName || ''}">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Phone Number *</label>
+              <input type="tel" class="form-control-custom" id="editPhone" value="${customer.phone}" required>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Email</label>
+              <input type="email" class="form-control-custom" id="editEmail" value="${customer.email || ''}">
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Branch *</label>
+              <select class="form-control-custom" id="editBranch" required>
+                <option value="Hamdan" ${customer.branch === 'Hamdan' ? 'selected' : ''}>Hamdan</option>
+                <option value="Muroor" ${customer.branch === 'Muroor' ? 'selected' : ''}>Muroor</option>
+                <option value="Shabiya 11" ${customer.branch === 'Shabiya 11' ? 'selected' : ''}>Shabiya 11</option>
+                <option value="Al Barsha" ${customer.branch === 'Al Barsha' ? 'selected' : ''}>Al Barsha</option>
+                <option value="Al Rigga" ${customer.branch === 'Al Rigga' ? 'selected' : ''}>Al Rigga</option>
+                <option value="Khalidiya" ${customer.branch === 'Khalidiya' ? 'selected' : ''}>Khalidiya</option>
+                <option value="Al Satwa" ${customer.branch === 'Al Satwa' ? 'selected' : ''}>Al Satwa</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Status</label>
+              <select class="form-control-custom" id="editStatus">
+                <option value="Active" ${customer.status === 'Active' ? 'selected' : ''}>Active</option>
+                <option value="Inactive" ${customer.status === 'Inactive' ? 'selected' : ''}>Inactive</option>
+                <option value="Opt-Out" ${customer.status === 'Opt-Out' ? 'selected' : ''}>Opt-Out</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Date of Birth</label>
+              <input type="date" class="form-control-custom" id="editDob" value="${customer.dob || ''}">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating-custom">
+              <label class="filter-label">Anniversary</label>
+              <input type="date" class="form-control-custom" id="editAnniversary" value="${customer.anniversary || ''}">
+            </div>
+          </div>
+        </div>
+        <div class="form-floating-custom">
+          <label class="filter-label">Address</label>
+          <textarea class="form-control-custom" id="editAddress" rows="3">${customer.address || ''}</textarea>
+        </div>
+        <div class="form-floating-custom">
+          <label class="filter-label">Notes</label>
+          <textarea class="form-control-custom" id="editNotes" rows="3">${customer.notes || ''}</textarea>
+        </div>
+        <div class="form-floating-custom">
+          <label class="filter-label">Tags (comma separated)</label>
+          <input type="text" class="form-control-custom" id="editTags" value="${customer.tags ? customer.tags.join(', ') : ''}">
+        </div>
+      `;
+
+      const modal = new bootstrap.Modal(document.getElementById('editCustomerModal'));
+      modal.show();
     }
 
-    // Use AI-generated message
-    function useAIMessage() {
-      if (!aiGeneratedMessage) return;
+    // Save Edited Customer
+    function saveEditedCustomer() {
+      const customerId = document.getElementById('editCustomerId').value;
+      const customer = customers.find(c => c.id === customerId);
       
-      document.getElementById('messageText').value = aiGeneratedMessage.text;
-      updateMessagePreview();
-      updateCharCount();
+      if (!customer) return;
+
+      customer.firstName = document.getElementById('editFirstName').value.trim();
+      customer.lastName = document.getElementById('editLastName').value.trim();
+      customer.phone = document.getElementById('editPhone').value.trim();
+      customer.email = document.getElementById('editEmail').value.trim();
+      customer.branch = document.getElementById('editBranch').value;
+      customer.status = document.getElementById('editStatus').value;
+      customer.dob = document.getElementById('editDob').value;
+      customer.anniversary = document.getElementById('editAnniversary').value;
+      customer.address = document.getElementById('editAddress').value.trim();
+      customer.notes = document.getElementById('editNotes').value.trim();
+      customer.tags = document.getElementById('editTags').value.split(',').map(t => t.trim()).filter(t => t);
+
+      saveData();
+      renderCustomers();
+      updateMetrics();
       
-      if (aiGeneratedMessage.imageUrl) {
-        uploadedImage = aiGeneratedMessage.imageUrl;
-        const preview = document.getElementById('imagePreview');
-        preview.src = uploadedImage;
-        preview.style.display = 'block';
-        document.getElementById('imageUploadText').textContent = 'AI-generated image attached';
+      const modal = bootstrap.Modal.getInstance(document.getElementById('editCustomerModal'));
+      modal.hide();
+      
+      showToast('Customer updated successfully!', 'success');
+    }
+
+    // Delete Customer
+    function deleteCustomer(customerId) {
+      if (confirm('Are you sure you want to delete this customer?')) {
+        customers = customers.filter(c => c.id !== customerId);
+        saveData();
+        renderCustomers();
+        updateMetrics();
+        showToast('Customer deleted successfully!', 'success');
+      }
+    }
+
+    // Quick Add Customer
+    function quickAddCustomer() {
+      showSection('add-customer');
+    }
+
+    // Apply Filters
+    function applyFilters() {
+      renderCustomers();
+    }
+
+    // Bulk Message
+    function bulkMessage() {
+      if (selectedCustomers.size === 0) {
+        showToast('Please select customers first', 'warning');
+        return;
+      }
+      showSection('messaging');
+    }
+
+    // Bulk Delete
+    function bulkDelete() {
+      if (selectedCustomers.size === 0) {
+        showToast('Please select customers first', 'warning');
+        return;
       }
       
-      showToast('AI-generated message applied!');
+      if (confirm(`Are you sure you want to delete ${selectedCustomers.size} customers?`)) {
+        customers = customers.filter(c => !selectedCustomers.has(c.id));
+        selectedCustomers.clear();
+        saveData();
+        renderCustomers();
+        updateMetrics();
+        showToast('Customers deleted successfully!', 'success');
+      }
     }
 
-    // Regenerate AI message
-    function regenerateAIMessage() {
-      generateAIMessage();
+    // CSV Template Download
+    function downloadTemplate() {
+      const csvContent = `FirstName,LastName,Phone,Email,Branch,Status,DOB,Anniversary,Address,Notes,Tags
+John,Doe,+971501234567,john@email.com,Hamdan,Active,1990-01-01,2020-01-01,"123 Main St","Regular customer","Regular"
+Jane,Smith,+971507654321,jane@email.com,Muroor,Active,1985-05-15,2018-06-20,"456 Oak Ave","VIP customer","VIP,Premium"`;
+      
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'customer_template.csv';
+      a.click();
+      
+      showToast('Template downloaded successfully!', 'success');
     }
 
-    // Handle image upload
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      if (file && file.type.startsWith('image/')) {
+    // File Upload Handlers
+    function handleDragOver(e) {
+      e.preventDefault();
+      document.getElementById('fileUploadArea').classList.add('dragover');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      document.getElementById('fileUploadArea').classList.remove('dragover');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      document.getElementById('fileUploadArea').classList.remove('dragover');
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        handleFileSelect({ target: { files } });
+      }
+    }
+
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (file && file.type === 'text/csv') {
+        document.getElementById('fileName').textContent = file.name;
+        document.getElementById('fileInfo').style.display = 'block';
+        
         const reader = new FileReader();
         reader.onload = function(e) {
-          uploadedImage = e.target.result;
-          const preview = document.getElementById('imagePreview');
-          preview.src = uploadedImage;
-          preview.style.display = 'block';
-          document.getElementById('imageUploadText').textContent = file.name;
+          csvData = parseCSV(e.target.result);
         };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    // Save last message
-    function saveLastMessage(messageText, imageUrl, recipients) {
-      lastSavedMessage = {
-        text: messageText,
-        image: imageUrl,
-        recipients: recipients.map(r => r.phone),
-        timestamp: new Date().toISOString(),
-        type: messageType
-      };
-      
-      // Save to localStorage
-      localStorage.setItem('lastSavedMessage', JSON.stringify(lastSavedMessage));
-      
-      // Also add to message history
-      const messageRecord = {
-        type: messageType,
-        text: messageText,
-        image: imageUrl,
-        recipients: recipients,
-        timestamp: new Date().toISOString(),
-        status: 'sent'
-      };
-      
-      messageHistory.push(messageRecord);
-      saveToLocalStorage();
-    }
-
-    // Load last saved message
-    function loadLastSavedMessage() {
-      const saved = localStorage.getItem('lastSavedMessage');
-      if (saved) {
-        lastSavedMessage = JSON.parse(saved);
-      }
-    }
-
-    // Debug function
-    function debug(message) {
-      console.log(message);
-      document.getElementById('debugInfo').textContent = `Debug: ${message}`;
-    }
-
-    // Show data status
-    function showDataStatus(message, type = 'success') {
-      const statusEl = document.getElementById('dataStatus');
-      const statusText = document.getElementById('dataStatusText');
-      
-      statusEl.style.display = 'block';
-      statusText.textContent = message;
-      
-      if (type === 'success') {
-        statusEl.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+        reader.readAsText(file);
       } else {
-        statusEl.style.background = 'linear-gradient(135deg, #dc3545, #fd7e14)';
+        showToast('Please select a valid CSV file', 'error');
       }
-      
-      setTimeout(() => {
-        statusEl.style.display = 'none';
-      }, 3000);
     }
 
-    // Initialize customers from provided data
-    function initializeCustomers() {
-      debug('Initializing customers...');
+    // Parse CSV
+    function parseCSV(csvText) {
+      const lines = csvText.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const data = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        if (lines[i].trim()) {
+          const values = lines[i].split(',').map(v => v.trim().replace(/"/g, ''));
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index] || '';
+          });
+          data.push(row);
+        }
+      }
+      
+      return data;
+    }
+
+    // Process CSV
+    function processCSV() {
+      if (csvData.length === 0) {
+        showToast('No data to process', 'error');
+        return;
+      }
+      
+      // Show preview
+      const previewBody = document.getElementById('previewTableBody');
+      previewBody.innerHTML = '';
+      
+      csvData.slice(0, 5).forEach(row => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${row.FirstName || ''} ${row.LastName || ''}</td>
+          <td>${row.Phone || ''}</td>
+          <td>${row.Email || ''}</td>
+          <td>${row.Branch || ''}</td>
+          <td>${row.Status || 'Active'}</td>
+        `;
+        previewBody.appendChild(tr);
+      });
+      
+      document.getElementById('importPreview').style.display = 'block';
+      showToast(`Previewing ${csvData.length} records`, 'info');
+    }
+
+    // Confirm Import
+    function confirmImport() {
       showLoading();
       
-      // Always use the provided data to ensure data is displayed
-      debug('Creating customers from provided data');
-      const now = new Date();
-      customers = customerData.map(item => ({
-        phone: `+971${item.mobile}`,
-        name: item.name,
-        branch: item.branch,
-        status: 'Active',
-        addedDate: now.toISOString(),
-        lastContact: now.toLocaleString(),
-        lastMessageDate: null, // Track when customer was last messaged
-        lastMessageContent: null // Store last message content
-      }));
+      let imported = 0;
+      let skipped = 0;
       
-      // Save to localStorage
-      saveToLocalStorage();
-      debug(`Created ${customers.length} new customers`);
-      showDataStatus(`Successfully loaded ${customers.length} customers!`);
+      csvData.forEach(row => {
+        // Check if phone already exists
+        if (!customers.find(c => c.phone === row.Phone)) {
+          const newCustomer = {
+            id: Date.now().toString() + Math.random(),
+            firstName: row.FirstName || '',
+            lastName: row.LastName || '',
+            phone: row.Phone || '',
+            email: row.Email || '',
+            branch: row.Branch || 'Hamdan',
+            status: row.Status || 'Active',
+            dob: row.DOB || '',
+            anniversary: row.Anniversary || '',
+            address: row.Address || '',
+            notes: row.Notes || '',
+            tags: row.Tags ? row.Tags.split(';').map(t => t.trim()).filter(t => t) : [],
+            addedDate: new Date().toISOString()
+          };
+          
+          customers.push(newCustomer);
+          imported++;
+        } else {
+          skipped++;
+        }
+      });
       
-      filteredCustomers = [...customers];
-      debug(`Filtered customers: ${filteredCustomers.length}`);
-      
+      saveData();
       hideLoading();
+      
+      document.getElementById('importPreview').style.display = 'none';
+      document.getElementById('fileInfo').style.display = 'none';
+      document.getElementById('csvFile').value = '';
+      
+      showToast(`Import completed! ${imported} imported, ${skipped} skipped`, 'success');
+      updateMetrics();
+      
+      if (currentSection === 'customers') {
+        renderCustomers();
+      }
     }
 
-    // Update last updated time
-    function updateLastUpdatedTime() {
-      const now = new Date();
-      document.getElementById('lastUpdated').textContent = now.toLocaleString();
+    // Cancel Import
+    function cancelImport() {
+      document.getElementById('importPreview').style.display = 'none';
+      csvData = [];
     }
 
-    // Utility: format date/time
-    function nowStr() {
-      const d = new Date();
-      return d.toLocaleString();
+    // Update Recipients for Messaging
+    function updateRecipients() {
+      const type = document.getElementById('recipientType').value;
+      const branchSelection = document.getElementById('branchSelection');
+      const recipientsList = document.getElementById('recipientsList');
+      const recipientCount = document.getElementById('recipientCount');
+      
+      let recipients = [];
+      
+      if (type === 'all') {
+        recipients = customers.filter(c => c.status === 'Active');
+        branchSelection.style.display = 'none';
+      } else if (type === 'branch') {
+        const branch = document.getElementById('msgBranch').value;
+        recipients = customers.filter(c => c.status === 'Active' && c.branch === branch);
+        branchSelection.style.display = 'block';
+      } else {
+        recipients = [];
+        branchSelection.style.display = 'none';
+      }
+      
+      // Display recipients
+      recipientsList.innerHTML = recipients.map(c => 
+        `<div class="mb-1">${c.firstName} ${c.lastName} (${c.phone})</div>`
+      ).join('');
+      
+      recipientCount.textContent = recipients.length;
     }
 
-    // Show loading overlay
+    // Load Message Template
+    function loadTemplate() {
+      const template = document.getElementById('msgTemplate').value;
+      const templates = {
+        welcome: 'Welcome to our service! We\'re excited to have you with us.',
+        promotion: 'Special offer just for you! Get 20% off on your next order.',
+        reminder: 'This is a reminder for your upcoming appointment.',
+        feedback: 'We value your feedback! Please rate your experience.',
+        custom: ''
+      };
+      
+      document.getElementById('msgText').value = templates[template] || '';
+    }
+
+    // Send Messages
+    function sendMessages() {
+      const messageText = document.getElementById('msgText').value.trim();
+      const messageType = document.querySelector('input[name="msgType"]:checked').value;
+      
+      if (!messageText) {
+        showToast('Please enter a message', 'error');
+        return;
+      }
+      
+      const recipientType = document.getElementById('recipientType').value;
+      let recipients = [];
+      
+      if (recipientType === 'all') {
+        recipients = customers.filter(c => c.status === 'Active');
+      } else if (recipientType === 'branch') {
+        const branch = document.getElementById('msgBranch').value;
+        recipients = customers.filter(c => c.status === 'Active' && c.branch === branch);
+      }
+      
+      if (recipients.length === 0) {
+        showToast('No recipients selected', 'error');
+        return;
+      }
+      
+      showLoading();
+      
+      // Simulate sending messages
+      recipients.forEach(customer => {
+        messageLog.push({
+          customerId: customer.id,
+          phone: customer.phone,
+          email: customer.email,
+          type: messageType,
+          message: messageText,
+          timestamp: new Date().toISOString(),
+          status: 'sent'
+        });
+      });
+      
+      saveData();
+      hideLoading();
+      
+      showToast(`Messages sent to ${recipients.length} customers!`, 'success');
+      updateMetrics();
+    }
+
+    // Quick Message
+    function quickMessage(customerId) {
+      const customer = customers.find(c => c.id === customerId);
+      if (!customer) return;
+      
+      const message = prompt(`Enter message for ${customer.firstName} ${customer.lastName}:`);
+      if (message) {
+        messageLog.push({
+          customerId: customer.id,
+          phone: customer.phone,
+          type: 'whatsapp',
+          message: message,
+          timestamp: new Date().toISOString(),
+          status: 'sent'
+        });
+        
+        saveData();
+        showToast('Message sent!', 'success');
+        updateMetrics();
+      }
+    }
+
+    // Export Data
+    function exportData() {
+      let csv = 'ID,FirstName,LastName,Phone,Email,Branch,Status,DOB,Anniversary,Address,Notes,Tags,AddedDate\n';
+      
+      customers.forEach(c => {
+        csv += `"${c.id}","${c.firstName}","${c.lastName}","${c.phone}","${c.email}","${c.branch}","${c.status}","${c.dob}","${c.anniversary}","${c.address}","${c.notes}","${c.tags ? c.tags.join(';') : ''}","${c.addedDate}"\n`;
+      });
+      
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `customers_export_${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      
+      showToast('Data exported successfully!', 'success');
+    }
+
+    // Backup Data
+    function backupData() {
+      const backup = {
+        customers: customers,
+        messageLog: messageLog,
+        settings: settings,
+        timestamp: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backup_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      showToast('Backup created successfully!', 'success');
+    }
+
+    // Clear All Data
+    function clearAllData() {
+      if (confirm('Are you sure you want to delete all data? This action cannot be undone!')) {
+        customers = [];
+        messageLog = [];
+        localStorage.clear();
+        renderCustomers();
+        updateMetrics();
+        showToast('All data cleared!', 'success');
+      }
+    }
+
+    // Save Settings
+    function saveSettings() {
+      settings.companyName = document.getElementById('companyName').value;
+      settings.companyPhone = document.getElementById('companyPhone').value;
+      settings.companyEmail = document.getElementById('companyEmail').value;
+      settings.enableRateLimit = document.getElementById('enableRateLimit').checked;
+      settings.enableDeliveryReport = document.getElementById('enableDeliveryReport').checked;
+      
+      saveData();
+      showToast('Settings saved successfully!', 'success');
+    }
+
+    // Generate Report
+    function generateReport() {
+      const report = {
+        totalCustomers: customers.length,
+        activeCustomers: customers.filter(c => c.status === 'Active').length,
+        messagesSent: messageLog.length,
+        branches: [...new Set(customers.map(c => c.branch))].length,
+        generatedAt: new Date().toISOString()
+      };
+      
+      const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `report_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      
+      showToast('Report generated successfully!', 'success');
+    }
+
+    // Initialize Charts
+    function initCharts() {
+      // Customer Growth Chart
+      const growthCtx = document.getElementById('customerGrowthChart');
+      if (growthCtx) {
+        new Chart(growthCtx, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+              label: 'New Customers',
+              data: [12, 19, 15, 25, 22, 30],
+              borderColor: '#667eea',
+              backgroundColor: 'rgba(102, 126, 234, 0.1)',
+              tension: 0.4
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+
+      // Branch Distribution Chart
+      const branchCtx = document.getElementById('branchDistributionChart');
+      if (branchCtx) {
+        new Chart(branchCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Hamdan', 'Muroor', 'Shabiya 11', 'Al Barsha', 'Others'],
+            datasets: [{
+              data: [30, 25, 20, 15, 10],
+              backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#28a745',
+                '#ffc107',
+                '#dc3545'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+
+      // Message Stats Chart
+      const messageCtx = document.getElementById('messageStatsChart');
+      if (messageCtx) {
+        new Chart(messageCtx, {
+          type: 'bar',
+          data: {
+            labels: ['WhatsApp', 'SMS', 'Email'],
+            datasets: [{
+              label: 'Messages Sent',
+              data: [150, 80, 45],
+              backgroundColor: [
+                '#25D366',
+                '#007BFF',
+                '#17a2b8'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+
+      // Status Chart
+      const statusCtx = document.getElementById('statusChart');
+      if (statusCtx) {
+        new Chart(statusCtx, {
+          type: 'pie',
+          data: {
+            labels: ['Active', 'Inactive', 'Opt-Out'],
+            datasets: [{
+              data: [120, 20, 5],
+              backgroundColor: [
+                '#28a745',
+                '#ffc107',
+                '#dc3545'
+              ]
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false
+          }
+        });
+      }
+    }
+
+    // Update Charts
+    function updateCharts() {
+      // Update chart data with real data
+      // This would typically fetch real data and update the charts
+    }
+
+    // Show Loading
     function showLoading() {
-      document.getElementById('loadingOverlay').style.display = 'flex';
+      document.getElementById('loadingOverlay').classList.add('active');
     }
 
-    // Hide loading overlay
+    // Hide Loading
     function hideLoading() {
-      document.getElementById('loadingOverlay').style.display = 'none';
+      document.getElementById('loadingOverlay').classList.remove('active');
     }
 
-    // Show toast notification
+    // Show Toast
     function showToast(message, type = 'success') {
       const toastHtml = `
-        <div class="toast custom-toast align-items-center text-white bg-${type === 'success' ? 'success' : 'danger'} border-0" role="alert">
+        <div class="toast custom-toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : type === 'warning' ? 'warning' : 'info'} border-0" role="alert">
           <div class="d-flex">
             <div class="toast-body">
               ${message}
@@ -1802,863 +2088,18 @@
       }, 5000);
     }
 
-    // Save data to LocalStorage
-    function saveToLocalStorage() {
-      localStorage.setItem('customers', JSON.stringify(customers));
-      localStorage.setItem('messageHistory', JSON.stringify(messageHistory));
-      updateLastUpdatedTime();
-      debug('Data saved to localStorage');
-    }
-
-    // Validate phone number
-    function validatePhone(phone) {
-      const phoneRegex = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
-      return phoneRegex.test(phone);
-    }
-
-    // Render table rows & metrics
-    function render() {
-      debug('Rendering table...');
-      showLoading();
-      
-      const tbody = document.querySelector("#customerTable tbody");
-      tbody.innerHTML = '';
-      
-      if (filteredCustomers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="text-center text-muted py-4">No customers found</td></tr>';
-        hideLoading();
-        return;
-      }
-      
-      // Calculate pagination
-      const startIndex = (currentPage - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedCustomers = filteredCustomers.slice(startIndex, endIndex);
-      
-      debug(`Showing ${paginatedCustomers.length} of ${filteredCustomers.length} customers`);
-      
-      paginatedCustomers.forEach((c, index) => {
-        const tr = document.createElement("tr");
-        const globalIndex = startIndex + index;
-        const canSend = canSendMessageToday(c);
-        
-        tr.innerHTML = 
-          `<td>
-             <input type="checkbox" class="customer-checkbox form-check-input" 
-                    data-index="${globalIndex}" 
-                    onchange="toggleCustomerSelection(${globalIndex})"
-                    ${selectedCustomers.has(globalIndex) ? 'checked' : ''}>
-           </td>
-           <td><strong>${c.phone}</strong></td>
-           <td>${c.name || '-'}</td>
-           <td><span class="branch-badge">${c.branch}</span></td>
-           <td><span class="status-badge ${c.status === 'Active' ? 'status-active' : 'status-opt-out'}">${c.status}</span></td>
-           <td><small>${c.lastContact}</small></td>
-           <td>
-             <span class="message-status ${canSend ? 'message-can-send' : 'message-sent-today'}">
-               ${canSend ? 'Can Message' : 'Messaged Today'}
-             </span>
-           </td>
-           <td>
-             <div class="last-message-display">
-               ${c.lastMessageContent ? 
-                 `<small class="text-muted">${c.lastMessageContent.substring(0, 30)}...</small>` : 
-                 '<small class="text-muted">No messages sent</small>'
-               }
-             </div>
-           </td>
-           <td class="table-actions">
-             <button class="btn btn-sm btn-success btn-action" onclick="quickMessage(${globalIndex})" title="Send Message" ${!canSend ? 'disabled' : ''}>
-               <i class="bi bi-send"></i>
-             </button>
-             <button class="btn btn-sm btn-primary btn-action" onclick="editCustomer(${globalIndex})" title="Edit">
-               <i class="bi bi-pencil"></i>
-             </button>
-             <button class="btn btn-sm btn-danger btn-action" onclick="deleteCustomer(${globalIndex})" title="Delete">
-               <i class="bi bi-trash"></i>
-             </button>
-           </td>`;
-        tbody.appendChild(tr);
-      });
-
-      // Render pagination
-      renderPagination();
-      
-      // Update metrics
-      updateMetrics();
-      
-      hideLoading();
-      debug('Table rendered successfully');
-    }
-
-    // Update metrics
-    function updateMetrics() {
-      document.getElementById("metricTotal").textContent = customers.length;
-      
-      const today = new Date().toDateString();
-      const newTodayCount = customers.filter(c => 
-        new Date(c.addedDate).toDateString() === today
-      ).length;
-      document.getElementById("metricNewToday").textContent = newTodayCount;
-      
-      const optOutCount = customers.filter(c => c.status === "Opt-Out").length;
-      document.getElementById("metricOptOut").textContent = optOutCount;
-      
-      const now = new Date();
-      const noContact60 = customers.filter(c => {
-        const last = new Date(c.lastContact);
-        const diffDays = (now - last) / (1000 * 60 * 60 * 24);
-        return diffDays > 60;
-      }).length;
-      document.getElementById("metricNoContact60").textContent = noContact60;
-    }
-
-    // Render pagination
-    function renderPagination() {
-      const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-      const pagination = document.getElementById('pagination');
-      pagination.innerHTML = '';
-      
-      if (totalPages <= 1) return;
-      
-      // Previous button
-      const prevLi = document.createElement('li');
-      prevLi.className = `page-item ${currentPage === 1 ? 'disabled' : ''}`;
-      prevLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage - 1})">Previous</a>`;
-      pagination.appendChild(prevLi);
-      
-      // Page numbers
-      for (let i = 1; i <= totalPages; i++) {
-        const li = document.createElement('li');
-        li.className = `page-item ${i === currentPage ? 'active' : ''}`;
-        li.innerHTML = `<a class="page-link" href="#" onclick="changePage(${i})">${i}</a>`;
-        pagination.appendChild(li);
-      }
-      
-      // Next button
-      const nextLi = document.createElement('li');
-      nextLi.className = `page-item ${currentPage === totalPages ? 'disabled' : ''}`;
-      nextLi.innerHTML = `<a class="page-link" href="#" onclick="changePage(${currentPage + 1})">Next</a>`;
-      pagination.appendChild(nextLi);
-    }
-
-    // Change page
-    function changePage(page) {
-      const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-      if (page >= 1 && page <= totalPages) {
-        currentPage = page;
-        render();
-      }
-      return false;
-    }
-
-    // Sort table
-    function sortTable(column) {
-      if (sortColumn === column) {
-        sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
-      } else {
-        sortColumn = column;
-        sortDirection = 'asc';
-      }
-      
-      filteredCustomers.sort((a, b) => {
-        let aVal = a[column];
-        let bVal = b[column];
-        
-        if (column === 'lastContact' || column === 'addedDate' || column === 'lastMessageDate') {
-          aVal = aVal ? new Date(aVal) : new Date(0);
-          bVal = bVal ? new Date(bVal) : new Date(0);
-        }
-        
-        if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
-        if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
-        return 0;
-      });
-      
-      currentPage = 1;
-      render();
-    }
-
-    // Search functionality
-    document.getElementById('searchInput').addEventListener('input', function(e) {
-      const searchTerm = e.target.value.toLowerCase();
-      
-      if (searchTerm === '') {
-        filteredCustomers = [...customers];
-      } else {
-        filteredCustomers = customers.filter(c => 
-          c.phone.toLowerCase().includes(searchTerm) ||
-          (c.name && c.name.toLowerCase().includes(searchTerm)) ||
-          (c.branch && c.branch.toLowerCase().includes(searchTerm)) ||
-          c.status.toLowerCase().includes(searchTerm) ||
-          (c.lastMessageContent && c.lastMessageContent.toLowerCase().includes(searchTerm))
-        );
-      }
-      
-      currentPage = 1;
-      render();
-    });
-
-    // Form submission
-    document.getElementById("customerForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      
-      const phone = document.getElementById("phone").value.trim();
-      const name = document.getElementById("name").value.trim();
-      const branch = document.getElementById("branch").value;
-      const status = document.getElementById("status").value;
-
-      if (!phone) {
-        showToast("Phone number is required.", 'error');
-        return;
-      }
-
-      if (!validatePhone(phone)) {
-        showToast("Please enter a valid phone number.", 'error');
-        return;
-      }
-
-      const existingIndex = customers.findIndex(c => c.phone === phone);
-      
-      if (existingIndex !== -1) {
-        // Update existing
-        customers[existingIndex] = {
-          ...customers[existingIndex],
-          name,
-          branch,
-          status,
-          lastContact: nowStr()
-        };
-        showToast("Customer updated successfully!");
-      } else {
-        // Add new
-        customers.push({
-          phone,
-          name,
-          branch,
-          status,
-          addedDate: new Date().toISOString(),
-          lastContact: nowStr(),
-          lastMessageDate: null,
-          lastMessageContent: null
-        });
-        showToast("New customer added successfully!");
-      }
-
-      saveToLocalStorage();
-      filteredCustomers = [...customers];
-      this.reset();
-      render();
-    });
-
-    // Edit customer
-    function editCustomer(index) {
-      const customer = filteredCustomers[index];
-      const originalIndex = customers.findIndex(c => c.phone === customer.phone);
-      
-      document.getElementById('editIndex').value = originalIndex;
-      document.getElementById('editPhone').value = customer.phone;
-      document.getElementById('editName').value = customer.name || '';
-      document.getElementById('editBranch').value = customer.branch;
-      document.getElementById('editStatus').value = customer.status;
-      
-      const modal = new bootstrap.Modal(document.getElementById('editModal'));
-      modal.show();
-    }
-
-    // Save edit
-    function saveEdit() {
-      const index = parseInt(document.getElementById('editIndex').value);
-      const name = document.getElementById('editName').value.trim();
-      const branch = document.getElementById('editBranch').value;
-      const status = document.getElementById('editStatus').value;
-      
-      customers[index] = {
-        ...customers[index],
-        name,
-        branch,
-        status,
-        lastContact: nowStr()
-      };
-      
-      saveToLocalStorage();
-      filteredCustomers = [...customers];
-      render();
-      
-      const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
-      modal.hide();
-      
-      showToast("Customer updated successfully!");
-    }
-
-    // Delete customer
-    function deleteCustomer(index) {
-      const customer = filteredCustomers[index];
-      
-      if (confirm(`Are you sure you want to delete customer ${customer.phone}?`)) {
-        const originalIndex = customers.findIndex(c => c.phone === customer.phone);
-        customers.splice(originalIndex, 1);
-        
-        saveToLocalStorage();
-        filteredCustomers = [...customers];
-        render();
-        
-        showToast("Customer deleted successfully!");
-      }
-    }
-
-    // Reset form
+    // Reset Form
     function resetForm() {
-      document.getElementById('customerForm').reset();
+      document.getElementById('addCustomerForm').reset();
     }
 
-    // Export to CSV
-    function exportToCSV() {
-      if (customers.length === 0) {
-        showToast("No data to export.", 'error');
-        return;
-      }
-      
-      let csv = 'Phone,Name,Branch,Status,Added Date,Last Contact,Last Message Date,Last Message Content\n';
-      
-      customers.forEach(c => {
-        csv += `"${c.phone}","${c.name || ''}","${c.branch}","${c.status}","${c.addedDate}","${c.lastContact}","${c.lastMessageDate || ''}","${c.lastMessageContent || ''}"\n`;
-      });
-      
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `customers_${new Date().toISOString().split('T')[0]}.csv`;
-      a.click();
-      
-      showToast("Data exported successfully!");
+    // Refresh Data
+    function refreshData() {
+      loadData();
+      renderCustomers();
+      updateMetrics();
+      showToast('Data refreshed!', 'success');
     }
-
-    // Clear all data
-    function clearAllData() {
-      if (confirm("Are you sure you want to delete all customer data? This action cannot be undone.")) {
-        customers = [];
-        filteredCustomers = [];
-        saveToLocalStorage();
-        render();
-        showToast("All data cleared successfully!");
-      }
-    }
-
-    // Toggle select all customers
-    function toggleSelectAll() {
-      const selectAll = document.getElementById('selectAll').checked || document.getElementById('headerCheckbox').checked;
-      const checkboxes = document.querySelectorAll('.customer-checkbox');
-      
-      checkboxes.forEach(checkbox => {
-        checkbox.checked = selectAll;
-        const index = parseInt(checkbox.dataset.index);
-        if (selectAll) {
-          selectedCustomers.add(index);
-        } else {
-          selectedCustomers.delete(index);
-        }
-      });
-    }
-
-    // Toggle customer selection
-    function toggleCustomerSelection(index) {
-      if (selectedCustomers.has(index)) {
-        selectedCustomers.delete(index);
-      } else {
-        selectedCustomers.add(index);
-      }
-    }
-
-    // Open message modal
-    function openMessageModal() {
-      // Reset message modal state
-      selectedCustomers.clear();
-      selectedBranches.clear();
-      selectedTemplate = -1;
-      messageType = 'whatsapp';
-      uploadedImage = null;
-      aiGeneratedMessage = null;
-      
-      document.getElementById('messageText').value = '';
-      document.getElementById('aiPrompt').value = '';
-      document.getElementById('messagePreview').innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
-      document.getElementById('selectAllRadio').checked = true;
-      document.getElementById('customSelection').style.display = 'none';
-      document.getElementById('branchSelection').style.display = 'none';
-      document.getElementById('sendProgress').style.display = 'none';
-      document.getElementById('progressList').innerHTML = '';
-      document.getElementById('whatsappLinks').style.display = 'none';
-      document.getElementById('whatsappLinksList').innerHTML = '';
-      document.getElementById('aiGeneratedContent').style.display = 'none';
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('imageUploadText').textContent = 'Click to upload an image (optional)';
-      document.getElementById('imageUpload').value = '';
-      
-      // Load last saved message if available
-      if (lastSavedMessage) {
-        document.getElementById('messageText').value = lastSavedMessage.text;
-        if (lastSavedMessage.image) {
-          uploadedImage = lastSavedMessage.image;
-          const preview = document.getElementById('imagePreview');
-          preview.src = uploadedImage;
-          preview.style.display = 'block';
-          document.getElementById('imageUploadText').textContent = 'Last image attached';
-        }
-        updateMessagePreview();
-        updateCharCount();
-      }
-      
-      // Update customer checkboxes
-      updateCustomerCheckboxes();
-      updateBranchCheckboxes();
-      updateMessageStats();
-      
-      const modal = new bootstrap.Modal(document.getElementById('messageModal'));
-      modal.show();
-    }
-
-    // Update customer checkboxes in message modal
-    function updateCustomerCheckboxes() {
-      const container = document.getElementById('customerCheckboxes');
-      container.innerHTML = '';
-      
-      const activeCustomers = customers.filter(c => c.status === 'Active');
-      
-      activeCustomers.forEach((customer, index) => {
-        const canSend = canSendMessageToday(customer);
-        const div = document.createElement('div');
-        div.className = 'form-check';
-        div.innerHTML = `
-          <input class="form-check-input" type="checkbox" value="${index}" id="customerCheck${index}" ${!canSend ? 'disabled' : ''}>
-          <label class="form-check-label" for="customerCheck${index}">
-            ${customer.name || customer.phone} (${customer.phone}) - ${customer.branch}
-            ${!canSend ? '<span class="text-muted">(Already messaged today)</span>' : ''}
-          </label>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // Update branch checkboxes in message modal
-    function updateBranchCheckboxes() {
-      const container = document.getElementById('branchCheckboxes');
-      container.innerHTML = '';
-      
-      const branches = getUniqueBranches();
-      
-      branches.forEach(branch => {
-        const div = document.createElement('div');
-        div.className = 'form-check form-check-inline';
-        div.innerHTML = `
-          <input class="form-check-input branch-checkbox" type="checkbox" value="${branch}" id="branchCheck${branch}">
-          <label class="form-check-label" for="branchCheck${branch}">
-            ${branch}
-          </label>
-        `;
-        container.appendChild(div);
-      });
-      
-      // Add event listeners to branch checkboxes
-      document.querySelectorAll('.branch-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          if (this.checked) {
-            selectedBranches.add(this.value);
-          } else {
-            selectedBranches.delete(this.value);
-          }
-          updateBranchStats();
-          updateSelectedCount();
-          updateMessageStats();
-        });
-      });
-    }
-
-    // Update branch statistics
-    function updateBranchStats() {
-      const statsContainer = document.getElementById('branchStats');
-      statsContainer.innerHTML = '';
-      
-      if (selectedBranches.size === 0) {
-        statsContainer.innerHTML = '<p class="text-muted">Please select at least one branch</p>';
-        return;
-      }
-      
-      let totalCustomers = 0;
-      let eligibleCustomers = 0;
-      
-      selectedBranches.forEach(branch => {
-        const branchCustomers = customers.filter(c => 
-          c.branch === branch && c.status === 'Active'
-        );
-        totalCustomers += branchCustomers.length;
-        
-        const eligibleBranchCustomers = branchCustomers.filter(c => 
-          canSendMessageToday(c)
-        );
-        eligibleCustomers += eligibleBranchCustomers.length;
-      });
-      
-      statsContainer.innerHTML = `
-        <div class="branch-stat">
-          <div class="branch-stat-number">${totalCustomers}</div>
-          <div class="branch-stat-label">Total Customers</div>
-        </div>
-        <div class="branch-stat">
-          <div class="branch-stat-number">${eligibleCustomers}</div>
-          <div class="branch-stat-label">Can Message Today</div>
-        </div>
-        <div class="branch-stat">
-          <div class="branch-stat-number">${totalCustomers - eligibleCustomers}</div>
-          <div class="branch-stat-label">Already Messaged</div>
-        </div>
-      `;
-    }
-
-    // Update customer selection based on radio button
-    function updateCustomerSelection() {
-      const selectionType = document.querySelector('input[name="selectionType"]:checked').value;
-      const customSelection = document.getElementById('customSelection');
-      const branchSelection = document.getElementById('branchSelection');
-      
-      // Hide all selection options first
-      customSelection.style.display = 'none';
-      branchSelection.style.display = 'none';
-      
-      // Clear selected customers
-      selectedCustomers.clear();
-      
-      if (selectionType === 'all') {
-        // Select all active customers who can be messaged today
-        customers.forEach((c, index) => {
-          if (c.status === 'Active' && canSendMessageToday(c)) {
-            selectedCustomers.add(index);
-          }
-        });
-      } else if (selectionType === 'branch') {
-        // Show branch selection
-        branchSelection.style.display = 'block';
-        updateBranchStats();
-        return; // Don't update selected count yet, wait for branch selection
-      } else {
-        // Show custom selection
-        customSelection.style.display = 'block';
-        
-        // Update selection based on checkboxes
-        const checkboxes = document.querySelectorAll('#customerCheckboxes input[type="checkbox"]:checked');
-        checkboxes.forEach(checkbox => {
-          // Find the actual customer index
-          const activeCustomers = customers.filter(c => c.status === 'Active');
-          const customer = activeCustomers[parseInt(checkbox.value)];
-          const actualIndex = customers.findIndex(c => c.phone === customer.phone);
-          selectedCustomers.add(actualIndex);
-        });
-      }
-      
-      updateSelectedCount();
-      updateMessageStats();
-    }
-
-    // Update selected count display
-    function updateSelectedCount() {
-      const count = selectedCustomers.size;
-      document.getElementById('selectedCountText').textContent = `${count} customer${count !== 1 ? 's' : ''} selected`;
-    }
-
-    // Select message type
-    function selectMessageType(type) {
-      messageType = type;
-      
-      // Update button styles
-      document.getElementById('whatsappBtn').className = `btn message-type-btn ${type === 'whatsapp' ? 'active btn-success' : 'btn-outline-success'}`;
-      document.getElementById('smsBtn').className = `btn message-type-btn ${type === 'sms' ? 'active btn-primary' : 'btn-outline-primary'}`;
-      
-      updateMessageStats();
-    }
-
-    // Select message template
-    function selectTemplate(index) {
-      selectedTemplate = index;
-      
-      // Update template selection UI
-      document.querySelectorAll('.message-template').forEach((el, i) => {
-        if (i === index) {
-          el.classList.add('active');
-        } else {
-          el.classList.remove('active');
-        }
-      });
-      
-      // Update message text
-      const template = messageTemplates[index];
-      document.getElementById('messageText').value = template.text;
-      updateMessagePreview();
-      updateCharCount();
-    }
-
-    // Update message preview
-    function updateMessagePreview() {
-      const messageText = document.getElementById('messageText').value;
-      const preview = document.getElementById('messagePreview');
-      
-      if (messageText.trim() === '' && !uploadedImage) {
-        preview.innerHTML = '<p class="text-muted mb-0">Your message will appear here...</p>';
-      } else {
-        let previewContent = '';
-        
-        if (uploadedImage) {
-          previewContent += `<img src="${uploadedImage}" style="max-width: 100%; border-radius: 8px; margin-bottom: 10px;"><br>`;
-        }
-        
-        if (messageText.trim() !== '') {
-          // Format message based on type
-          let formattedMessage = messageText;
-          if (messageType === 'whatsapp') {
-            formattedMessage = `<i class="bi bi-whatsapp text-success me-2"></i>${messageText}`;
-          } else {
-            formattedMessage = `<i class="bi bi-chat-dots text-primary me-2"></i>${messageText}`;
-          }
-          previewContent += `<p class="mb-0">${formattedMessage}</p>`;
-        }
-        
-        preview.innerHTML = previewContent;
-      }
-    }
-
-    // Update character count
-    function updateCharCount() {
-      const messageText = document.getElementById('messageText').value;
-      document.getElementById('charCount').textContent = messageText.length;
-    }
-
-    // Update message statistics
-    function updateMessageStats() {
-      const count = selectedCustomers.size;
-      const whatsappCost = count * 0.05; // Example cost
-      const smsCost = count * 0.10; // Example cost
-      
-      document.getElementById('totalMessages').textContent = count;
-      document.getElementById('whatsappCount').textContent = messageType === 'whatsapp' ? count : 0;
-      document.getElementById('smsCount').textContent = messageType === 'sms' ? count : 0;
-      document.getElementById('estimatedCost').textContent = `$${messageType === 'whatsapp' ? whatsappCost.toFixed(2) : smsCost.toFixed(2)}`;
-    }
-
-    // Close WhatsApp modal
-    function closeWhatsAppModal() {
-      document.getElementById('whatsappModal').style.display = 'none';
-    }
-
-    // Open WhatsApp with multiple fallback methods
-    function openWhatsApp(phoneNumber, message) {
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-      
-      // Create a temporary link element
-      const link = document.createElement('a');
-      link.href = whatsappUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      
-      // Trigger a click on the link
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      return true;
-    }
-
-    // Send message - ENHANCED WITH IMAGE SUPPORT
-    async function sendMessage() {
-      const messageText = document.getElementById('messageText').value.trim();
-      
-      if (selectedCustomers.size === 0) {
-        showToast("Please select at least one customer.", 'error');
-        return;
-      }
-      
-      if (messageText === '' && !uploadedImage) {
-        showToast("Please enter a message or upload an image.", 'error');
-        return;
-      }
-      
-      // Get selected customers
-      const recipients = Array.from(selectedCustomers).map(i => customers[i]);
-      
-      // Filter out customers who have already been messaged today
-      const eligibleRecipients = recipients.filter(customer => 
-        canSendMessageToday(customer)
-      );
-      
-      if (eligibleRecipients.length === 0) {
-        showToast("All selected customers have already been messaged today.", 'error');
-        return;
-      }
-      
-      if (eligibleRecipients.length < recipients.length) {
-        showToast(`${recipients.length - eligibleRecipients.length} customer(s) have already been messaged today and will be skipped.`);
-      }
-      
-      // Save the message for future use
-      saveLastMessage(messageText, uploadedImage, eligibleRecipients);
-      
-      if (messageType === 'whatsapp') {
-        // Show WhatsApp modal with all links
-        const whatsappModal = document.getElementById('whatsappModal');
-        const linkList = document.getElementById('whatsappLinkList');
-        linkList.innerHTML = '';
-        
-        // Create WhatsApp links for all eligible recipients
-        eligibleRecipients.forEach((customer, index) => {
-          const phoneNumber = customer.phone.replace(/[^\d]/g, '');
-          
-          // Combine message text and image
-          let fullMessage = messageText;
-          if (uploadedImage) {
-            fullMessage = messageText + '\n\n[Image attached]';
-          }
-          
-          const encodedMessage = encodeURIComponent(fullMessage);
-          const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-          
-          const listItem = document.createElement('li');
-          listItem.className = 'whatsapp-link-item';
-          listItem.innerHTML = `
-            <span>${customer.name || customer.phone} (${customer.phone})</span>
-            <button class="whatsapp-link-button" onclick="openWhatsApp('${phoneNumber}', '${fullMessage.replace(/'/g, "\\'")}')">
-              <i class="bi bi-whatsapp me-1"></i>Open WhatsApp
-            </button>
-          `;
-          linkList.appendChild(listItem);
-          
-          // Update customer record
-          const originalIndex = customers.findIndex(c => c.phone === customer.phone);
-          customers[originalIndex].lastMessageDate = new Date().toISOString();
-          customers[originalIndex].lastContact = nowStr();
-          customers[originalIndex].lastMessageContent = messageText;
-        });
-        
-        // Show the modal
-        whatsappModal.style.display = 'flex';
-        
-        showToast(`WhatsApp links created for ${eligibleRecipients.length} customer(s)! Click on any link to open WhatsApp with pre-filled message.`);
-      } else {
-        // SMS - Copy phone numbers to clipboard
-        const phoneNumbers = eligibleRecipients.map(c => c.phone).join('\n');
-        
-        try {
-          await navigator.clipboard.writeText(phoneNumbers);
-          showToast(`Phone numbers for ${eligibleRecipients.length} customer(s) copied to clipboard! You can now use your SMS app to send messages.`);
-        } catch (error) {
-          showToast('Failed to copy phone numbers. Please try again.', 'error');
-        }
-        
-        // Update customer records for SMS recipients
-        eligibleRecipients.forEach(customer => {
-          const originalIndex = customers.findIndex(c => c.phone === customer.phone);
-          customers[originalIndex].lastMessageDate = new Date().toISOString();
-          customers[originalIndex].lastContact = nowStr();
-          customers[originalIndex].lastMessageContent = messageText;
-        });
-      }
-      
-      // Add to message history
-      const messageRecord = {
-        type: messageType,
-        text: messageText,
-        image: uploadedImage,
-        recipients: eligibleRecipients,
-        timestamp: new Date().toISOString(),
-        status: 'sent'
-      };
-      
-      messageHistory.push(messageRecord);
-      saveToLocalStorage();
-      
-      // Close modal after delay
-      setTimeout(() => {
-        const modal = bootstrap.Modal.getInstance(document.getElementById('messageModal'));
-        modal.hide();
-        render();
-      }, 2000);
-    }
-
-    // Copy to clipboard function
-    async function copyToClipboard(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        showToast('Link copied to clipboard!');
-      } catch (error) {
-        // Fallback for older browsers
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        showToast('Link copied to clipboard!');
-      }
-    }
-
-    // Quick message for single customer
-    function quickMessage(index) {
-      const customer = filteredCustomers[index];
-      
-      // Check if customer can be messaged today
-      if (!canSendMessageToday(customer)) {
-        showToast("This customer has already been messaged today. Please try again tomorrow.", 'error');
-        return;
-      }
-      
-      // Clean phone number
-      const phoneNumber = customer.phone.replace(/[^\d]/g, '');
-      
-      // Use last saved message if available
-      let messageText = '';
-      if (lastSavedMessage) {
-        messageText = lastSavedMessage.text;
-      }
-      
-      // Open WhatsApp with message
-      if (openWhatsApp(phoneNumber, messageText)) {
-        // Update customer record
-        const originalIndex = customers.findIndex(c => c.phone === customer.phone);
-        customers[originalIndex].lastMessageDate = new Date().toISOString();
-        customers[originalIndex].lastContact = nowStr();
-        customers[originalIndex].lastMessageContent = messageText;
-        saveToLocalStorage();
-        render();
-        
-        showToast(`Opening WhatsApp for ${customer.name || customer.phone}...`);
-      } else {
-        // Fallback: Show the link
-        const whatsappUrl = `https://wa.me/${phoneNumber}`;
-        showToast(`WhatsApp blocked. Please click here: <a href="${whatsappUrl}" target="_blank">Open WhatsApp</a>`, 'error');
-      }
-    }
-
-    // Event listeners for message modal
-    document.getElementById('messageText').addEventListener('input', function() {
-      updateMessagePreview();
-      updateCharCount();
-    });
-
-    // Event listeners for customer checkboxes in modal
-    document.addEventListener('change', function(e) {
-      if (e.target.matches('#customerCheckboxes input[type="checkbox"]')) {
-        updateCustomerSelection();
-      }
-    });
-
-    // Initialize the application
-    document.addEventListener('DOMContentLoaded', function() {
-      debug('DOM loaded, initializing...');
-      loadLastSavedMessage();
-      initializeCustomers();
-      updateLastUpdatedTime();
-      render();
-      debug('Initialization complete');
-    });
   </script>
 </body>
 </html>
