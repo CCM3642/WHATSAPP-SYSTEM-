@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
     <style>
         :root {
             --primary: #4361ee;
@@ -64,7 +64,7 @@
             opacity: 0.9;
         }
 
-        .dashboard {
+        .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 25px;
@@ -140,61 +140,6 @@
             font-size: 0.95rem;
         }
 
-        .chart-container {
-            position: relative;
-            height: 300px;
-            margin-top: 20px;
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin-top: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid var(--light-gray);
-        }
-
-        th {
-            background-color: var(--light);
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        tr:hover {
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .badge-success {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: var(--success);
-        }
-
-        .badge-warning {
-            background-color: rgba(255, 152, 0, 0.1);
-            color: var(--warning);
-        }
-
-        .badge-danger {
-            background-color: rgba(244, 67, 54, 0.1);
-            color: var(--danger);
-        }
-
         .progress-bar {
             height: 8px;
             background-color: var(--light-gray);
@@ -206,6 +151,7 @@
         .progress {
             height: 100%;
             border-radius: 4px;
+            transition: width 0.3s ease;
         }
 
         .tabs {
@@ -234,53 +180,6 @@
 
         .tab-content.active {
             display: block;
-        }
-
-        .upload-area {
-            border: 2px dashed var(--primary);
-            border-radius: var(--border-radius);
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 30px;
-            background-color: rgba(67, 97, 238, 0.05);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .upload-area:hover {
-            background-color: rgba(67, 97, 238, 0.1);
-        }
-
-        .upload-area i {
-            font-size: 3rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .upload-area p {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-
-        .upload-area small {
-            color: var(--gray);
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-weight: 500;
-            transition: var(--transition);
-            text-decoration: none;
-        }
-
-        .btn:hover {
-            background-color: var(--secondary);
         }
 
         .filter-container {
@@ -374,8 +273,182 @@
             100% { transform: rotate(360deg); }
         }
 
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: var(--danger);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .upload-section {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            flex: 1;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            text-align: center;
+            border: 2px dashed var(--light-gray);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.02);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+
+        .upload-area p {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+
+        .upload-area small {
+            color: var(--gray);
+        }
+
+        .template-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 300px;
+        }
+
+        .template-section h3 {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .template-section p {
+            color: var(--gray);
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .data-instructions {
+            background: rgba(67, 97, 238, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .data-instructions h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .data-instructions ul {
+            margin-left: 20px;
+            color: var(--gray);
+        }
+
+        .data-instructions li {
+            margin-bottom: 5px;
+        }
+
         @media (max-width: 768px) {
-            .dashboard {
+            .dashboard-grid {
                 grid-template-columns: 1fr;
             }
             
@@ -385,6 +458,14 @@
             
             .filter-container {
                 flex-direction: column;
+            }
+
+            .upload-section {
+                flex-direction: column;
+            }
+
+            .template-section {
+                min-width: auto;
             }
         }
     </style>
@@ -396,11 +477,30 @@
             <p>Comprehensive analysis of payment methods and delivery performance</p>
         </header>
 
-        <div class="upload-area" id="uploadArea">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>Drag & drop your Excel file here or click to browse</p>
-            <small>Supported formats: .xlsx, .xls</small>
-            <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+        <div class="upload-section">
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Drag & drop your Excel file here or click to browse</p>
+                <small>Supported formats: .xlsx, .xls</small>
+                <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+            </div>
+            
+            <div class="template-section">
+                <h3><i class="fas fa-file-excel" style="color: var(--success); margin-right: 8px;"></i>Data Management</h3>
+                <p>Download our Excel template to ensure your data is formatted correctly for analysis.</p>
+                <button class="btn btn-success" onclick="downloadTemplate()">
+                    <i class="fas fa-download"></i>Download Excel Template
+                </button>
+                <div class="data-instructions">
+                    <h4>Template Instructions:</h4>
+                    <ul>
+                        <li>Fill in all required fields (marked with *)</li>
+                        <li>Use numeric values for all amount fields</li>
+                        <li>Ensure dates are in YYYY-MM-DD format</li>
+                        <li>Save as .xlsx or .xls format</li>
+                    </ul>
+                </div>
+            </div>
         </div>
 
         <div class="loading" id="loading">
@@ -408,17 +508,21 @@
             <p>Processing your data...</p>
         </div>
 
-        <div class="filter-container" id="filterContainer" style="display: none;">
+        <div class="filter-container" id="filterContainer">
             <div class="filter-group">
                 <label for="monthFilter">Month</label>
                 <select id="monthFilter">
                     <option value="all">All Months</option>
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
                     <option value="4">April</option>
                     <option value="5">May</option>
                     <option value="6">June</option>
                     <option value="7">July</option>
                     <option value="8">August</option>
                     <option value="9">September</option>
+                    <option value="10">October</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -436,304 +540,302 @@
             </div>
         </div>
 
-        <div id="dashboardContent" style="display: none;">
-            <div class="dashboard">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Total Sales</h3>
-                        <div class="card-icon icon-primary">
-                            <i class="fas fa-dollar-sign"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="totalSales">AED 0</div>
-                    <div class="stat-label">Overall Revenue</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%; background-color: var(--primary);" id="salesProgress"></div>
+        <div class="dashboard-grid">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Total Sales</h3>
+                    <div class="card-icon icon-primary">
+                        <i class="fas fa-dollar-sign"></i>
                     </div>
                 </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Total Transactions</h3>
-                        <div class="card-icon icon-success">
-                            <i class="fas fa-receipt"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="totalTransactions">0</div>
-                    <div class="stat-label">All Payment Methods</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%; background-color: var(--success);" id="transactionsProgress"></div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Delivery Sales</h3>
-                        <div class="card-icon icon-warning">
-                            <i class="fas fa-truck"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="deliverySales">AED 0</div>
-                    <div class="stat-label">All Delivery Platforms</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%; background-color: var(--warning);" id="deliveryProgress"></div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Card Payments</h3>
-                        <div class="card-icon icon-danger">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                    </div>
-                    <div class="stat-value" id="cardPercentage">0%</div>
-                    <div class="stat-label">Percentage of Total Sales</div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 0%; background-color: var(--danger);" id="cardProgress"></div>
-                    </div>
+                <div class="stat-value" id="totalSales">AED 0</div>
+                <div class="stat-label">Overall Revenue</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%; background-color: var(--primary);" id="salesProgress"></div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Payment Method Comparison</h3>
-                    <div class="tabs">
-                        <div class="tab active" data-tab="visa-master">Visa vs Mastercard</div>
-                        <div class="tab" data-tab="cash-card">Cash vs Card</div>
-                        <div class="tab" data-tab="platforms">Platform Performance</div>
+                    <h3 class="card-title">Total Transactions</h3>
+                    <div class="card-icon icon-success">
+                        <i class="fas fa-receipt"></i>
                     </div>
                 </div>
-                
-                <div class="tab-content active" id="visa-master">
-                    <div class="chart-container">
-                        <canvas id="visaMasterChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="visaMasterTable">
-                            <thead>
-                                <tr>
-                                    <th>Payment Method</th>
-                                    <th>Total Amount</th>
-                                    <th>Transaction Count</th>
-                                    <th>Average Transaction</th>
-                                    <th>Market Share</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Visa Card</td>
-                                    <td id="visaAmount">AED 0</td>
-                                    <td id="visaCount">0</td>
-                                    <td id="visaAvg">AED 0</td>
-                                    <td id="visaShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Mastercard</td>
-                                    <td id="masterAmount">AED 0</td>
-                                    <td id="masterCount">0</td>
-                                    <td id="masterAvg">AED 0</td>
-                                    <td id="masterShare">0%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="cash-card">
-                    <div class="chart-container">
-                        <canvas id="cashCardChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="cashCardTable">
-                            <thead>
-                                <tr>
-                                    <th>Payment Type</th>
-                                    <th>Total Amount</th>
-                                    <th>Transaction Count</th>
-                                    <th>Average Transaction</th>
-                                    <th>Percentage</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Cash</td>
-                                    <td id="cashAmount">AED 0</td>
-                                    <td id="cashCount">0</td>
-                                    <td id="cashAvg">AED 0</td>
-                                    <td id="cashPercentage">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Card</td>
-                                    <td id="cardAmount">AED 0</td>
-                                    <td id="cardCount">0</td>
-                                    <td id="cardAvg">AED 0</td>
-                                    <td id="cardPercentage2">0%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="platforms">
-                    <div class="chart-container">
-                        <canvas id="platformChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="platformTable">
-                            <thead>
-                                <tr>
-                                    <th>Platform</th>
-                                    <th>Total Amount</th>
-                                    <th>Transaction Count</th>
-                                    <th>Average Transaction</th>
-                                    <th>Market Share</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Talabat</td>
-                                    <td id="talabatAmount">AED 0</td>
-                                    <td id="talabatCount">0</td>
-                                    <td id="talabatAvg">AED 0</td>
-                                    <td id="talabatShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Noon</td>
-                                    <td id="noonAmount">AED 0</td>
-                                    <td id="noonCount">0</td>
-                                    <td id="noonAvg">AED 0</td>
-                                    <td id="noonShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Careem</td>
-                                    <td id="careemAmount">AED 0</td>
-                                    <td id="careemCount">0</td>
-                                    <td id="careemAvg">AED 0</td>
-                                    <td id="careemShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Smile</td>
-                                    <td id="smileAmount">AED 0</td>
-                                    <td id="smileCount">0</td>
-                                    <td id="smileAvg">AED 0</td>
-                                    <td id="smileShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Deliveroo</td>
-                                    <td id="deliverooAmount">AED 0</td>
-                                    <td id="deliverooCount">0</td>
-                                    <td id="deliverooAvg">AED 0</td>
-                                    <td id="deliverooShare">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Keeta</td>
-                                    <td id="keetaAmount">AED 0</td>
-                                    <td id="keetaCount">0</td>
-                                    <td id="keetaAvg">AED 0</td>
-                                    <td id="keetaShare">0%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="stat-value" id="totalTransactions">0</div>
+                <div class="stat-label">All Payment Methods</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%; background-color: var(--success);" id="transactionsProgress"></div>
                 </div>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <h3 class="card-title">Restaurant Delivery Performance</h3>
-                    <div class="tabs">
-                        <div class="tab active" data-tab="delivery-comparison">Delivery Comparison</div>
-                        <div class="tab" data-tab="delivery-levels">Delivery Levels</div>
-                        <div class="tab" data-tab="monthly-report">Monthly Report</div>
+                    <h3 class="card-title">Delivery Sales</h3>
+                    <div class="card-icon icon-warning">
+                        <i class="fas fa-truck"></i>
                     </div>
                 </div>
-                
-                <div class="tab-content active" id="delivery-comparison">
-                    <div class="chart-container">
-                        <canvas id="restaurantChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="restaurantTable">
-                            <thead>
-                                <tr>
-                                    <th>Branch</th>
-                                    <th>Internal Delivery</th>
-                                    <th>Third-Party Delivery</th>
-                                    <th>Total Delivery</th>
-                                    <th>Delivery % of Sales</th>
-                                </tr>
-                            </thead>
-                            <tbody id="restaurantTableBody">
-                                <!-- Populated by JavaScript -->
-                            </tbody>
-                        </table>
+                <div class="stat-value" id="deliverySales">AED 0</div>
+                <div class="stat-label">All Delivery Platforms</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%; background-color: var(--warning);" id="deliveryProgress"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Card Payments</h3>
+                    <div class="card-icon icon-danger">
+                        <i class="fas fa-credit-card"></i>
                     </div>
                 </div>
-                
-                <div class="tab-content" id="delivery-levels">
-                    <div class="chart-container">
-                        <canvas id="deliveryLevelsChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="deliveryLevelsTable">
-                            <thead>
-                                <tr>
-                                    <th>Delivery Type</th>
-                                    <th>Total Amount</th>
-                                    <th>Transaction Count</th>
-                                    <th>Average Transaction</th>
-                                    <th>Percentage of Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>Internal Delivery</td>
-                                    <td id="internalAmount">AED 0</td>
-                                    <td id="internalCount">0</td>
-                                    <td id="internalAvg">AED 0</td>
-                                    <td id="internalPercentage">0%</td>
-                                </tr>
-                                <tr>
-                                    <td>Third-Party Delivery</td>
-                                    <td id="thirdPartyAmount">AED 0</td>
-                                    <td id="thirdPartyCount">0</td>
-                                    <td id="thirdPartyAvg">AED 0</td>
-                                    <td id="thirdPartyPercentage">0%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="stat-value" id="cardPercentage">0%</div>
+                <div class="stat-label">Percentage of Total Sales</div>
+                <div class="progress-bar">
+                    <div class="progress" style="width: 0%; background-color: var(--danger);" id="cardProgress"></div>
                 </div>
-                
-                <div class="tab-content" id="monthly-report">
-                    <div class="chart-container">
-                        <canvas id="monthlyChart"></canvas>
-                    </div>
-                    <div class="table-container">
-                        <table id="monthlyTable">
-                            <thead>
-                                <tr>
-                                    <th>Month</th>
-                                    <th>Total Sales</th>
-                                    <th>Internal Delivery</th>
-                                    <th>Third-Party Delivery</th>
-                                    <th>Cash %</th>
-                                    <th>Card %</th>
-                                    <th>Growth</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monthlyTableBody">
-                                <!-- Populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Payment Method Comparison</h3>
+                <div class="tabs">
+                    <div class="tab active" data-tab="visa-master">Visa vs Mastercard</div>
+                    <div class="tab" data-tab="cash-card">Cash vs Card</div>
+                    <div class="tab" data-tab="platforms">Platform Performance</div>
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="visa-master">
+                <div class="chart-container">
+                    <canvas id="visaMasterChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="visaMasterTable">
+                        <thead>
+                            <tr>
+                                <th>Payment Method</th>
+                                <th>Total Amount</th>
+                                <th>Transaction Count</th>
+                                <th>Average Transaction</th>
+                                <th>Market Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Visa Card</td>
+                                <td id="visaAmount">AED 0</td>
+                                <td id="visaCount">0</td>
+                                <td id="visaAvg">AED 0</td>
+                                <td id="visaShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Mastercard</td>
+                                <td id="masterAmount">AED 0</td>
+                                <td id="masterCount">0</td>
+                                <td id="masterAvg">AED 0</td>
+                                <td id="masterShare">0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="cash-card">
+                <div class="chart-container">
+                    <canvas id="cashCardChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="cashCardTable">
+                        <thead>
+                            <tr>
+                                <th>Payment Type</th>
+                                <th>Total Amount</th>
+                                <th>Transaction Count</th>
+                                <th>Average Transaction</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Cash</td>
+                                <td id="cashAmount">AED 0</td>
+                                <td id="cashCount">0</td>
+                                <td id="cashAvg">AED 0</td>
+                                <td id="cashPercentage">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Card</td>
+                                <td id="cardAmount">AED 0</td>
+                                <td id="cardCount">0</td>
+                                <td id="cardAvg">AED 0</td>
+                                <td id="cardPercentage2">0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="platforms">
+                <div class="chart-container">
+                    <canvas id="platformChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="platformTable">
+                        <thead>
+                            <tr>
+                                <th>Platform</th>
+                                <th>Total Amount</th>
+                                <th>Transaction Count</th>
+                                <th>Average Transaction</th>
+                                <th>Market Share</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Talabat</td>
+                                <td id="talabatAmount">AED 0</td>
+                                <td id="talabatCount">0</td>
+                                <td id="talabatAvg">AED 0</td>
+                                <td id="talabatShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Noon</td>
+                                <td id="noonAmount">AED 0</td>
+                                <td id="noonCount">0</td>
+                                <td id="noonAvg">AED 0</td>
+                                <td id="noonShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Careem</td>
+                                <td id="careemAmount">AED 0</td>
+                                <td id="careemCount">0</td>
+                                <td id="careemAvg">AED 0</td>
+                                <td id="careemShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Smiles</td>
+                                <td id="smileAmount">AED 0</td>
+                                <td id="smileCount">0</td>
+                                <td id="smileAvg">AED 0</td>
+                                <td id="smileShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Deliveroo</td>
+                                <td id="deliverooAmount">AED 0</td>
+                                <td id="deliverooCount">0</td>
+                                <td id="deliverooAvg">AED 0</td>
+                                <td id="deliverooShare">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Keeta</td>
+                                <td id="keetaAmount">AED 0</td>
+                                <td id="keetaCount">0</td>
+                                <td id="keetaAvg">AED 0</td>
+                                <td id="keetaShare">0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Restaurant Delivery Performance</h3>
+                <div class="tabs">
+                    <div class="tab active" data-tab="delivery-comparison">Delivery Comparison</div>
+                    <div class="tab" data-tab="delivery-levels">Delivery Levels</div>
+                    <div class="tab" data-tab="monthly-report">Monthly Report</div>
+                </div>
+            </div>
+            
+            <div class="tab-content active" id="delivery-comparison">
+                <div class="chart-container">
+                    <canvas id="restaurantChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="restaurantTable">
+                        <thead>
+                            <tr>
+                                <th>Branch</th>
+                                <th>Internal Delivery</th>
+                                <th>Third-Party Delivery</th>
+                                <th>Total Delivery</th>
+                                <th>Delivery % of Sales</th>
+                            </tr>
+                        </thead>
+                        <tbody id="restaurantTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="delivery-levels">
+                <div class="chart-container">
+                    <canvas id="deliveryLevelsChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="deliveryLevelsTable">
+                        <thead>
+                            <tr>
+                                <th>Delivery Type</th>
+                                <th>Total Amount</th>
+                                <th>Transaction Count</th>
+                                <th>Average Transaction</th>
+                                <th>Percentage of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Internal Delivery</td>
+                                <td id="internalAmount">AED 0</td>
+                                <td id="internalCount">0</td>
+                                <td id="internalAvg">AED 0</td>
+                                <td id="internalPercentage">0%</td>
+                            </tr>
+                            <tr>
+                                <td>Third-Party Delivery</td>
+                                <td id="thirdPartyAmount">AED 0</td>
+                                <td id="thirdPartyCount">0</td>
+                                <td id="thirdPartyAvg">AED 0</td>
+                                <td id="thirdPartyPercentage">0%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="monthly-report">
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+                <div class="table-container">
+                    <table id="monthlyTable">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Total Sales</th>
+                                <th>Internal Delivery</th>
+                                <th>Third-Party Delivery</th>
+                                <th>Cash %</th>
+                                <th>Card %</th>
+                                <th>Growth</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyTableBody">
+                            <!-- Populated by JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
 
         <div class="footer">
-            <p>© 2023 Payment & Delivery Analytics Dashboard. All rights reserved.</p>
+            <p>© 2025 Payment & Delivery Analytics Dashboard. All rights reserved.</p>
         </div>
     </div>
 
@@ -753,22 +855,20 @@
         const yearFilter = document.getElementById('yearFilter');
         const notification = document.getElementById('notification');
         const loading = document.getElementById('loading');
-        const filterContainer = document.getElementById('filterContainer');
-        const dashboardContent = document.getElementById('dashboardContent');
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', () => {
-            // Set up event listeners
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', handleDragOver);
-            uploadArea.addEventListener('drop', handleDrop);
-            fileInput.addEventListener('change', handleFileSelect);
-            
+            setupEventListeners();
+            loadSampleData();
+        });
+
+        function setupEventListeners() {
+            // Filter change events
             monthFilter.addEventListener('change', applyFilters);
             branchFilter.addEventListener('change', applyFilters);
             yearFilter.addEventListener('change', applyFilters);
             
-            // Set up tab navigation
+            // Tab navigation
             document.querySelectorAll('.tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabName = tab.getAttribute('data-tab');
@@ -786,19 +886,21 @@
                 });
             });
             
-            // Load sample data for demonstration
-            loadSampleData();
-        });
+            // File upload
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', handleDragOver);
+            uploadArea.addEventListener('drop', handleDrop);
+            fileInput.addEventListener('change', handleFileSelect);
+        }
 
-        // File handling functions
         function handleDragOver(e) {
             e.preventDefault();
-            uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.2)';
+            uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
         }
 
         function handleDrop(e) {
             e.preventDefault();
-            uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+            uploadArea.style.backgroundColor = 'white';
             
             if (e.dataTransfer.files.length) {
                 processFile(e.dataTransfer.files[0]);
@@ -843,13 +945,13 @@
             reader.readAsArrayBuffer(file);
         }
 
-        function processData(data) {
+        function processData(rawData) {
             // Clear existing data
             salesData = [];
             
             // Skip header row
-            for (let i = 1; i < data.length; i++) {
-                const row = data[i];
+            for (let i = 1; i < rawData.length; i++) {
+                const row = rawData[i];
                 
                 // Skip empty rows or rows with asterisks
                 if (!row || row.length === 0 || row[0] === '*' || row[0] === 'HEAD') {
@@ -901,10 +1003,6 @@
             
             // Apply filters and update dashboard
             applyFilters();
-            
-            // Show dashboard content
-            filterContainer.style.display = 'flex';
-            dashboardContent.style.display = 'block';
         }
 
         function updateBranchFilter() {
@@ -940,22 +1038,14 @@
             const totalTransactions = filteredData.reduce((sum, item) => sum + item.countReceipts, 0);
             
             // Calculate delivery sales
-            const deliverySales = filteredData.reduce((sum, item) => {
-                return sum + item.talabat + item.keeta + item.noon + item.careem + 
-                       item.smiles + item.deliveroo + item.deliveryCard + item.deliveryCash;
-            }, 0);
+            const deliverySales = filteredData.reduce((sum, item) => sum + item.talabat + item.keeta + item.noon + item.careem + item.smiles + item.deliveroo, 0);
             
             // Calculate card payments
-            const cardPayments = filteredData.reduce((sum, item) => {
-                return sum + item.mastercard + item.visa + item.noon + item.careem + 
-                       item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
-            }, 0);
+            const cardPayments = filteredData.reduce((sum, item) => sum + item.mastercard + item.visa + item.noon + item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard, 0);
             
-            const totalPayments = filteredData.reduce((sum, item) => {
-                return sum + item.cash + item.deliveryCash + item.onlineCash + cardPayments;
-            }, 0);
+            const totalPayments = filteredData.reduce((sum, item) => sum + item.cash + item.deliveryCash + item.onlineCash + cardPayments, 0);
             
-            const cardPercentage = totalPayments > 0 ? (cardPayments / totalPayments * 100).toFixed(1) : 0;
+            const cardPercentage = totalPayments > 0 ? ((cardPayments / totalPayments) * 100).toFixed(1) : 0;
             
             // Update summary cards
             document.getElementById('totalSales').textContent = `AED ${totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1044,12 +1134,10 @@
             const cashAvg = cashCount > 0 ? cashAmount / cashCount : 0;
             
             const cardAmount2 = filteredData.reduce((sum, item) => {
-                return sum + item.mastercard + item.visa + item.noon + item.careem + 
-                       item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
+                return sum + item.mastercard + item.visa + item.noon + item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
             }, 0);
             const cardCount2 = filteredData.reduce((sum, item) => {
-                return sum + item.countMaster + item.countVisa + item.countNoon + item.countCareem + 
-                       item.countSmiles + item.countDeliveroo + item.countDeliveryCard + item.countOnlineCard;
+                return sum + item.countMaster + item.countVisa + item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo + item.countDeliveryCard + item.countOnlineCard;
             }, 0);
             const cardAvg2 = cardCount2 > 0 ? cardAmount2 / cardCount2 : 0;
             
@@ -1284,7 +1372,6 @@
                             stacked: true
                         },
                         y: {
-                            stacked: true,
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
@@ -1445,7 +1532,6 @@
                             borderColor: 'rgba(54, 162, 235, 1)',
                             backgroundColor: 'rgba(54, 162, 235, 0.1)',
                             borderWidth: 2,
-                            fill: true,
                             tension: 0.3
                         },
                         {
@@ -1454,7 +1540,6 @@
                             borderColor: 'rgba(75, 192, 192, 1)',
                             backgroundColor: 'rgba(75, 192, 192, 0.1)',
                             borderWidth: 2,
-                            fill: true,
                             tension: 0.3
                         },
                         {
@@ -1463,7 +1548,6 @@
                             borderColor: 'rgba(153, 102, 255, 1)',
                             backgroundColor: 'rgba(153, 102, 255, 0.1)',
                             borderWidth: 2,
-                            fill: true,
                             tension: 0.3
                         }
                     ]
@@ -1487,86 +1571,179 @@
 
         function showNotification(message, type = 'success') {
             notification.textContent = message;
-            notification.className = 'notification show';
-            
-            if (type === 'error') {
-                notification.classList.add('error');
-            }
+            notification.className = `notification show ${type === 'error' ? 'error' : ''}`;
             
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
         }
 
-        function loadSampleData() {
-            // This function loads sample data for demonstration
-            // In a real implementation, this would be replaced with actual file processing
+        function downloadTemplate() {
+            // Create a new workbook
+            const wb = XLSX.utils.book_new();
             
-            // Sample data structure
-            const sampleData = [
-                // Header row
-                ["HEAD", "Branch", "Month", "Year", "Receipts", "TALABAT", "TABNA", "Keeta CARD", "Cash", "NOON CARD", "Master card", "Visa Card", "Careem CARD", "Delivery CARD", "SMILES CARD", "Delivery Cash", "DELIVERO CARD", "ONLINE CASH", "ONLINE CARD", "Count_Receipts", "Count_TALABAT", "Count_TABNA", "Count_Keeta", "Count_Cash", "Count_NOON", "Count_Master", "Count_Visa", "Count_Careem", "Count_DeliveryCard", "Count_SMILES", "Count_DeliveryCash", "Count_DELIVERO", "Count_ONLINE_Cash", "Count_ONLINE_Card"],
-                // Sample data rows
-                ["0", "Crispy Chicken-Hamdan St", "4", "2025", "713032.85", "54117.2", "0", "0", "186014.7", "76678", "108985.2", "81529.3", "33315.5", "30359.4", "29152", "76265.55", "1355", "22846.6", "12414.4", "23797", "1283", "0", "0", "8824", "2094", "4173", "2780", "774", "614", "726", "1749", "30", "500", "250"],
-                ["1", "Crispy Chicken Khaldia", "4", "2025", "568123.4", "66907.5", "0", "0", "141794.5", "70410.55", "96104.2", "75239.4", "24687.85", "15048.5", "14043", "39736.5", "7781", "10359.8", "6010.6", "18743", "1583", "0", "0", "6607", "1909", "3610", "2571", "528", "313", "313", "843", "154", "216", "96"],
-                ["2", "Crispy Chicken Shabiya 11", "4", "2025", "638249.55", "58114.3", "0", "0", "170358.6", "91722.25", "113049.5", "76809.3", "27218.7", "17757.8", "29282", "39223.2", "2709", "7009.9", "4995", "20572", "1268", "0", "0", "7450", "2396", "3973", "2571", "698", "361", "695", "885", "30", "148", "97"],
-                ["3", "Crispy Chicken Muroor", "4", "2025", "526701.4", "58756.1", "0", "0", "117085.5", "59499.4", "94169.5", "94127", "23090.2", "17654.3", "13822", "39140.9", "3254", "3476.8", "2625.7", "17251", "1332", "0", "0", "5759", "1568", "3301", "3085", "504", "350", "321", "861", "57", "68", "45"],
-                ["4", "Crispy Chicken Al Barsha", "4", "2025", "587672.25", "56932.9", "0", "0", "172377.1", "69635.6", "72508.8", "85775.5", "35817.65", "28896.6", "17572", "32525.2", "5984.2", "6923.8", "2722.9", "22717", "1466", "0", "0", "8636", "1861", "3373", "3863", "923", "927", "488", "889", "110", "134", "47"],
-                ["5", "Crispy Chicken Al Satwa", "4", "2025", "401399.75", "46661.6", "0", "0", "136611.2", "55635.2", "37767.6", "43045.8", "25925.65", "7002.9", "14256", "22150.9", "834", "9113.9", "2395", "14139", "1189", "0", "0", "6186", "1539", "1451", "1591", "650", "222", "348", "659", "21", "220", "63"],
-                ["6", "Crispy Chicken Al Rgga", "4", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-                ["7", "Crispy Chicken-ELctria", "4", "2025", "725003.9", "85789.3", "0", "0", "285810", "79148.2", "144394.4", "83074.2", "29678.8", "*", "17109", "0", "0", "0", "*", "28496", "2045", "0", "0", "14226", "2248", "5717", "3179", "685", "0", "396", "0", "0", "0", "0"],
-                ["8", "Crispy Chicken-Hamdan St", "5", "2025", "779896.16", "78502.01", "0", "0", "179545", "67466", "105428.8", "87058", "76727.95", "42337.4", "29013", "74728.1", "0", "23807.1", "15282.8", "26810", "2006", "0", "0", "8747", "1726", "4089", "3045", "2496", "822", "1281", "1693", "0", "599", "306"],
-                ["9", "Crispy Chicken Khaldia", "5", "2025", "636993.45", "101706.3", "0", "0", "133816.2", "55736", "92045.9", "77473.6", "65816.15", "18711.5", "24937", "35898.1", "10534.8", "12771.3", "7546.6", "21403", "2479", "0", "0", "6398", "1401", "3601", "2682", "1989", "351", "1104", "732", "227", "296", "143"],
-                ["10", "Crispy Chicken Shabiya 11", "5", "2025", "690026.34", "82371.09", "0", "0", "162737.4", "81939", "103720.7", "74482.8", "66268.15", "24338.4", "45809", "32365", "2950", "9287.8", "3757", "23546", "1992", "0", "0", "7272", "1935", "3805", "2471", "2125", "472", "2416", "715", "35", "229", "79"],
-                ["11", "Crispy Chicken Muroor", "5", "2025", "537997.55", "72217.95", "0", "0", "114084.3", "41839", "90524.7", "91953.1", "45571.1", "21529.4", "17892", "32772.5", "3175.6", "4181", "2256.9", "18430", "1768", "0", "0", "5778", "1032", "3236", "3130", "1448", "415", "753", "679", "60", "90", "41"],
-                ["12", "Crispy Chicken Al Barsha", "5", "2025", "629874.52", "89097.4", "0", "0", "174601.4", "60410.2", "78601.8", "97187", "51857.82", "15437.7", "25703", "21550.7", "6389", "6702.8", "2335.7", "24979", "2413", "0", "0", "9058", "1505", "3491", "4270", "1783", "377", "1294", "504", "108", "134", "42"],
-                ["13", "Crispy Chicken Al Satwa", "5", "2025", "467366.25", "85652.59", "0", "0", "145733.7", "55119", "42165.7", "46452.4", "37542.56", "4925.9", "19178", "15704.8", "1504", "10682.8", "2704.8", "16409", "2333", "0", "0", "6479", "1377", "1615", "1700", "1333", "119", "682", "387", "36", "274", "74"],
-                ["14", "Crispy Chicken Al Rgga", "5", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-                ["15", "Crispy Chicken-ELctria", "5", "2025", "805574.13", "105621.88", "0", "0", "279068.6", "70771", "147053.2", "90210.9", "83505.55", "0", "29343", "0", "0", "0", "*", "31864", "2717", "0", "0", "13999", "1876", "5927", "3466", "2468", "0", "1411", "0", "0", "0", "0"],
-                ["16", "Crispy Chicken-Hamdan St", "6", "2025", "802422.7", "70292", "0", "0", "167802.1", "70183", "95082", "80223.5", "132121", "48375.7", "42429.6", "57853.3", "0", "24627.1", "13433.4", "26357", "1488", "0", "0", "7747", "1805", "3574", "2765", "3986", "943", "1874", "1375", "0", "545", "255"],
-                ["17", "Crispy Chicken Khaldia", "6", "2025", "673051.75", "110787", "0", "0", "125488.9", "65632", "76390.6", "67505.8", "107789.75", "25847.3", "30508", "31012.6", "12987.4", "13310.4", "5792", "21006", "2258", "0", "0", "5692", "1635", "2830", "2274", "3208", "449", "1330", "629", "324", "268", "109"],
-                ["18", "Crispy Chicken Shabiya 11", "6", "2025", "709110.5", "81004", "0", "0", "150376.5", "91791", "84279.3", "65831.4", "97073", "25524.5", "64348", "29086", "4446.8", "11083", "4267", "22937", "1697", "0", "0", "6385", "2177", "3121", "2154", "2869", "490", "3039", "624", "75", "227", "79"],
-                ["19", "Crispy Chicken Muroor", "6", "2025", "572960.75", "75584.6", "0", "0", "103700", "47024.35", "78331.1", "83033.2", "95629.3", "24270.7", "23823", "31775", "3189.7", "4295.9", "2303.9", "18287", "1560", "0", "0", "4979", "1165", "2733", "2748", "2864", "455", "980", "621", "62", "91", "29"],
-                ["20", "Crispy Chicken Al Barsha", "6", "2025", "664193.64", "82159", "0", "0", "165442", "74702.92", "69533.7", "89733.8", "91895.22", "19546.5", "36868", "21889.7", "4546", "5947.8", "1929", "24731", "1869", "0", "0", "8348", "1889", "3080", "3981", "2660", "439", "1765", "452", "87", "123", "38"],
-                ["21", "Crispy Chicken Al Satwa", "6", "2025", "509383.02", "78146", "0", "0", "145487", "68818", "38024.2", "46191.6", "71963.92", "6534.8", "24912", "14469.8", "1021", "10674.7", "3140", "16685", "1759", "0", "0", "6172", "1774", "1389", "1669", "2098", "154", "997", "309", "21", "268", "75"],
-                ["22", "Crispy Chicken Al Rgga", "6", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-                ["23", "Crispy Chicken-ELctria", "6", "2025", "835561.1", "77934.6", "0", "0", "276154.5", "81448", "128717.8", "81216.7", "149330.5", "*", "40759", "*", "*", "*", "*", "31156", "1685", "0", "0", "12991", "2142", "4959", "3003", "4565", "0", "1811", "0", "0", "0", "0"],
-                ["24", "Crispy Chicken-Hamdan St", "7", "2025", "777059.15", "66926.1", "0", "0", "172422.2", "89252", "99073.6", "79656", "92367.75", "51512.1", "26574", "57693.2", "0", "26364.7", "15217.5", "26169", "1591", "0", "0", "8455", "2336", "4052", "2900", "2370", "1151", "901", "1406", "0", "682", "325"],
-                ["25", "Crispy Chicken Khaldia", "7", "2025", "694472.4", "117570", "0", "0", "127529.4", "119262", "77361.8", "65523.2", "80288.5", "24510.4", "19850", "27107.4", "17703.5", "11913.3", "5852.9", "22152", "2681", "0", "0", "6279", "3033", "3060", "2411", "2025", "501", "675", "596", "465", "297", "129"],
-                ["26", "Crispy Chicken Shabiya 11", "7", "2025", "741667.75", "69781.6", "0", "0", "152950.1", "182336", "93975.1", "65937.6", "66697.75", "23603", "35455", "31556.8", "2465", "12398.9", "4510.9", "23241", "1578", "0", "0", "6871", "4241", "3565", "2355", "1699", "517", "1321", "660", "30", "312", "92"],
-                ["27", "Crispy Chicken Muroor", "7", "2025", "564894", "65616.5", "0", "0", "104652", "84981", "80619.4", "85486", "63691.5", "26768.4", "17051", "26232.9", "3668.7", "4192.8", "1933.8", "18295", "1521", "0", "0", "5239", "2149", "2930", "2887", "1653", "550", "594", "564", "83", "95", "30"],
-                ["28", "Crispy Chicken Al Barsha", "7", "2025", "618161.7", "54250", "0", "0", "160480", "108752", "67285.8", "93884.1", "47575", "23714.9", "27647", "20911.8", "5208.2", "5862", "2590.9", "23642", "1303", "0", "0", "8525", "2735", "3131", "4265", "1288", "521", "1091", "486", "124", "124", "49"],
-                ["29", "Crispy Chicken Al Satwa", "7", "2025", "522713.7", "53308", "0", "0", "152499.2", "112494", "42893.4", "56615.5", "39813", "8327", "20813", "16357.8", "1510", "13780.9", "4301.9", "17692", "1275", "0", "0", "6968", "2870", "1619", "2027", "1101", "184", "794", "344", "26", "376", "108"],
-                ["30", "Crispy Chicken Al Rgga", "7", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-                ["31", "Crispy Chicken-ELctria", "7", "2025", "857462.9", "106325.7", "0", "*", "270913.8", "141613", "123620.7", "85049.2", "104304.5", "0", "25636", "0", "0", "*", "*", "31963", "2537", "0", "0", "13510", "3788", "5195", "3357", "2692", "0", "884", "0", "0", "0", "0"],
-                ["32", "Crispy Chicken-Hamdan St", "8", "2025", "755184.5", "34146", "0", "0", "153603.6", "82445", "90102.7", "72028", "169359.1", "55024.6", "15481", "48159.5", "0", "23005.4", "11829.6", "25560", "773", "0", "0", "7589", "2245", "3613", "2556", "5174", "1139", "592", "1108", "0", "551", "220"],
-                ["33", "Crispy Chicken Khaldia", "8", "2025", "637005.25", "85718", "0", "0", "105227.4", "84210", "70391.9", "61783.4", "138502.75", "27759.7", "10877", "23279.7", "11894", "11873.5", "5487.9", "20366", "1868", "0", "0", "5043", "2209", "2721", "2215", "4171", "511", "407", "521", "335", "252", "113"],
-                ["34", "Crispy Chicken Shabiya 11", "8", "2025", "694108.25", "49748", "0", "0", "142059.3", "120861.5", "86039.4", "65922.9", "138677.75", "30474.8", "21513", "24860.8", "1383", "9286.8", "3281", "22402", "1069", "0", "0", "6426", "2894", "3211", "2342", "4088", "606", "929", "556", "21", "190", "70"],
-                ["35", "Crispy Chicken Muroor", "8", "2025", "516549.3", "47553", "0", "0", "97705.7", "62998", "72921.3", "80103.3", "94395.9", "23238.6", "8410", "21122.8", "2217", "3829.8", "2053.9", "16968", "1015", "0", "0", "4790", "1625", "2651", "2710", "2813", "492", "297", "420", "39", "80", "36"],
-                ["36", "Crispy Chicken Al Barsha", "8", "2025", "648693.85", "52223", "0", "0", "156793.3", "88138.5", "67635.7", "89040.8", "118072.25", "24315.8", "12843", "24979.9", "7248", "4830.9", "2572.7", "23814", "1208", "0", "0", "7983", "2267", "2987", "3984", "3639", "498", "531", "403", "155", "109", "50"],
-                ["37", "Crispy Chicken Al Satwa", "8", "2025", "532036.55", "47974", "0", "0", "140287.4", "99441", "40173.8", "50752.5", "105013.25", "8769.9", "9176", "13705.9", "1840", "11337.8", "3565", "17853", "1155", "0", "0", "6294", "2562", "1490", "1845", "3254", "178", "322", "314", "52", "287", "100"],
-                ["38", "Crispy Chicken Al Rgga", "8", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
-                ["39", "Crispy Chicken-ELctria", "8", "2025", "805213.3", "71230", "0", "0", "248702.3", "100728.5", "117440.6", "81469.4", "174850.5", "0", "10792", "0", "0", "0", "0", "30581", "1706", "0", "0", "12414", "2751", "4762", "3138", "5390", "0", "420", "0", "0", "0", "0"],
-                ["40", "Crispy Chicken-Hamdan St", "9", "2025", "722126.83", "0", "0", "0", "156497.9", "121182.74", "90563.8", "73915.8", "96353.49", "58980.8", "35906", "47580.7", "0", "25945.1", "15200.5", "24619", "0", "0", "0", "7519", "3553", "3600", "2753", "2674", "1234", "1286", "1111", "0", "602", "287"],
-                ["41", "Crispy Chicken Khaldia", "9", "2025", "571512.2", "0", "0", "0", "114135", "118512.13", "73708.8", "62959", "81100.77", "29906.7", "27564", "27862.7", "19268.5", "9426.7", "7067.9", "19137", "0", "0", "0", "5554", "3300", "2890", "2280", "2218", "581", "949", "563", "486", "194", "122"],
-                ["42", "Crispy Chicken Shabiya 11", "9", "2025", "669003.3", "0", "0", "0", "137532.9", "171659.46", "86172.8", "67246.8", "80976.74", "33670.8", "52701", "27618.8", "1004", "6870", "3550", "21870", "0", "0", "0", "6169", "4558", "3150", "2314", "2267", "656", "1914", "613", "13", "157", "59"],
-                ["43", "Crispy Chicken Muroor", "9", "2025", "493890.77", "0", "0", "0", "107632.8", "89313.16", "78434.9", "77196.8", "57361.41", "25414.4", "21535", "25603.9", "4730.6", "4368", "2299.8", "16509", "0", "0", "0", "5077", "2468", "2844", "2671", "1568", "516", "707", "457", "82", "87", "32"],
-                ["44", "Crispy Chicken Al Barsha", "9", "2025", "629719.75", "0", "0", "15675", "158980.9", "143838.04", "64293", "87489.9", "74319.51", "22251", "25437.7", "21109.8", "7835", "5655.9", "2834", "23756", "0", "0", "209", "7945", "3922", "2859", "3898", "2027", "464", "1703", "415", "147", "107", "60"],
-                ["45", "Crispy Chicken Al Satwa", "9", "2025", "557244.49", "0", "0", "16425.1", "146964", "163809.88", "40364.9", "52771", "63710.41", "8561", "33051.6", "14505", "1849.6", "11576", "3656", "19546", "0", "0", "235", "6658", "4648", "1565", "1957", "1783", "189", "1781", "306", "48", "285", "91"],
-                ["46", "Crispy Chicken Al Rgga", "9", "2025", "0", "0", "0", "4506.2", "31690.4", "957", "14338.5", "20902.1", "559", "317", "1252", "1676", "0", "0", "0", "3680", "0", "0", "77", "1789", "24", "701", "960", "12", "5", "72", "40", "0", "0", "0"],
-                ["47", "Crispy Chicken-ELctria", "9", "2025", "76198.2", "0", "0", "0", "249546", "139599.1", "122085", "85520.8", "99607.43", "0", "31228.6", "0", "0", "0", "0", "28364", "0", "0", "0", "12162", "4064", "4951", "3296", "2824", "0", "1067", "0", "0", "0", "0"],
-                ["48", "Crispy Chicken-Hamdan St", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["49", "Crispy Chicken Khaldia", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["50", "Crispy Chicken Shabiya 11", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["51", "Crispy Chicken Muroor", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["52", "Crispy Chicken Al Barsha", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["53", "Crispy Chicken Al Satwa", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["54", "Crispy Chicken Al Rgga", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"],
-                ["55", "Crispy Chicken-ELctria", "10", "2025", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*", "*"]
+            // Create template data with headers
+            const templateData = [
+                [
+                    'HEAD*', 'Branch*', 'Month*', 'Year*', 'Receipts*', 'TALABAT', 'TABNA', 'Keeta CARD', 
+                    'Cash', 'NOON CARD', 'Master card', 'Visa Card', 'Careem CARD', 'Delivery CARD', 
+                    'SMILES CARD', 'Delivery Cash', 'DELIVERO CARD', 'ONLINE CASH', 'ONLINE CARD', 
+                    'Count_Receipts', 'Count_TALABAT', 'Count_TABNA', 'Count_Keeta', 'Count_Cash', 
+                    'Count_NOON', 'Count_Master', 'Count_Visa', 'Count_Careem', 'Count_DeliveryCard', 
+                    'Count_SMILES', 'Count_DeliveryCash', 'Count_DELIVERO', 'Count_ONLINE_Cash', 'Count_ONLINE_Card'
+                ],
+                [
+                    'HEAD', 'Crispy Chicken-Hamdan St', '1', '2025', '785537.88', '55272.96', '0', '0', 
+                    '207908.13', '79328.39', '125061.73', '78456.25', '38265.58', '23471.38', 
+                    '50561', '95829.04', '5482.62', '15755.12', '9790.68', '26775', '1144', '0', 
+                    '0', '9935', '2238', '4594', '2770', '1167', '449', '1498', '2308', '97', '377', '192'
+                ],
+                [
+                    'HEAD', 'Crispy Chicken Khaldia', '1', '2025', '584685.4', '62454.93', '92.59', '0', 
+                    '139821', '67034.34', '88632.53', '73895.9', '25667.99', '13905.94', 
+                    '44374.88', '46454.41', '8601.88', '9089.81', '4659.2', '19523', '1217', '2', 
+                    '0', '6647', '1897', '3458', '2477', '812', '249', '1343', '992', '137', '202', '90'
+                ]
             ];
             
-            // Process the sample data
+            // Create worksheet
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            
+            // Set column widths
+            const colWidths = [
+                { wch: 8 },   // HEAD
+                { wch: 25 },  // Branch
+                { wch: 8 },   // Month
+                { wch: 8 },   // Year
+                { wch: 12 },  // Receipts
+                { wch: 12 },  // TALABAT
+                { wch: 10 },  // TABNA
+                { wch: 12 },  // Keeta CARD
+                { wch: 10 },  // Cash
+                { wch: 12 },  // NOON CARD
+                { wch: 12 },  // Master card
+                { wch: 12 },  // Visa Card
+                { wch: 12 },  // Careem CARD
+                { wch: 14 },  // Delivery CARD
+                { wch: 14 },  // SMILES CARD
+                { wch: 14 },  // Delivery Cash
+                { wch: 14 },  // DELIVERO CARD
+                { wch: 12 },  // ONLINE CASH
+                { wch: 12 },  // ONLINE CARD
+                { wch: 14 },  // Count_Receipts
+                { wch: 14 },  // Count_TALABAT
+                { wch: 12 },  // Count_TABNA
+                { wch: 12 },  // Count_Keeta
+                { wch: 12 },  // Count_Cash
+                { wch: 12 },  // Count_NOON
+                { wch: 12 },  // Count_Master
+                { wch: 12 },  // Count_Visa
+                { wch: 14 },  // Count_Careem
+                { wch: 18 },  // Count_DeliveryCard
+                { wch: 14 },  // Count_SMILES
+                { wch: 18 },  // Count_DeliveryCash
+                { wch: 14 },  // Count_DELIVERO
+                { wch: 16 },  // Count_ONLINE_Cash
+                { wch: 16 }   // Count_ONLINE_Card
+            ];
+            ws['!cols'] = colWidths;
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, "Sales Data");
+            
+            // Generate Excel file and download
+            XLSX.writeFile(wb, "Sales_Data_Template.xlsx");
+            
+            showNotification('Excel template downloaded successfully!', 'success');
+        }
+
+        function loadSampleData() {
+            // Load the provided sales data
+            const sampleData = [
+                ["HEAD", "Crispy Chicken-Hamdan St", "1", "2025", "785537.88", "55272.96", "0", "0", "207908.13", "79328.39", "125061.73", "78456.25", "38265.58", "23471.38", "50561", "95829.04", "5482.62", "15755.12", "9790.68", "26775", "1144", "0", "0", "9935", "2238", "4594", "2770", "1167", "449", "1498", "2308", "97", "377", "192"],
+                ["HEAD", "Crispy Chicken Khaldia", "1", "2025", "584685.4", "62454.93", "92.59", "0", "139821", "67034.34", "88632.53", "73895.9", "25667.99", "13905.94", "44374.88", "46454.41", "8601.88", "9089.81", "4659.2", "19523", "1217", "2", "0", "6647", "1897", "3458", "2477", "812", "249", "1343", "992", "137", "202", "90"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "1", "2025", "630955.6", "35802.49", "75", "0", "167078.54", "79487.04", "102733.74", "69778.54", "34104.18", "18043.94", "77531.22", "34733.77", "4263.98", "4779.37", "2618.79", "21470", "705", "2", "0", "7395", "2215", "3814", "2436", "1074", "366", "2399", "835", "54", "119", "58"],
+                ["HEAD", "Crispy Chicken Muroor", "1", "2025", "527597.59", "48211.79", "35", "0", "120193.1", "50495.26", "83440.34", "85619.29", "32059.59", "23144.36", "40854.29", "36604.32", "3547.86", "1861.7", "1490.69", "17770", "969", "1", "0", "5888", "1452", "2990", "2820", "963", "467", "1294", "788", "65", "41", "31"],
+                ["HEAD", "Crispy Chicken Al Barsha", "1", "2025", "611173.74", "38175.48", "0", "0", "178819.55", "66462.64", "73224.5", "84120.81", "49244.9", "27673.05", "50254.01", "28078.99", "6794.63", "5677.37", "2647.81", "24058", "839", "0", "0", "8938", "1902", "3357", "3712", "1652", "854", "1657", "872", "119", "113", "43"],
+                ["HEAD", "Crispy Chicken Al Satwa", "1", "2025", "385718.26", "28527.83", "0", "0", "124512.61", "71302.62", "34050.62", "34706.38", "31417.87", "6986.61", "25312.49", "19861.9", "1432.48", "5835.16", "1736.69", "14065", "632", "0", "0", "5698", "2076", "1352", "1314", "1103", "171", "837", "647", "24", "167", "43"],
+                ["HEAD", "Crispy Chicken Al Rgga", "1", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "1", "2025", "740083.76", "52228.79", "0", "0", "300244.92", "91589.3", "150467.4", "81937.11", "27260.97", "0", "36355.27", "0", "0", "0", "0", "30341", "1041", "0", "0", "15547", "2623", "6077", "3164", "867", "0", "1022", "0", "139", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "2", "2025", "742068.15", "55021", "0", "0", "183743.1", "71094.5", "107837.1", "70459.9", "39408.15", "21608.3", "67595.7", "89937.3", "5805.2", "17714.4", "10974.5", "25749", "1176", "0", "0", "8862", "2008", "4155", "2443", "1091", "424", "2746", "2036", "0", "417", "227"],
+                ["HEAD", "Crispy Chicken Khaldia", "2", "2025", "566345.35", "46961", "0", "0", "132388.5", "74018.8", "84054.2", "68511.6", "38073.4", "13376.8", "47101.9", "38340.9", "0", "9389.9", "5271.9", "18616", "962", "0", "0", "6357", "2007", "3228", "2175", "654", "234", "1685", "820", "189", "206", "99"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "2", "2025", "614655.25", "37354.6", "0", "0", "156115.55", "96767.8", "92407.1", "63840.3", "26730.7", "17187.7", "81636", "33917.6", "8856.45", "3616", "2723.9", "21387", "788", "0", "0", "6899", "2546", "3508", "2128", "1046", "355", "3167", "781", "26", "86", "57"],
+                ["HEAD", "Crispy Chicken Muroor", "2", "2025", "501652.3", "37739.4", "0", "0", "117647.8", "54019.4", "81050.3", "78333.9", "24872.9", "21538.1", "40537.8", "36899.4", "2358", "1582.9", "2355.8", "17373", "828", "0", "0", "5743", "1432", "2980", "2627", "917", "435", "1457", "764", "116", "33", "41"],
+                ["HEAD", "Crispy Chicken Al Barsha", "2", "2025", "610930.05", "37097.2", "0", "0", "173216", "76302.9", "73590.9", "82166.1", "42034.8", "24825.7", "55001.25", "26873.7", "5074.6", "6422.9", "2553.8", "23744", "905", "0", "0", "8386", "2101", "3275", "3655", "1511", "708", "1990", "819", "196", "132", "46"],
+                ["HEAD", "Crispy Chicken Al Satwa", "2", "2025", "426646.6", "26462.6", "0", "0", "129080.2", "75701.8", "34280.4", "35910.7", "30554.4", "5245", "59401.4", "19103.6", "10134.8", "7294.9", "2683.6", "15427", "676", "0", "0", "5885", "2121", "1351", "1349", "1155", "140", "1915", "579", "15", "185", "55"],
+                ["HEAD", "Crispy Chicken Al Rgga", "2", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "905", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "2", "2025", "710819.7", "42288", "0", "0", "287077.7", "81781.2", "135759.5", "74741.5", "52609.5", "0", "36562.3", "0", "0", "0", "0", "28535", "945", "0", "0", "14484", "2269", "5597", "2907", "923", "0", "1410", "0", "*", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "3", "2025", "603475.3", "58532", "0", "0", "155788.8", "57141", "93312.5", "59885.3", "39450", "29185.4", "22783", "58597.7", "4832.4", "15534.6", "8432.6", "19852", "1258", "0", "0", "7130", "1508", "3590", "2115", "1198", "576", "591", "1301", "92", "342", "151"],
+                ["HEAD", "Crispy Chicken Khaldia", "3", "2025", "458231.5", "47596", "0", "0", "111459.7", "57406", "74431.3", "58843.2", "28444.3", "14202.8", "13248", "30417.8", "9538.8", "8568.7", "4074.9", "14684", "1071", "0", "0", "5171", "1467", "2755", "1856", "757", "257", "346", "634", "172", "143", "55"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "3", "2025", "449433.7", "40882", "0", "0", "118002.6", "65578", "80476.1", "50587.3", "27248.8", "15450.8", "20465", "24822.3", "2639", "1484.9", "1796.9", "15249", "879", "0", "0", "5372", "1614", "3069", "1824", "918", "328", "558", "578", "35", "40", "34"],
+                ["HEAD", "Crispy Chicken Muroor", "3", "2025", "347325.2", "38980", "0", "0", "72515.9", "38501", "58233.6", "56914.5", "24282.2", "17654.3", "9538", "24153.7", "2721", "2899", "932", "11328", "824", "0", "0", "3642", "981", "2112", "1937", "647", "343", "233", "474", "68", "49", "18"],
+                ["HEAD", "Crispy Chicken Al Barsha", "3", "2025", "475552.3", "38379", "0", "0", "149371.1", "48279", "65862.3", "70819.1", "35823.9", "21620.9", "13662", "20453.7", "6465.6", "3367.8", "1447.9", "18794", "937", "0", "0", "7237", "1261", "3014", "3122", "1191", "745", "399", "682", "108", "70", "28"],
+                ["HEAD", "Crispy Chicken Al Satwa", "3", "2025", "316797.8", "31064", "0", "0", "108133.3", "41738", "33590.5", "32193.6", "27878.8", "6555.8", "13671", "15377.8", "763", "4200", "1632", "11430", "742", "0", "0", "5047", "1085", "1269", "1198", "922", "165", "373", "480", "15", "100", "34"],
+                ["HEAD", "Crispy Chicken Al Rgga", "3", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "3", "2025", "605098.6", "54285", "0", "0", "243126.1", "72104", "127753", "66548.1", "27856.4", "0", "13426", "0", "0", "0", "0", "24038", "1215", "0", "0", "12074", "1960", "5149", "2563", "734", "0", "343", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "4", "2025", "713032.85", "54117.2", "0", "0", "186014.7", "76678", "108985.2", "81529.3", "33315.5", "30359.4", "29152", "76265.55", "1355", "22846.6", "12414.4", "23797", "1283", "0", "0", "8824", "2094", "4173", "2780", "774", "614", "726", "1749", "30", "500", "250"],
+                ["HEAD", "Crispy Chicken Khaldia", "4", "2025", "568123.4", "66907.5", "0", "0", "141794.5", "70410.55", "96104.2", "75239.4", "24687.85", "15048.5", "14043", "39736.5", "7781", "10359.8", "6010.6", "18743", "1583", "0", "0", "6607", "1909", "3610", "2571", "528", "313", "313", "843", "154", "216", "96"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "4", "2025", "638249.55", "58114.3", "0", "0", "170358.6", "91722.25", "113049.5", "76809.3", "27218.7", "17757.8", "29282", "39223.2", "2709", "7009.9", "4995", "20572", "1268", "0", "0", "7450", "2396", "3973", "2571", "698", "361", "695", "885", "30", "148", "97"],
+                ["HEAD", "Crispy Chicken Muroor", "4", "2025", "526701.4", "58756.1", "0", "0", "117085.5", "59499.4", "94169.5", "94127", "23090.2", "17654.3", "13822", "39140.9", "3254", "3476.8", "2625.7", "17251", "1332", "0", "0", "5759", "1568", "3301", "3085", "504", "350", "321", "861", "57", "68", "45"],
+                ["HEAD", "Crispy Chicken Al Barsha", "4", "2025", "587672.25", "56932.9", "0", "0", "172377.1", "69635.6", "72508.8", "85775.5", "35817.65", "28896.6", "17572", "32525.2", "5984.2", "6923.8", "2722.9", "22717", "1466", "0", "0", "8636", "1861", "3373", "3863", "923", "927", "488", "889", "110", "134", "47"],
+                ["HEAD", "Crispy Chicken Al Satwa", "4", "2025", "401399.75", "46661.6", "0", "0", "136611.2", "55635.2", "37767.6", "43045.8", "25925.65", "7002.9", "14256", "22150.9", "834", "9113.9", "2395", "14139", "1189", "0", "0", "6186", "1539", "1451", "1591", "650", "222", "348", "659", "21", "220", "63"],
+                ["HEAD", "Crispy Chicken Al Rgga", "4", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "4", "2025", "725003.9", "85789.3", "0", "0", "285810", "79148.2", "144394.4", "83074.2", "29678.8", "0", "17109", "0", "0", "0", "0", "28496", "2045", "0", "0", "14226", "2248", "5717", "3179", "685", "0", "396", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "5", "2025", "779896.16", "78502.01", "0", "0", "179545", "67466", "105428.8", "87058", "76727.95", "42337.4", "29013", "74728.1", "0", "23807.1", "15282.8", "26810", "2006", "0", "0", "8747", "1726", "4089", "3045", "2496", "822", "1281", "1693", "0", "599", "306"],
+                ["HEAD", "Crispy Chicken Khaldia", "5", "2025", "636993.45", "101706.3", "0", "0", "133816.2", "55736", "92045.9", "77473.6", "65816.15", "18711.5", "24937", "35898.1", "10534.8", "12771.3", "7546.6", "21403", "2479", "0", "0", "6398", "1401", "3601", "2682", "1989", "351", "1104", "732", "227", "296", "143"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "5", "2025", "690026.34", "82371.09", "0", "0", "162737.4", "81939", "103720.7", "74482.8", "66268.15", "24338.4", "45809", "32365", "2950", "9287.8", "3757", "23546", "1992", "0", "0", "7272", "1935", "3805", "2471", "2125", "472", "2416", "715", "35", "229", "79"],
+                ["HEAD", "Crispy Chicken Muroor", "5", "2025", "537997.55", "72217.95", "0", "0", "114084.3", "41839", "90524.7", "91953.1", "45571.1", "21529.4", "17892", "32772.5", "3175.6", "4181", "2256.9", "18430", "1768", "0", "0", "5778", "1032", "3236", "3130", "1448", "415", "753", "679", "60", "90", "41"],
+                ["HEAD", "Crispy Chicken Al Barsha", "5", "2025", "629874.52", "89097.4", "0", "0", "174601.4", "60410.2", "78601.8", "97187", "51857.82", "15437.7", "25703", "21550.7", "6389", "6702.8", "2335.7", "24979", "2413", "0", "0", "9058", "1505", "3491", "4270", "1783", "377", "1294", "504", "108", "134", "42"],
+                ["HEAD", "Crispy Chicken Al Satwa", "5", "2025", "467366.25", "85652.59", "0", "0", "145733.7", "55119", "42165.7", "46452.4", "37542.56", "4925.9", "19178", "15704.8", "1504", "10682.8", "2704.8", "16409", "2333", "0", "0", "6479", "1377", "1615", "1700", "1333", "119", "682", "387", "36", "274", "74"],
+                ["HEAD", "Crispy Chicken Al Rgga", "5", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "5", "2025", "805574.13", "105621.88", "0", "0", "279068.6", "70771", "147053.2", "90210.9", "83505.55", "0", "29343", "0", "0", "0", "0", "31864", "2717", "0", "0", "13999", "1876", "5927", "3466", "2468", "0", "1411", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "6", "2025", "802422.7", "70292", "0", "0", "167802.1", "70183", "95082", "80223.5", "132121", "48375.7", "42429.6", "57853.3", "0", "24627.1", "13433.4", "26357", "1488", "0", "0", "7747", "1805", "3574", "2765", "3986", "943", "1874", "1375", "0", "545", "255"],
+                ["HEAD", "Crispy Chicken Khaldia", "6", "2025", "673051.75", "110787", "0", "0", "125488.9", "65632", "76390.6", "67505.8", "107789.75", "25847.3", "30508", "31012.6", "12987.4", "13310.4", "5792", "21006", "2258", "0", "0", "5692", "1635", "2830", "2274", "3208", "449", "1330", "629", "324", "268", "109"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "6", "2025", "709110.5", "81004", "0", "0", "150376.5", "91791", "84279.3", "65831.4", "97073", "25524.5", "64348", "29086", "4446.8", "11083", "4267", "22937", "1697", "0", "0", "6385", "2177", "3121", "2154", "2869", "490", "3039", "624", "75", "227", "79"],
+                ["HEAD", "Crispy Chicken Muroor", "6", "2025", "572960.75", "75584.6", "0", "0", "103700", "47024.35", "78331.1", "83033.2", "95629.3", "24270.7", "23823", "31775", "3189.7", "4295.9", "2303.9", "18287", "1560", "0", "0", "4979", "1165", "2733", "2748", "2864", "455", "980", "621", "62", "91", "29"],
+                ["HEAD", "Crispy Chicken Al Barsha", "6", "2025", "664193.64", "82159", "0", "0", "165442", "74702.92", "69533.7", "89733.8", "91895.22", "19546.5", "36868", "21889.7", "4546", "5947.8", "1929", "24731", "1869", "0", "0", "8348", "1889", "3080", "3981", "2660", "439", "1765", "452", "87", "123", "38"],
+                ["HEAD", "Crispy Chicken Al Satwa", "6", "2025", "509383.02", "78146", "0", "0", "145487", "68818", "38024.2", "46191.6", "71963.92", "6534.8", "24912", "14469.8", "1021", "10674.7", "3140", "16685", "1759", "0", "0", "6172", "1774", "1389", "1669", "2098", "154", "997", "309", "21", "268", "75"],
+                ["HEAD", "Crispy Chicken Al Rgga", "6", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "6", "2025", "835561.1", "77934.6", "0", "0", "276154.5", "81448", "128717.8", "81216.7", "149330.5", "0", "40759", "0", "0", "0", "0", "31156", "1685", "0", "0", "12991", "2142", "4959", "3003", "4565", "0", "1811", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "7", "2025", "777059.15", "66926.1", "0", "0", "172422.2", "89252", "99073.6", "79656", "92367.75", "51512.1", "26574", "57693.2", "0", "26364.7", "15217.5", "26169", "1591", "0", "0", "8455", "2336", "4052", "2900", "2370", "1151", "901", "1406", "0", "682", "325"],
+                ["HEAD", "Crispy Chicken Khaldia", "7", "2025", "694472.4", "117570", "0", "0", "127529.4", "119262", "77361.8", "65523.2", "80288.5", "24510.4", "19850", "27107.4", "17703.5", "11913.3", "5852.9", "22152", "2681", "0", "0", "6279", "3033", "3060", "2411", "2025", "501", "675", "596", "465", "297", "129"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "7", "2025", "741667.75", "69781.6", "0", "0", "152950.1", "182336", "93975.1", "65937.6", "66697.75", "23603", "35455", "31556.8", "2465", "12398.9", "4510.9", "23241", "1578", "0", "0", "6871", "4241", "3565", "2355", "1699", "517", "1321", "660", "30", "312", "92"],
+                ["HEAD", "Crispy Chicken Muroor", "7", "2025", "564894", "65616.5", "0", "0", "104652", "84981", "80619.4", "85486", "63691.5", "26768.4", "17051", "26232.9", "3668.7", "4192.8", "1933.8", "18295", "1521", "0", "0", "5239", "2149", "2930", "2887", "1653", "550", "594", "564", "83", "95", "30"],
+                ["HEAD", "Crispy Chicken Al Barsha", "7", "2025", "618161.7", "54250", "0", "0", "160480", "108752", "67285.8", "93884.1", "47575", "23714.9", "27647", "20911.8", "5208.2", "5862", "2590.9", "23642", "1303", "0", "0", "8525", "2735", "3131", "4265", "1288", "521", "1091", "486", "124", "124", "49"],
+                ["HEAD", "Crispy Chicken Al Satwa", "7", "2025", "522713.7", "53308", "0", "0", "152499.2", "112494", "42893.4", "56615.5", "39813", "8327", "20813", "16357.8", "1510", "13780.9", "4301.9", "17692", "1275", "0", "0", "6968", "2870", "1619", "2027", "1101", "184", "794", "344", "26", "376", "108"],
+                ["HEAD", "Crispy Chicken Al Rgga", "7", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "7", "2025", "857462.9", "106325.7", "0", "*", "270913.8", "141613", "123620.7", "85049.2", "104304.5", "0", "25636", "0", "0", "0", "0", "31963", "2537", "0", "0", "13510", "3788", "5195", "3357", "2692", "0", "884", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "8", "2025", "755184.5", "34146", "0", "0", "153603.6", "82445", "90102.7", "72028", "169359.1", "55024.6", "15481", "48159.5", "0", "23005.4", "11829.6", "25560", "773", "0", "0", "7589", "2245", "3613", "2556", "5174", "1139", "592", "1108", "0", "551", "220"],
+                ["HEAD", "Crispy Chicken Khaldia", "8", "2025", "637005.25", "85718", "0", "0", "105227.4", "84210", "70391.9", "61783.4", "138502.75", "27759.7", "10877", "23279.7", "11894", "11873.5", "5487.9", "20366", "1868", "0", "0", "5043", "2209", "2721", "2215", "4171", "511", "407", "521", "335", "252", "113"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "8", "2025", "694108.25", "49748", "0", "0", "142059.3", "120861.5", "86039.4", "65922.9", "138677.75", "30474.8", "21513", "24860.8", "1383", "9286.8", "3281", "22402", "1069", "0", "0", "6426", "2894", "3211", "2342", "4088", "606", "929", "556", "21", "190", "70"],
+                ["HEAD", "Crispy Chicken Muroor", "8", "2025", "516549.3", "47553", "0", "0", "97705.7", "62998", "72921.3", "80103.3", "94395.9", "23238.6", "8410", "21122.8", "2217", "3829.8", "2053.9", "16968", "1015", "0", "0", "4790", "1625", "2651", "2710", "2813", "492", "297", "420", "39", "80", "36"],
+                ["HEAD", "Crispy Chicken Al Barsha", "8", "2025", "648693.85", "52223", "0", "0", "156793.3", "88138.5", "67635.7", "89040.8", "118072.25", "24315.8", "12843", "24979.9", "7248", "4830.9", "2572.7", "23814", "1208", "0", "0", "7983", "2267", "2987", "3984", "3639", "498", "531", "403", "155", "109", "50"],
+                ["HEAD", "Crispy Chicken Al Satwa", "8", "2025", "532036.55", "47974", "0", "0", "140287.4", "99441", "40173.8", "50752.5", "105013.25", "8769.9", "9176", "13705.9", "1840", "11337.8", "3565", "17853", "1155", "0", "0", "6294", "2562", "1490", "1845", "3254", "178", "322", "314", "52", "287", "100"],
+                ["HEAD", "Crispy Chicken Al Rgga", "8", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "8", "2025", "805213.3", "71230", "0", "0", "248702.3", "100728.5", "117440.6", "81469.4", "174850.5", "0", "10792", "0", "0", "0", "0", "30581", "1706", "0", "0", "12414", "2751", "4762", "3138", "5390", "0", "420", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "9", "2025", "722126.83", "0", "0", "0", "156497.9", "121182.74", "90563.8", "73915.8", "96353.49", "58980.8", "35906", "47580.7", "0", "25945.1", "15200.5", "24619", "0", "0", "0", "7519", "3553", "3600", "2753", "2674", "1234", "1286", "1111", "0", "602", "287"],
+                ["HEAD", "Crispy Chicken Khaldia", "9", "2025", "571512.2", "0", "0", "0", "114135", "118512.13", "73708.8", "62959", "81100.77", "29906.7", "27564", "27862.7", "19268.5", "9426.7", "7067.9", "19137", "0", "0", "0", "5554", "3300", "2890", "2280", "2218", "581", "949", "563", "486", "194", "122"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "9", "2025", "669003.3", "0", "0", "0", "137532.9", "171659.46", "86172.8", "67246.8", "80976.74", "33670.8", "52701", "27618.8", "1004", "6870", "3550", "21870", "0", "0", "0", "6169", "4558", "3150", "2314", "2267", "656", "1914", "613", "13", "157", "59"],
+                ["HEAD", "Crispy Chicken Muroor", "9", "2025", "493890.77", "0", "0", "0", "107632.8", "89313.16", "78434.9", "77196.8", "57361.41", "25414.4", "21535", "25603.9", "4730.6", "4368", "2299.8", "16509", "0", "0", "0", "5077", "2468", "2844", "2671", "1568", "516", "707", "457", "82", "87", "32"],
+                ["HEAD", "Crispy Chicken Al Barsha", "9", "2025", "629719.75", "0", "0", "15675", "158980.9", "143838.04", "64293", "87489.9", "74319.51", "22251", "25437.7", "21109.8", "7835", "5655.9", "2834", "23756", "0", "0", "209", "7945", "3922", "2859", "3898", "2027", "464", "1703", "415", "147", "107", "60"],
+                ["HEAD", "Crispy Chicken Al Satwa", "9", "2025", "557244.49", "0", "0", "16425.1", "146964", "163809.88", "40364.9", "52771", "63710.41", "8561", "33051.6", "14505", "1849.6", "11576", "3656", "19546", "0", "0", "235", "6658", "4648", "1565", "1957", "1783", "189", "1781", "306", "48", "285", "91"],
+                ["HEAD", "Crispy Chicken Al Rgga", "9", "2025", "0", "0", "0", "4506.2", "31690.4", "957", "14338.5", "20902.1", "559", "317", "1252", "1676", "0", "0", "0", "0", "3680", "0", "0", "77", "1789", "24", "701", "960", "12", "5", "72", "40", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-ELctria", "9", "2025", "76198.2", "0", "0", "0", "249546", "139599.1", "122085", "85520.8", "99607.43", "0", "31228.6", "0", "0", "0", "0", "28364", "0", "0", "0", "12162", "4064", "4951", "3296", "2824", "0", "1067", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken-Hamdan St", "10", "2025", "763733.1", "0", "0", "22559.25", "162448.8", "166803.8", "97561", "81148", "69649.25", "58669.4", "27576", "44897.5", "25", "21847.8", "10547.3", "25438", "0", "0", "422", "7769", "5322", "3745", "2929", "1665", "1159", "732", "1006", "1", "473", "215"],
+                ["HEAD", "Crispy Chicken Khaldia", "10", "2025", "649241.64", "0", "0", "21670.7", "120479.8", "154665.14", "82429.9", "74844.6", "59464.9", "34178.1", "25588", "27115.9", "30989.4", "10074.7", "7740.5", "21131", "0", "0", "422", "5756", "4715", "3230", "2673", "1367", "627", "643", "537", "807", "215", "139"],
+                ["HEAD", "Crispy Chicken Shabiya 11", "10", "2025", "744778.92", "0", "0", "29489.45", "146399.7", "233077.62", "89192.8", "66143.8", "66152.45", "30474.5", "40811", "27481.9", "3848", "8215.8", "3491.9", "23560", "0", "0", "549", "6418", "6833", "3312", "2370", "1505", "635", "1040", "590", "54", "187", "67"],
+                ["HEAD", "Crispy Chicken Muroor", "10", "2025", "536168.33", "0", "0", "18124.7", "107684.9", "113347.88", "83137", "86209", "44178.35", "31843.8", "19074", "18651", "8482.7", "3904", "1531", "17785", "0", "0", "355", "5224", "3465", "2980", "2979", "1027", "587", "496", "386", "197", "64", "25"],
+                ["HEAD", "Crispy Chicken Al Barsha", "10", "2025", "781435.5", "0", "0", "167922.1", "159603.9", "184973.3", "64795", "85309", "40084.1", "20928.9", "16125", "23889.9", "10398.4", "6118.9", "1287", "26087", "0", "0", "3337", "8063", "5237", "3018", "3826", "987", "444", "475", "406", "172", "98", "24"],
+                ["HEAD", "Crispy Chicken Al Satwa", "10", "2025", "655294.15", "0", "0", "168826.35", "153982", "172458.8", "43650", "55353.9", "22140.8", "4026", "12204", "8746.9", "2722.5", "9091.9", "2091", "20525", "0", "0", "3361", "6761", "5093", "1759", "2006", "549", "94", "357", "199", "58", "239", "49"],
+                ["HEAD", "Crispy Chicken Al Rgga", "10", "2025", "773870.29", "0", "0", "282731.65", "174333", "119856.44", "68381.8", "98023", "5697", "6836.9", "7261", "7798", "875.5", "1747", "329", "25777", "0", "0", "5827", "8364", "3914", "2853", "4054", "143", "156", "200", "176", "28", "53", "9"],
+                ["HEAD", "Crispy Chicken-ELctria", "10", "2025", "825524.92", "0", "0", "23082.6", "276572", "192047.4", "134869.9", "96545.9", "75943.12", "0", "26464", "0", "0", "0", "0", "31776", "0", "0", "464", "13436", "6326", "5343", "3726", "1807", "0", "674", "0", "0", "0", "0"]
+            ];
+            
             processData(sampleData);
+            showNotification('Sample data loaded successfully!', 'success');
         }
     </script>
 </body>
