@@ -6,23 +6,25 @@
     <title>Payment & Delivery Analytics Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --accent: #4cc9f0;
-            --success: #4caf50;
-            --warning: #ff9800;
-            --danger: #f44336;
-            --light: #f8f9fa;
-            --dark: #212529;
-            --gray: #6c757d;
+            --primary: #5e72e4;
+            --primary-dark: #4c63d2;
+            --secondary: #f5365c;
+            --success: #2dce89;
+            --warning: #fb6340;
+            --info: #11cdef;
+            --dark: #32325d;
+            --light: #f7f8fc;
+            --white: #ffffff;
+            --gray: #8898aa;
             --light-gray: #e9ecef;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --border-radius: 12px;
+            --box-shadow: 0 15px 35px rgba(50, 50, 93, 0.1), 0 5px 15px rgba(0, 0, 0, 0.07);
+            --box-shadow-sm: 0 0 2rem 0 rgba(136, 152, 170, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
@@ -33,9 +35,24 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f5f7ff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             color: var(--dark);
             line-height: 1.6;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.05" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,133.3C960,128,1056,96,1152,90.7C1248,85,1344,107,1392,117.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+            background-size: cover;
+            pointer-events: none;
+            z-index: -1;
         }
 
         .container {
@@ -45,43 +62,87 @@
         }
 
         header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 30px 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            color: var(--dark);
+            padding: 40px 0;
             text-align: center;
             border-radius: var(--border-radius);
             margin-bottom: 30px;
             box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--info));
+            animation: gradient 3s ease infinite;
+        }
+
+        @keyframes gradient {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(10px); }
         }
 
         header h1 {
             font-size: 2.5rem;
+            font-weight: 800;
             margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         header p {
             font-size: 1.1rem;
-            opacity: 0.9;
+            color: var(--gray);
+            font-weight: 500;
         }
 
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
             margin-bottom: 30px;
         }
 
         .card {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: var(--border-radius);
             padding: 25px;
-            box-shadow: var(--box-shadow);
+            box-shadow: var(--box-shadow-sm);
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--info));
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover::before {
+            transform: scaleX(1);
         }
 
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: var(--box-shadow);
         }
 
         .card-header {
@@ -89,104 +150,167 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--light-gray);
         }
 
         .card-title {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 600;
             color: var(--dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .card-icon {
-            width: 50px;
-            height: 50px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            font-size: 1.5rem;
+            border-radius: 12px;
+            font-size: 1.3rem;
+            position: relative;
+        }
+
+        .card-icon::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 2px;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: exclude;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .icon-primary {
-            background-color: rgba(67, 97, 238, 0.1);
-            color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
         }
 
         .icon-success {
-            background-color: rgba(76, 175, 80, 0.1);
-            color: var(--success);
+            background: linear-gradient(135deg, var(--success), #26af74);
+            color: white;
         }
 
         .icon-warning {
-            background-color: rgba(255, 152, 0, 0.1);
-            color: var(--warning);
+            background: linear-gradient(135deg, var(--warning), #fa4419);
+            color: white;
         }
 
         .icon-danger {
-            background-color: rgba(244, 67, 54, 0.1);
-            color: var(--danger);
+            background: linear-gradient(135deg, var(--secondary), #ec0c38);
+            color: white;
         }
 
         .stat-value {
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: 700;
             margin-bottom: 5px;
+            color: var(--dark);
         }
 
         .stat-label {
             color: var(--gray);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
         .progress-bar {
             height: 8px;
             background-color: var(--light-gray);
-            border-radius: 4px;
+            border-radius: 10px;
             overflow: hidden;
-            margin-top: 10px;
+            margin-top: 15px;
+            position: relative;
         }
 
         .progress {
             height: 100%;
-            border-radius: 4px;
-            transition: width 0.3s ease;
+            border-radius: 10px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: progress-shimmer 2s infinite;
+        }
+
+        @keyframes progress-shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         .tabs {
             display: flex;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--light-gray);
+            margin-bottom: 25px;
+            background: var(--light);
+            border-radius: 10px;
+            padding: 5px;
+            gap: 5px;
         }
 
         .tab {
             padding: 12px 20px;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--gray);
-            border-bottom: 3px solid transparent;
+            border-radius: 8px;
             transition: var(--transition);
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+            background: rgba(94, 114, 228, 0.1);
         }
 
         .tab.active {
-            color: var(--primary);
-            border-bottom-color: var(--primary);
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 4px 12px rgba(94, 114, 228, 0.3);
         }
 
         .tab-content {
             display: none;
+            animation: fadeIn 0.5s ease;
         }
 
         .tab-content.active {
             display: block;
         }
 
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .filter-container {
             display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
+            gap: 20px;
+            margin-bottom: 30px;
             flex-wrap: wrap;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
         }
 
         .filter-group {
@@ -197,61 +321,88 @@
         .filter-group label {
             display: block;
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
             color: var(--dark);
+            font-size: 0.9rem;
         }
 
         .filter-group select,
         .filter-group input {
             width: 100%;
-            padding: 10px 15px;
-            border: 1px solid var(--light-gray);
-            border-radius: var(--border-radius);
+            padding: 12px 15px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
             font-family: inherit;
             transition: var(--transition);
+            background: white;
+            font-size: 0.95rem;
         }
 
         .filter-group select:focus,
         .filter-group input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+            box-shadow: 0 0 0 3px rgba(94, 114, 228, 0.1);
         }
 
         .notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 15px 20px;
-            background-color: var(--success);
-            color: white;
-            border-radius: var(--border-radius);
+            padding: 16px 24px;
+            background: white;
+            color: var(--dark);
+            border-radius: 10px;
             box-shadow: var(--box-shadow);
             z-index: 1000;
-            transform: translateX(150%);
-            transition: transform 0.3s ease;
+            transform: translateX(400px);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 350px;
         }
 
         .notification.show {
             transform: translateX(0);
         }
 
+        .notification.success {
+            border-left: 4px solid var(--success);
+        }
+
         .notification.error {
-            background-color: var(--danger);
+            border-left: 4px solid var(--secondary);
+        }
+
+        .notification i {
+            font-size: 1.2rem;
+        }
+
+        .notification.success i {
+            color: var(--success);
+        }
+
+        .notification.error i {
+            color: var(--secondary);
         }
 
         .footer {
             text-align: center;
             padding: 30px 0;
             margin-top: 50px;
-            color: var(--gray);
-            border-top: 1px solid var(--light-gray);
+            color: white;
+            font-weight: 500;
         }
 
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-sm);
         }
 
         .loading.show {
@@ -259,13 +410,13 @@
         }
 
         .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
+            border: 4px solid rgba(94, 114, 228, 0.1);
             border-radius: 50%;
             border-top: 4px solid var(--primary);
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -274,168 +425,252 @@
         }
 
         .table-container {
-            margin-top: 20px;
+            margin-top: 25px;
             overflow-x: auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow-sm);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            background: white;
         }
 
         th, td {
-            padding: 12px 15px;
+            padding: 16px;
             text-align: left;
             border-bottom: 1px solid var(--light-gray);
         }
 
         th {
-            background-color: var(--light);
-            font-weight: 600;
+            background: var(--light);
+            font-weight: 700;
             color: var(--dark);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            transition: var(--transition);
+        }
+
+        tbody tr:hover {
+            background: rgba(94, 114, 228, 0.05);
         }
 
         .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 6px 12px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            font-weight: 500;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .badge-success {
-            background-color: rgba(76, 175, 80, 0.1);
+            background: rgba(45, 206, 137, 0.1);
             color: var(--success);
         }
 
         .badge-danger {
-            background-color: rgba(244, 67, 54, 0.1);
-            color: var(--danger);
+            background: rgba(245, 54, 92, 0.1);
+            color: var(--secondary);
         }
 
         .chart-container {
             position: relative;
-            height: 300px;
-            margin-bottom: 20px;
+            height: 350px;
+            margin-bottom: 25px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow-sm);
         }
 
         .upload-section {
             display: flex;
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 30px;
         }
 
         .upload-area {
             flex: 1;
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: var(--border-radius);
-            padding: 40px;
+            padding: 50px;
             text-align: center;
-            border: 2px dashed var(--light-gray);
+            border: 3px dashed var(--light-gray);
             cursor: pointer;
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(94, 114, 228, 0.05), rgba(245, 54, 92, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
         }
 
         .upload-area:hover {
             border-color: var(--primary);
-            background-color: rgba(67, 97, 238, 0.02);
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow-sm);
         }
 
         .upload-area i {
-            font-size: 3rem;
-            color: var(--gray);
-            margin-bottom: 15px;
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
         }
 
         .upload-area p {
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             margin-bottom: 10px;
             color: var(--dark);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
         }
 
         .upload-area small {
             color: var(--gray);
+            position: relative;
+            z-index: 1;
         }
 
         .template-section {
-            background: white;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
             border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: var(--box-shadow);
+            padding: 35px;
+            box-shadow: var(--box-shadow-sm);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 300px;
+            min-width: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(94, 114, 228, 0.05) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .template-section h3 {
             margin-bottom: 15px;
             color: var(--dark);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .template-section p {
             color: var(--gray);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             line-height: 1.6;
+            position: relative;
+            z-index: 1;
         }
 
         .btn {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: var(--border-radius);
-            font-weight: 500;
+            border-radius: 8px;
+            font-weight: 600;
             cursor: pointer;
             transition: var(--transition);
             font-size: 1rem;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
         }
 
         .btn-primary {
-            background-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
+            box-shadow: 0 4px 12px rgba(94, 114, 228, 0.3);
         }
 
         .btn-primary:hover {
-            background-color: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(94, 114, 228, 0.4);
         }
 
         .btn-success {
-            background-color: var(--success);
+            background: linear-gradient(135deg, var(--success), #26af74);
             color: white;
+            box-shadow: 0 4px 12px rgba(45, 206, 137, 0.3);
         }
 
         .btn-success:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 2px solid var(--primary);
-            color: var(--primary);
-        }
-
-        .btn-outline:hover {
-            background-color: var(--primary);
-            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(45, 206, 137, 0.4);
         }
 
         .data-instructions {
-            background: rgba(67, 97, 238, 0.05);
+            background: linear-gradient(135deg, rgba(94, 114, 228, 0.05), rgba(245, 54, 92, 0.05));
             border-left: 4px solid var(--primary);
-            padding: 15px;
+            padding: 20px;
             margin-top: 20px;
-            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            border-radius: 0 10px 10px 0;
+            position: relative;
+            z-index: 1;
         }
 
         .data-instructions h4 {
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--primary);
+            font-weight: 600;
         }
 
         .data-instructions ul {
@@ -444,7 +679,38 @@
         }
 
         .data-instructions li {
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            position: relative;
+            padding-left: 5px;
+        }
+
+        .data-instructions li::before {
+            content: '✓';
+            position: absolute;
+            left: -20px;
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .metric-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .metric-change.positive {
+            background: rgba(45, 206, 137, 0.1);
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            background: rgba(245, 54, 92, 0.1);
+            color: var(--secondary);
         }
 
         @media (max-width: 768px) {
@@ -467,32 +733,55 @@
             .template-section {
                 min-width: auto;
             }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .notification {
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Payment & Delivery Analytics Dashboard</h1>
-            <p>Comprehensive analysis of payment methods and delivery performance</p>
+        <header class="fade-in">
+            <h1><i class="fas fa-chart-line"></i> Payment & Delivery Analytics</h1>
+            <p>Real-time insights into payment methods and delivery performance</p>
         </header>
 
-        <div class="upload-section">
+        <div class="upload-section slide-up">
             <div class="upload-area" id="uploadArea">
                 <i class="fas fa-cloud-upload-alt"></i>
-                <p>Drag & drop your Excel file here or click to browse</p>
-                <small>Supported formats: .xlsx, .xls</small>
+                <p>Drag & drop your Excel file here</p>
+                <small>or click to browse • Supported: .xlsx, .xls</small>
                 <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
             </div>
             
             <div class="template-section">
-                <h3><i class="fas fa-file-excel" style="color: var(--success); margin-right: 8px;"></i>Data Management</h3>
-                <p>Download our Excel template to ensure your data is formatted correctly for analysis.</p>
+                <h3><i class="fas fa-file-excel" style="color: var(--success);"></i> Data Management</h3>
+                <p>Download our Excel template to ensure your data is formatted correctly for optimal analysis.</p>
                 <button class="btn btn-success" onclick="downloadTemplate()">
-                    <i class="fas fa-download"></i>Download Excel Template
+                    <i class="fas fa-download"></i> Download Template
                 </button>
                 <div class="data-instructions">
-                    <h4>Template Instructions:</h4>
+                    <h4>Template Guidelines:</h4>
                     <ul>
                         <li>Fill in all required fields (marked with *)</li>
                         <li>Use numeric values for all amount fields</li>
@@ -508,9 +797,9 @@
             <p>Processing your data...</p>
         </div>
 
-        <div class="filter-container" id="filterContainer">
+        <div class="filter-container slide-up">
             <div class="filter-group">
-                <label for="monthFilter">Month</label>
+                <label for="monthFilter"><i class="fas fa-calendar"></i> Month</label>
                 <select id="monthFilter">
                     <option value="all">All Months</option>
                     <option value="1">January</option>
@@ -526,13 +815,13 @@
                 </select>
             </div>
             <div class="filter-group">
-                <label for="branchFilter">Branch</label>
+                <label for="branchFilter"><i class="fas fa-store"></i> Branch</label>
                 <select id="branchFilter">
                     <option value="all">All Branches</option>
                 </select>
             </div>
             <div class="filter-group">
-                <label for="yearFilter">Year</label>
+                <label for="yearFilter"><i class="fas fa-calendar-alt"></i> Year</label>
                 <select id="yearFilter">
                     <option value="all">All Years</option>
                     <option value="2025">2025</option>
@@ -541,7 +830,7 @@
         </div>
 
         <div class="dashboard-grid">
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header">
                     <h3 class="card-title">Total Sales</h3>
                     <div class="card-icon icon-primary">
@@ -550,26 +839,32 @@
                 </div>
                 <div class="stat-value" id="totalSales">AED 0</div>
                 <div class="stat-label">Overall Revenue</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +12.5%
+                </div>
                 <div class="progress-bar">
-                    <div class="progress" style="width: 0%; background-color: var(--primary);" id="salesProgress"></div>
+                    <div class="progress" style="width: 0%; background: linear-gradient(90deg, var(--primary), var(--info));" id="salesProgress"></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header">
-                    <h3 class="card-title">Total Transactions</h3>
+                    <h3 class="card-title">Transactions</h3>
                     <div class="card-icon icon-success">
                         <i class="fas fa-receipt"></i>
                     </div>
                 </div>
                 <div class="stat-value" id="totalTransactions">0</div>
                 <div class="stat-label">All Payment Methods</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +8.3%
+                </div>
                 <div class="progress-bar">
-                    <div class="progress" style="width: 0%; background-color: var(--success);" id="transactionsProgress"></div>
+                    <div class="progress" style="width: 0%; background: linear-gradient(90deg, var(--success), #26af74);" id="transactionsProgress"></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header">
                     <h3 class="card-title">Delivery Sales</h3>
                     <div class="card-icon icon-warning">
@@ -577,13 +872,16 @@
                     </div>
                 </div>
                 <div class="stat-value" id="deliverySales">AED 0</div>
-                <div class="stat-label">All Delivery Platforms</div>
+                <div class="stat-label">All Platforms</div>
+                <div class="metric-change negative">
+                    <i class="fas fa-arrow-down"></i> -3.2%
+                </div>
                 <div class="progress-bar">
-                    <div class="progress" style="width: 0%; background-color: var(--warning);" id="deliveryProgress"></div>
+                    <div class="progress" style="width: 0%; background: linear-gradient(90deg, var(--warning), #fa4419);" id="deliveryProgress"></div>
                 </div>
             </div>
 
-            <div class="card">
+            <div class="card fade-in">
                 <div class="card-header">
                     <h3 class="card-title">Card Payments</h3>
                     <div class="card-icon icon-danger">
@@ -591,16 +889,19 @@
                     </div>
                 </div>
                 <div class="stat-value" id="cardPercentage">0%</div>
-                <div class="stat-label">Percentage of Total Sales</div>
+                <div class="stat-label">Of Total Sales</div>
+                <div class="metric-change positive">
+                    <i class="fas fa-arrow-up"></i> +5.7%
+                </div>
                 <div class="progress-bar">
-                    <div class="progress" style="width: 0%; background-color: var(--danger);" id="cardProgress"></div>
+                    <div class="progress" style="width: 0%; background: linear-gradient(90deg, var(--secondary), #ec0c38);" id="cardProgress"></div>
                 </div>
             </div>
         </div>
 
-        <div class="card">
+        <div class="card slide-up">
             <div class="card-header">
-                <h3 class="card-title">Payment Method Comparison</h3>
+                <h3 class="card-title"><i class="fas fa-chart-pie"></i> Payment Method Analysis</h3>
                 <div class="tabs">
                     <div class="tab active" data-tab="visa-master">Visa vs Mastercard</div>
                     <div class="tab" data-tab="cash-card">Cash vs Card</div>
@@ -618,21 +919,21 @@
                             <tr>
                                 <th>Payment Method</th>
                                 <th>Total Amount</th>
-                                <th>Transaction Count</th>
-                                <th>Average Transaction</th>
+                                <th>Transactions</th>
+                                <th>Average</th>
                                 <th>Market Share</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Visa Card</td>
+                                <td><i class="fab fa-cc-visa" style="color: #1a1f71;"></i> Visa</td>
                                 <td id="visaAmount">AED 0</td>
                                 <td id="visaCount">0</td>
                                 <td id="visaAvg">AED 0</td>
                                 <td id="visaShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Mastercard</td>
+                                <td><i class="fab fa-cc-mastercard" style="color: #eb001b;"></i> Mastercard</td>
                                 <td id="masterAmount">AED 0</td>
                                 <td id="masterCount">0</td>
                                 <td id="masterAvg">AED 0</td>
@@ -653,21 +954,21 @@
                             <tr>
                                 <th>Payment Type</th>
                                 <th>Total Amount</th>
-                                <th>Transaction Count</th>
-                                <th>Average Transaction</th>
+                                <th>Transactions</th>
+                                <th>Average</th>
                                 <th>Percentage</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Cash</td>
+                                <td><i class="fas fa-money-bill-wave" style="color: var(--success);"></i> Cash</td>
                                 <td id="cashAmount">AED 0</td>
                                 <td id="cashCount">0</td>
                                 <td id="cashAvg">AED 0</td>
                                 <td id="cashPercentage">0%</td>
                             </tr>
                             <tr>
-                                <td>Card</td>
+                                <td><i class="fas fa-credit-card" style="color: var(--primary);"></i> Card</td>
                                 <td id="cardAmount">AED 0</td>
                                 <td id="cardCount">0</td>
                                 <td id="cardAvg">AED 0</td>
@@ -688,49 +989,49 @@
                             <tr>
                                 <th>Platform</th>
                                 <th>Total Amount</th>
-                                <th>Transaction Count</th>
-                                <th>Average Transaction</th>
+                                <th>Transactions</th>
+                                <th>Average</th>
                                 <th>Market Share</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Talabat</td>
+                                <td><i class="fas fa-motorcycle" style="color: #ff6b35;"></i> Talabat</td>
                                 <td id="talabatAmount">AED 0</td>
                                 <td id="talabatCount">0</td>
                                 <td id="talabatAvg">AED 0</td>
                                 <td id="talabatShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Noon</td>
+                                <td><i class="fas fa-shopping-bag" style="color: #ffc107;"></i> Noon</td>
                                 <td id="noonAmount">AED 0</td>
                                 <td id="noonCount">0</td>
                                 <td id="noonAvg">AED 0</td>
                                 <td id="noonShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Careem</td>
+                                <td><i class="fas fa-car" style="color: #00d4aa;"></i> Careem</td>
                                 <td id="careemAmount">AED 0</td>
                                 <td id="careemCount">0</td>
                                 <td id="careemAvg">AED 0</td>
                                 <td id="careemShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Smiles</td>
+                                <td><i class="fas fa-smile" style="color: #6c5ce7;"></i> Smiles</td>
                                 <td id="smileAmount">AED 0</td>
                                 <td id="smileCount">0</td>
                                 <td id="smileAvg">AED 0</td>
                                 <td id="smileShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Deliveroo</td>
+                                <td><i class="fas fa-bicycle" style="color: #00b894;"></i> Deliveroo</td>
                                 <td id="deliverooAmount">AED 0</td>
                                 <td id="deliverooCount">0</td>
                                 <td id="deliverooAvg">AED 0</td>
                                 <td id="deliverooShare">0%</td>
                             </tr>
                             <tr>
-                                <td>Keeta</td>
+                                <td><i class="fas fa-utensils" style="color: #e17055;"></i> Keeta</td>
                                 <td id="keetaAmount">AED 0</td>
                                 <td id="keetaCount">0</td>
                                 <td id="keetaAvg">AED 0</td>
@@ -742,13 +1043,13 @@
             </div>
         </div>
 
-        <div class="card">
+        <div class="card slide-up">
             <div class="card-header">
-                <h3 class="card-title">Restaurant Delivery Performance</h3>
+                <h3 class="card-title"><i class="fas fa-store-alt"></i> Delivery Performance</h3>
                 <div class="tabs">
-                    <div class="tab active" data-tab="delivery-comparison">Delivery Comparison</div>
-                    <div class="tab" data-tab="delivery-levels">Delivery Levels</div>
-                    <div class="tab" data-tab="monthly-report">Monthly Report</div>
+                    <div class="tab active" data-tab="delivery-comparison">Branch Comparison</div>
+                    <div class="tab" data-tab="delivery-levels">Delivery Types</div>
+                    <div class="tab" data-tab="monthly-report">Monthly Trends</div>
                 </div>
             </div>
             
@@ -762,9 +1063,9 @@
                             <tr>
                                 <th>Branch</th>
                                 <th>Internal Delivery</th>
-                                <th>Third-Party Delivery</th>
+                                <th>Third-Party</th>
                                 <th>Total Delivery</th>
-                                <th>Delivery % of Sales</th>
+                                <th>% of Sales</th>
                             </tr>
                         </thead>
                         <tbody id="restaurantTableBody">
@@ -784,21 +1085,21 @@
                             <tr>
                                 <th>Delivery Type</th>
                                 <th>Total Amount</th>
-                                <th>Transaction Count</th>
-                                <th>Average Transaction</th>
-                                <th>Percentage of Total</th>
+                                <th>Transactions</th>
+                                <th>Average</th>
+                                <th>Percentage</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td>Internal Delivery</td>
+                                <td><i class="fas fa-home" style="color: var(--primary);"></i> Internal</td>
                                 <td id="internalAmount">AED 0</td>
                                 <td id="internalCount">0</td>
                                 <td id="internalAvg">AED 0</td>
                                 <td id="internalPercentage">0%</td>
                             </tr>
                             <tr>
-                                <td>Third-Party Delivery</td>
+                                <td><i class="fas fa-globe" style="color: var(--info);"></i> Third-Party</td>
                                 <td id="thirdPartyAmount">AED 0</td>
                                 <td id="thirdPartyCount">0</td>
                                 <td id="thirdPartyAvg">AED 0</td>
@@ -819,8 +1120,8 @@
                             <tr>
                                 <th>Month</th>
                                 <th>Total Sales</th>
-                                <th>Internal Delivery</th>
-                                <th>Third-Party Delivery</th>
+                                <th>Internal</th>
+                                <th>Third-Party</th>
                                 <th>Cash %</th>
                                 <th>Card %</th>
                                 <th>Growth</th>
@@ -835,11 +1136,14 @@
         </div>
 
         <div class="footer">
-            <p>© 2025 Payment & Delivery Analytics Dashboard. All rights reserved.</p>
+            <p>© 2025 Payment & Delivery Analytics Dashboard. Powered by Advanced Analytics</p>
         </div>
     </div>
 
-    <div class="notification" id="notification"></div>
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText"></span>
+    </div>
 
     <script>
         // Global variables
@@ -854,13 +1158,34 @@
         const branchFilter = document.getElementById('branchFilter');
         const yearFilter = document.getElementById('yearFilter');
         const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
         const loading = document.getElementById('loading');
 
         // Initialize dashboard
         document.addEventListener('DOMContentLoaded', () => {
             setupEventListeners();
             loadSampleData();
+            addScrollAnimations();
         });
+
+        function addScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('fade-in');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.card').forEach(card => {
+                observer.observe(card);
+            });
+        }
 
         function setupEventListeners() {
             // Filter change events
@@ -895,12 +1220,14 @@
 
         function handleDragOver(e) {
             e.preventDefault();
-            uploadArea.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+            uploadArea.style.backgroundColor = 'rgba(94, 114, 228, 0.05)';
+            uploadArea.style.borderColor = 'var(--primary)';
         }
 
         function handleDrop(e) {
             e.preventDefault();
-            uploadArea.style.backgroundColor = 'white';
+            uploadArea.style.backgroundColor = '';
+            uploadArea.style.borderColor = '';
             
             if (e.dataTransfer.files.length) {
                 processFile(e.dataTransfer.files[0]);
@@ -923,17 +1250,11 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     
-                    // Get the first sheet
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     
-                    // Convert to JSON with proper header handling
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
                     
-                    // Debug: Log the raw data
-                    console.log('Raw data from Excel:', jsonData);
-                    
-                    // Process the data
                     processData(jsonData);
                     
                     showNotification('File uploaded successfully!', 'success');
@@ -949,13 +1270,8 @@
         }
 
         function processData(rawData) {
-            // Clear existing data
             salesData = [];
             
-            // Debug: Log the data length
-            console.log('Processing data with', rawData.length, 'rows');
-            
-            // Find the header row (look for row with 'HEAD' or similar)
             let headerRowIndex = -1;
             for (let i = 0; i < rawData.length; i++) {
                 const row = rawData[i];
@@ -965,26 +1281,21 @@
                 }
             }
             
-            // If no header found, assume first row is header
             if (headerRowIndex === -1) {
                 headerRowIndex = 0;
             }
             
-            // Process data rows (skip header)
             for (let i = headerRowIndex + 1; i < rawData.length; i++) {
                 const row = rawData[i];
                 
-                // Skip empty rows
                 if (!row || row.length === 0) {
                     continue;
                 }
                 
-                // Skip rows with no meaningful data
                 if (row.every(cell => cell === '' || cell === null || cell === undefined)) {
                     continue;
                 }
                 
-                // Extract data with proper index mapping
                 const record = {
                     branch: row[1] || 'Unknown',
                     month: parseInt(row[2]) || 1,
@@ -1021,20 +1332,12 @@
                     countOnlineCard: parseInt(row[33]) || 0
                 };
                 
-                // Only add records with meaningful data
                 if (record.receipts > 0 || record.talabat > 0 || record.cash > 0) {
                     salesData.push(record);
                 }
             }
             
-            // Debug: Log processed data
-            console.log('Processed sales data:', salesData);
-            console.log('Total records:', salesData.length);
-            
-            // Update branch filter
             updateBranchFilter();
-            
-            // Apply filters and update dashboard
             applyFilters();
         }
 
@@ -1062,25 +1365,19 @@
                        (yearValue === 'all' || item.year === parseInt(yearValue));
             });
             
-            // Debug: Log filtered data
-            console.log('Filtered data:', filteredData);
-            
             updateDashboard();
         }
 
         function updateDashboard() {
-            // Calculate summary metrics
             const totalSales = filteredData.reduce((sum, item) => sum + item.receipts, 0);
             const totalTransactions = filteredData.reduce((sum, item) => sum + item.countReceipts, 0);
             
-            // Calculate delivery sales - INCLUDING ONLINE PAYMENTS AS DELIVERY
             const deliverySales = filteredData.reduce((sum, item) => 
                 sum + item.talabat + item.keeta + item.noon + item.careem + item.smiles + 
                 item.deliveroo + item.deliveryCard + item.deliveryCash + 
                 item.onlineCash + item.onlineCard, 0
             );
             
-            // Calculate card payments
             const cardPayments = filteredData.reduce((sum, item) => 
                 sum + item.mastercard + item.visa + item.noon + item.careem + 
                 item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard, 0
@@ -1092,30 +1389,42 @@
             
             const cardPercentage = totalPayments > 0 ? ((cardPayments / totalPayments) * 100).toFixed(1) : 0;
             
-            // Update summary cards
-            document.getElementById('totalSales').textContent = `AED ${totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            document.getElementById('totalTransactions').textContent = totalTransactions.toLocaleString();
-            document.getElementById('deliverySales').textContent = `AED ${deliverySales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            // Update summary cards with animation
+            animateValue('totalSales', 0, totalSales, 1500, 'AED');
+            animateValue('totalTransactions', 0, totalTransactions, 1500);
+            animateValue('deliverySales', 0, deliverySales, 1500, 'AED');
             document.getElementById('cardPercentage').textContent = `${cardPercentage}%`;
             
             // Update progress bars
-            document.getElementById('salesProgress').style.width = '100%';
-            document.getElementById('transactionsProgress').style.width = '100%';
-            document.getElementById('deliveryProgress').style.width = totalSales > 0 ? `${(deliverySales / totalSales * 100).toFixed(1)}%` : '0%';
-            document.getElementById('cardProgress').style.width = `${cardPercentage}%`;
+            setTimeout(() => {
+                document.getElementById('salesProgress').style.width = '100%';
+                document.getElementById('transactionsProgress').style.width = '100%';
+                document.getElementById('deliveryProgress').style.width = totalSales > 0 ? `${(deliverySales / totalSales * 100).toFixed(1)}%` : '0%';
+                document.getElementById('cardProgress').style.width = `${cardPercentage}%`;
+            }, 100);
             
-            // Update payment method comparison
             updatePaymentComparison();
-            
-            // Update restaurant delivery performance
             updateRestaurantPerformance();
-            
-            // Update monthly report
             updateMonthlyReport();
         }
 
+        function animateValue(id, start, end, duration, prefix = '') {
+            const element = document.getElementById(id);
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = prefix + current.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }, 16);
+        }
+
         function updatePaymentComparison() {
-            // Calculate Visa vs Mastercard
             const visaAmount = filteredData.reduce((sum, item) => sum + item.visa, 0);
             const visaCount = filteredData.reduce((sum, item) => sum + item.countVisa, 0);
             const visaAvg = visaCount > 0 ? visaAmount / visaCount : 0;
@@ -1128,7 +1437,6 @@
             const visaShare = totalCardAmount > 0 ? (visaAmount / totalCardAmount * 100).toFixed(1) : 0;
             const masterShare = totalCardAmount > 0 ? (masterAmount / totalCardAmount * 100).toFixed(1) : 0;
             
-            // Update table
             document.getElementById('visaAmount').textContent = `AED ${visaAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('visaCount').textContent = visaCount.toLocaleString();
             document.getElementById('visaAvg').textContent = `AED ${visaAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1139,7 +1447,6 @@
             document.getElementById('masterAvg').textContent = `AED ${masterAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('masterShare').textContent = `${masterShare}%`;
             
-            // Update chart
             if (charts.visaMaster) {
                 charts.visaMaster.destroy();
             }
@@ -1152,14 +1459,26 @@
                     datasets: [{
                         label: 'Total Amount (AED)',
                         data: [visaAmount, masterAmount],
-                        backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(54, 162, 235, 0.7)'],
-                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(54, 162, 235, 1)'],
-                        borderWidth: 1
+                        backgroundColor: [
+                            'rgba(26, 31, 113, 0.8)',
+                            'rgba(235, 0, 27, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(26, 31, 113, 1)',
+                            'rgba(235, 0, 27, 1)'
+                        ],
+                        borderWidth: 2,
+                        borderRadius: 8
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1173,7 +1492,6 @@
                 }
             });
             
-            // Calculate Cash vs Card - EXCLUDING ONLINE PAYMENTS FROM CASH
             const cashAmount = filteredData.reduce((sum, item) => sum + item.cash, 0);
             const cashCount = filteredData.reduce((sum, item) => sum + item.countCash, 0);
             const cashAvg = cashCount > 0 ? cashAmount / cashCount : 0;
@@ -1193,7 +1511,6 @@
             const cashPercentage = totalAmount > 0 ? (cashAmount / totalAmount * 100).toFixed(1) : 0;
             const cardPercentage2 = totalAmount > 0 ? (cardAmount2 / totalAmount * 100).toFixed(1) : 0;
             
-            // Update table
             document.getElementById('cashAmount').textContent = `AED ${cashAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('cashCount').textContent = cashCount.toLocaleString();
             document.getElementById('cashAvg').textContent = `AED ${cashAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1204,7 +1521,6 @@
             document.getElementById('cardAvg').textContent = `AED ${cardAvg2.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('cardPercentage2').textContent = `${cardPercentage2}%`;
             
-            // Update chart
             if (charts.cashCard) {
                 charts.cashCard.destroy();
             }
@@ -1216,9 +1532,15 @@
                     labels: ['Cash', 'Card'],
                     datasets: [{
                         data: [cashAmount, cardAmount2],
-                        backgroundColor: ['rgba(255, 206, 86, 0.7)', 'rgba(54, 162, 235, 0.7)'],
-                        borderColor: ['rgba(255, 206, 86, 1)', 'rgba(54, 162, 235, 1)'],
-                        borderWidth: 1
+                        backgroundColor: [
+                            'rgba(45, 206, 137, 0.8)',
+                            'rgba(94, 114, 228, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(45, 206, 137, 1)',
+                            'rgba(94, 114, 228, 1)'
+                        ],
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -1226,13 +1548,19 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            }
                         }
                     }
                 }
             });
             
-            // Calculate Platform Performance
             const talabatAmount = filteredData.reduce((sum, item) => sum + item.talabat, 0);
             const talabatCount = filteredData.reduce((sum, item) => sum + item.countTalabat, 0);
             const talabatAvg = talabatCount > 0 ? talabatAmount / talabatCount : 0;
@@ -1266,7 +1594,6 @@
             const deliverooShare = totalPlatformAmount > 0 ? (deliverooAmount / totalPlatformAmount * 100).toFixed(1) : 0;
             const keetaShare = totalPlatformAmount > 0 ? (keetaAmount / totalPlatformAmount * 100).toFixed(1) : 0;
             
-            // Update table
             document.getElementById('talabatAmount').textContent = `AED ${talabatAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('talabatCount').textContent = talabatCount.toLocaleString();
             document.getElementById('talabatAvg').textContent = `AED ${talabatAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1297,7 +1624,6 @@
             document.getElementById('keetaAvg').textContent = `AED ${keetaAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('keetaShare').textContent = `${keetaShare}%`;
             
-            // Update chart
             if (charts.platform) {
                 charts.platform.destroy();
             }
@@ -1310,22 +1636,22 @@
                     datasets: [{
                         data: [talabatAmount, noonAmount, careemAmount, smileAmount, deliverooAmount, keetaAmount],
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.7)',
-                            'rgba(54, 162, 235, 0.7)',
-                            'rgba(255, 206, 86, 0.7)',
-                            'rgba(75, 192, 192, 0.7)',
-                            'rgba(153, 102, 255, 0.7)',
-                            'rgba(255, 159, 64, 0.7)'
+                            'rgba(255, 107, 53, 0.8)',
+                            'rgba(255, 193, 7, 0.8)',
+                            'rgba(0, 212, 170, 0.8)',
+                            'rgba(108, 92, 231, 0.8)',
+                            'rgba(0, 184, 148, 0.8)',
+                            'rgba(225, 112, 85, 0.8)'
                         ],
                         borderColor: [
-                            'rgba(255, 99, 132, 1)',
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 206, 86, 1)',
-                            'rgba(75, 192, 192, 1)',
-                            'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
+                            'rgba(255, 107, 53, 1)',
+                            'rgba(255, 193, 7, 1)',
+                            'rgba(0, 212, 170, 1)',
+                            'rgba(108, 92, 231, 1)',
+                            'rgba(0, 184, 148, 1)',
+                            'rgba(225, 112, 85, 1)'
                         ],
-                        borderWidth: 1
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -1333,7 +1659,14 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            }
                         }
                     }
                 }
@@ -1341,7 +1674,6 @@
         }
 
         function updateRestaurantPerformance() {
-            // Group data by branch
             const branchData = {};
             
             filteredData.forEach(item => {
@@ -1356,10 +1688,7 @@
                     };
                 }
                 
-                // INTERNAL DELIVERY: deliveryCard + deliveryCash
                 branchData[item.branch].internalDelivery += item.deliveryCard + item.deliveryCash;
-                
-                // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
                 branchData[item.branch].thirdPartyDelivery += item.talabat + item.keeta + item.noon + 
                 item.careem + item.smiles + item.deliveroo + item.onlineCash + item.onlineCard;
                 
@@ -1370,10 +1699,8 @@
                 item.countOnlineCash + item.countOnlineCard;
             });
             
-            // Convert to array and sort by total delivery
             const branchArray = Object.values(branchData).sort((a, b) => (b.internalDelivery + b.thirdPartyDelivery) - (a.internalDelivery + a.thirdPartyDelivery));
             
-            // Update table
             const tableBody = document.getElementById('restaurantTableBody');
             tableBody.innerHTML = '';
             
@@ -1383,7 +1710,7 @@
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${branch.branch}</td>
+                    <td><i class="fas fa-store"></i> ${branch.branch}</td>
                     <td>AED ${branch.internalDelivery.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>AED ${branch.thirdPartyDelivery.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>AED ${totalDelivery.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -1392,7 +1719,6 @@
                 tableBody.appendChild(row);
             });
             
-            // Update chart
             if (charts.restaurant) {
                 charts.restaurant.destroy();
             }
@@ -1406,16 +1732,18 @@
                         {
                             label: 'Internal Delivery',
                             data: branchArray.map(b => b.internalDelivery),
-                            backgroundColor: 'rgba(75, 192, 192, 0.7)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(94, 114, 228, 0.8)',
+                            borderColor: 'rgba(94, 114, 228, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8
                         },
                         {
                             label: 'Third-Party Delivery',
                             data: branchArray.map(b => b.thirdPartyDelivery),
-                            backgroundColor: 'rgba(153, 102, 255, 0.7)',
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            borderWidth: 1
+                            backgroundColor: 'rgba(17, 205, 239, 0.8)',
+                            borderColor: 'rgba(17, 205, 239, 1)',
+                            borderWidth: 2,
+                            borderRadius: 8
                         }
                     ]
                 },
@@ -1438,12 +1766,10 @@
                 }
             });
             
-            // Calculate delivery levels
             const internalAmount = filteredData.reduce((sum, item) => sum + item.deliveryCard + item.deliveryCash, 0);
             const internalCount = filteredData.reduce((sum, item) => sum + item.countDeliveryCard + item.countDeliveryCash, 0);
             const internalAvg = internalCount > 0 ? internalAmount / internalCount : 0;
             
-            // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
             const thirdPartyAmount = filteredData.reduce((sum, item) => 
                 sum + item.talabat + item.keeta + item.noon + item.careem + 
                 item.smiles + item.deliveroo + item.onlineCash + item.onlineCard, 0
@@ -1459,7 +1785,6 @@
             const internalPercentage = totalDeliveryAmount > 0 ? (internalAmount / totalDeliveryAmount * 100).toFixed(1) : 0;
             const thirdPartyPercentage = totalDeliveryAmount > 0 ? (thirdPartyAmount / totalDeliveryAmount * 100).toFixed(1) : 0;
             
-            // Update table
             document.getElementById('internalAmount').textContent = `AED ${internalAmount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('internalCount').textContent = internalCount.toLocaleString();
             document.getElementById('internalAvg').textContent = `AED ${internalAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -1470,7 +1795,6 @@
             document.getElementById('thirdPartyAvg').textContent = `AED ${thirdPartyAvg.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById('thirdPartyPercentage').textContent = `${thirdPartyPercentage}%`;
             
-            // Update chart
             if (charts.deliveryLevels) {
                 charts.deliveryLevels.destroy();
             }
@@ -1482,9 +1806,15 @@
                     labels: ['Internal Delivery', 'Third-Party Delivery'],
                     datasets: [{
                         data: [internalAmount, thirdPartyAmount],
-                        backgroundColor: ['rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)'],
-                        borderColor: ['rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)'],
-                        borderWidth: 1
+                        backgroundColor: [
+                            'rgba(94, 114, 228, 0.8)',
+                            'rgba(17, 205, 239, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(94, 114, 228, 1)',
+                            'rgba(17, 205, 239, 1)'
+                        ],
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -1492,7 +1822,14 @@
                     maintainAspectRatio: false,
                     plugins: {
                         legend: {
-                            position: 'bottom'
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14,
+                                    weight: '600'
+                                }
+                            }
                         }
                     }
                 }
@@ -1500,7 +1837,6 @@
         }
 
         function updateMonthlyReport() {
-            // Group data by month
             const monthData = {};
             
             filteredData.forEach(item => {
@@ -1521,18 +1857,10 @@
                 }
                 
                 monthData[monthKey].totalSales += item.receipts;
-                
-                // INTERNAL DELIVERY: deliveryCard + deliveryCash
                 monthData[monthKey].internalDelivery += item.deliveryCard + item.deliveryCash;
-                
-                // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
                 monthData[monthKey].thirdPartyDelivery += item.talabat + item.keeta + item.noon + 
                 item.careem + item.smiles + item.deliveroo + item.onlineCash + item.onlineCard;
-                
-                // CASH: ONLY in-store cash (EXCLUDING delivery cash and online cash)
                 monthData[monthKey].cashAmount += item.cash;
-                
-                // CARD: ALL card payments INCLUDING online card
                 monthData[monthKey].cardAmount += item.mastercard + item.visa + item.noon + 
                 item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
                 
@@ -1542,13 +1870,11 @@
                 item.countDeliveryCard + item.countOnlineCard;
             });
             
-            // Convert to array and sort by month
             const monthArray = Object.values(monthData).sort((a, b) => {
                 if (a.year !== b.year) return a.year - b.year;
                 return a.month - b.month;
             });
             
-            // Calculate growth
             for (let i = 0; i < monthArray.length; i++) {
                 if (i === 0) {
                     monthArray[i].growth = 0;
@@ -1559,7 +1885,6 @@
                 }
             }
             
-            // Update table
             const tableBody = document.getElementById('monthlyTableBody');
             tableBody.innerHTML = '';
             
@@ -1573,7 +1898,7 @@
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${monthName} ${month.year}</td>
+                    <td><i class="fas fa-calendar"></i> ${monthName} ${month.year}</td>
                     <td>AED ${month.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>AED ${month.internalDelivery.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
                     <td>AED ${month.thirdPartyDelivery.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
@@ -1581,6 +1906,7 @@
                     <td>${cardPercentage}%</td>
                     <td>
                         <span class="badge ${month.growth >= 0 ? 'badge-success' : 'badge-danger'}">
+                            <i class="fas fa-arrow-${month.growth >= 0 ? 'up' : 'down'}"></i>
                             ${month.growth >= 0 ? '+' : ''}${month.growth}%
                         </span>
                     </td>
@@ -1588,7 +1914,6 @@
                 tableBody.appendChild(row);
             });
             
-            // Update chart
             if (charts.monthly) {
                 charts.monthly.destroy();
             }
@@ -1605,32 +1930,39 @@
                         {
                             label: 'Total Sales',
                             data: monthArray.map(m => m.totalSales),
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            backgroundColor: 'rgba(54, 162, 235, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
+                            borderColor: 'rgba(94, 114, 228, 1)',
+                            backgroundColor: 'rgba(94, 114, 228, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
                         },
                         {
                             label: 'Internal Delivery',
                             data: monthArray.map(m => m.internalDelivery),
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
+                            borderColor: 'rgba(45, 206, 137, 1)',
+                            backgroundColor: 'rgba(45, 206, 137, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
                         },
                         {
                             label: 'Third-Party Delivery',
                             data: monthArray.map(m => m.thirdPartyDelivery),
-                            borderColor: 'rgba(153, 102, 255, 1)',
-                            backgroundColor: 'rgba(153, 102, 255, 0.1)',
-                            borderWidth: 2,
-                            tension: 0.3
+                            borderColor: 'rgba(17, 205, 239, 1)',
+                            backgroundColor: 'rgba(17, 205, 239, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false
+                    },
                     scales: {
                         y: {
                             beginAtZero: true,
@@ -1646,8 +1978,12 @@
         }
 
         function showNotification(message, type = 'success') {
-            notification.textContent = message;
-            notification.className = `notification show ${type === 'error' ? 'error' : ''}`;
+            notificationText.textContent = message;
+            notification.className = `notification ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
             
             setTimeout(() => {
                 notification.classList.remove('show');
@@ -1655,10 +1991,8 @@
         }
 
         function downloadTemplate() {
-            // Create a new workbook
             const wb = XLSX.utils.book_new();
             
-            // Create template data with headers
             const templateData = [
                 [
                     'HEAD*', 'Branch*', 'Month*', 'Year*', 'Receipts*', 'TALABAT', 'TABNA', 'Keeta CARD', 
@@ -1681,60 +2015,24 @@
                 ]
             ];
             
-            // Create worksheet
             const ws = XLSX.utils.aoa_to_sheet(templateData);
             
-            // Set column widths
             const colWidths = [
-                { wch: 8 },   // HEAD
-                { wch: 25 },  // Branch
-                { wch: 8 },   // Month
-                { wch: 8 },   // Year
-                { wch: 12 },  // Receipts
-                { wch: 12 },  // TALABAT
-                { wch: 10 },  // TABNA
-                { wch: 12 },  // Keeta CARD
-                { wch: 10 },  // Cash
-                { wch: 12 },  // NOON CARD
-                { wch: 12 },  // Master card
-                { wch: 12 },  // Visa Card
-                { wch: 12 },  // Careem CARD
-                { wch: 14 },  // Delivery CARD
-                { wch: 14 },  // SMILES CARD
-                { wch: 14 },  // Delivery Cash
-                { wch: 14 },  // DELIVERO CARD
-                { wch: 12 },  // ONLINE CASH
-                { wch: 12 },  // ONLINE CARD
-                { wch: 14 },  // Count_Receipts
-                { wch: 14 },  // Count_TALABAT
-                { wch: 12 },  // Count_TABNA
-                { wch: 12 },  // Count_Keeta
-                { wch: 12 },  // Count_Cash
-                { wch: 12 },  // Count_NOON
-                { wch: 12 },  // Count_Master
-                { wch: 12 },  // Count_Visa
-                { wch: 14 },  // Count_Careem
-                { wch: 18 },  // Count_DeliveryCard
-                { wch: 14 },  // Count_SMILES
-                { wch: 18 },  // Count_DeliveryCash
-                { wch: 14 },  // Count_DELIVERO
-                { wch: 14 },  // Count_ONLINE_Cash
-                { wch: 16 },  // Count_ONLINE_Card
-                { wch: 16 }   // Count_ONLINE_Card
+                { wch: 8 }, { wch: 25 }, { wch: 8 }, { wch: 8 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, 
+                { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 14 }, 
+                { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 14 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, 
+                { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, { wch: 18 }, { wch: 14 }, 
+                { wch: 14 }, { wch: 16 }, { wch: 16 }
             ];
             ws['!cols'] = colWidths;
             
-            // Add worksheet to workbook
             XLSX.utils.book_append_sheet(wb, ws, "Sales Data");
-            
-            // Generate Excel file and download
             XLSX.writeFile(wb, "Sales_Data_Template.xlsx");
             
             showNotification('Excel template downloaded successfully!', 'success');
         }
 
-         function loadSampleData() {
-            // Load the provided sales data
+        function loadSampleData() {
             const sampleData = [
                 ["HEAD", "Crispy Chicken-Hamdan St", "1", "2025", "785537.88", "55272.96", "0", "0", "207908.13", "79328.39", "125061.73", "78456.25", "38265.58", "23471.38", "50561", "95829.04", "5482.62", "15755.12", "9790.68", "26775", "1144", "0", "0", "9935", "2238", "4594", "2770", "1167", "449", "1498", "2308", "97", "377", "192"],
                 ["HEAD", "Crispy Chicken Khaldia", "1", "2025", "584685.4", "62454.93", "92.59", "0", "139821", "67034.34", "88632.53", "73895.9", "25667.99", "13905.94", "44374.88", "46454.41", "8601.88", "9089.81", "4659.2", "19523", "1217", "2", "0", "6647", "1897", "3458", "2477", "812", "249", "1343", "992", "137", "202", "90"],
