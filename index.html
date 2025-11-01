@@ -1073,13 +1073,22 @@
             const totalSales = filteredData.reduce((sum, item) => sum + item.receipts, 0);
             const totalTransactions = filteredData.reduce((sum, item) => sum + item.countReceipts, 0);
             
-            // Calculate delivery sales
-            const deliverySales = filteredData.reduce((sum, item) => sum + item.talabat + item.keeta + item.noon + item.careem + item.smiles + item.deliveroo, 0);
+            // Calculate delivery sales - INCLUDING ONLINE PAYMENTS AS DELIVERY
+            const deliverySales = filteredData.reduce((sum, item) => 
+                sum + item.talabat + item.keeta + item.noon + item.careem + item.smiles + 
+                item.deliveroo + item.deliveryCard + item.deliveryCash + 
+                item.onlineCash + item.onlineCard, 0
+            );
             
             // Calculate card payments
-            const cardPayments = filteredData.reduce((sum, item) => sum + item.mastercard + item.visa + item.noon + item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard, 0);
+            const cardPayments = filteredData.reduce((sum, item) => 
+                sum + item.mastercard + item.visa + item.noon + item.careem + 
+                item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard, 0
+            );
             
-            const totalPayments = filteredData.reduce((sum, item) => sum + item.cash + item.deliveryCash + item.onlineCash + cardPayments, 0);
+            const totalPayments = filteredData.reduce((sum, item) => 
+                sum + item.cash + item.deliveryCash + item.onlineCash + cardPayments, 0
+            );
             
             const cardPercentage = totalPayments > 0 ? ((cardPayments / totalPayments) * 100).toFixed(1) : 0;
             
@@ -1164,16 +1173,19 @@
                 }
             });
             
-            // Calculate Cash vs Card
-            const cashAmount = filteredData.reduce((sum, item) => sum + item.cash + item.deliveryCash + item.onlineCash, 0);
-            const cashCount = filteredData.reduce((sum, item) => sum + item.countCash + item.countDeliveryCash + item.countOnlineCash, 0);
+            // Calculate Cash vs Card - EXCLUDING ONLINE PAYMENTS FROM CASH
+            const cashAmount = filteredData.reduce((sum, item) => sum + item.cash, 0);
+            const cashCount = filteredData.reduce((sum, item) => sum + item.countCash, 0);
             const cashAvg = cashCount > 0 ? cashAmount / cashCount : 0;
             
             const cardAmount2 = filteredData.reduce((sum, item) => {
-                return sum + item.mastercard + item.visa + item.noon + item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
+                return sum + item.mastercard + item.visa + item.noon + item.careem + 
+                item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
             }, 0);
             const cardCount2 = filteredData.reduce((sum, item) => {
-                return sum + item.countMaster + item.countVisa + item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo + item.countDeliveryCard + item.countOnlineCard;
+                return sum + item.countMaster + item.countVisa + item.countNoon + 
+                item.countCareem + item.countSmiles + item.countDeliveroo + 
+                item.countDeliveryCard + item.countOnlineCard;
             }, 0);
             const cardAvg2 = cardCount2 > 0 ? cardAmount2 / cardCount2 : 0;
             
@@ -1344,11 +1356,18 @@
                     };
                 }
                 
+                // INTERNAL DELIVERY: deliveryCard + deliveryCash
                 branchData[item.branch].internalDelivery += item.deliveryCard + item.deliveryCash;
-                branchData[item.branch].thirdPartyDelivery += item.talabat + item.keeta + item.noon + item.careem + item.smiles + item.deliveroo;
+                
+                // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
+                branchData[item.branch].thirdPartyDelivery += item.talabat + item.keeta + item.noon + 
+                item.careem + item.smiles + item.deliveroo + item.onlineCash + item.onlineCard;
+                
                 branchData[item.branch].totalSales += item.receipts;
                 branchData[item.branch].internalCount += item.countDeliveryCard + item.countDeliveryCash;
-                branchData[item.branch].thirdPartyCount += item.countTalabat + item.countKeeta + item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo;
+                branchData[item.branch].thirdPartyCount += item.countTalabat + item.countKeeta + 
+                item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo + 
+                item.countOnlineCash + item.countOnlineCard;
             });
             
             // Convert to array and sort by total delivery
@@ -1424,8 +1443,16 @@
             const internalCount = filteredData.reduce((sum, item) => sum + item.countDeliveryCard + item.countDeliveryCash, 0);
             const internalAvg = internalCount > 0 ? internalAmount / internalCount : 0;
             
-            const thirdPartyAmount = filteredData.reduce((sum, item) => sum + item.talabat + item.keeta + item.noon + item.careem + item.smiles + item.deliveroo, 0);
-            const thirdPartyCount = filteredData.reduce((sum, item) => sum + item.countTalabat + item.countKeeta + item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo, 0);
+            // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
+            const thirdPartyAmount = filteredData.reduce((sum, item) => 
+                sum + item.talabat + item.keeta + item.noon + item.careem + 
+                item.smiles + item.deliveroo + item.onlineCash + item.onlineCard, 0
+            );
+            const thirdPartyCount = filteredData.reduce((sum, item) => 
+                sum + item.countTalabat + item.countKeeta + item.countNoon + 
+                item.countCareem + item.countSmiles + item.countDeliveroo + 
+                item.countOnlineCash + item.countOnlineCard, 0
+            );
             const thirdPartyAvg = thirdPartyCount > 0 ? thirdPartyAmount / thirdPartyCount : 0;
             
             const totalDeliveryAmount = internalAmount + thirdPartyAmount;
@@ -1494,12 +1521,25 @@
                 }
                 
                 monthData[monthKey].totalSales += item.receipts;
+                
+                // INTERNAL DELIVERY: deliveryCard + deliveryCash
                 monthData[monthKey].internalDelivery += item.deliveryCard + item.deliveryCash;
-                monthData[monthKey].thirdPartyDelivery += item.talabat + item.keeta + item.noon + item.careem + item.smiles + item.deliveroo;
-                monthData[monthKey].cashAmount += item.cash + item.deliveryCash + item.onlineCash;
-                monthData[monthKey].cardAmount += item.mastercard + item.visa + item.noon + item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
-                monthData[monthKey].cashCount += item.countCash + item.countDeliveryCash + item.countOnlineCash;
-                monthData[monthKey].cardCount += item.countMaster + item.countVisa + item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo + item.countDeliveryCard + item.countOnlineCard;
+                
+                // THIRD-PARTY DELIVERY: INCLUDING ONLINE PAYMENTS
+                monthData[monthKey].thirdPartyDelivery += item.talabat + item.keeta + item.noon + 
+                item.careem + item.smiles + item.deliveroo + item.onlineCash + item.onlineCard;
+                
+                // CASH: ONLY in-store cash (EXCLUDING delivery cash and online cash)
+                monthData[monthKey].cashAmount += item.cash;
+                
+                // CARD: ALL card payments INCLUDING online card
+                monthData[monthKey].cardAmount += item.mastercard + item.visa + item.noon + 
+                item.careem + item.smiles + item.deliveroo + item.deliveryCard + item.onlineCard;
+                
+                monthData[monthKey].cashCount += item.countCash;
+                monthData[monthKey].cardCount += item.countMaster + item.countVisa + 
+                item.countNoon + item.countCareem + item.countSmiles + item.countDeliveroo + 
+                item.countDeliveryCard + item.countOnlineCard;
             });
             
             // Convert to array and sort by month
@@ -1630,8 +1670,7 @@
                 ],
                 [
                     'HEAD', 'Crispy Chicken-Hamdan St', '1', '2025', '785537.88', '55272.96', '0', '0', 
-                    '207908.13', '79328.39', '125061.73', '78456.25', '38265.58', '23471.38', 
-                    '50561', '95829.04', '5482.62', '15755.12', '9790.68', '26775', '1144', '0', 
+                    '207908.13', '79328.39', '125061.73', '78456.25', '38265.58', '23471.38', '50561', '95829.04', '5482.62', '15755.12', '9790.68', '26775', '1144', '0', 
                     '0', '9935', '2238', '4594', '2770', '1167', '449', '1498', '2308', '97', '377', '192'
                 ],
                 [
@@ -1679,7 +1718,8 @@
                 { wch: 14 },  // Count_SMILES
                 { wch: 18 },  // Count_DeliveryCash
                 { wch: 14 },  // Count_DELIVERO
-                { wch: 16 },  // Count_ONLINE_Cash
+                { wch: 14 },  // Count_ONLINE_Cash
+                { wch: 16 },  // Count_ONLINE_Card
                 { wch: 16 }   // Count_ONLINE_Card
             ];
             ws['!cols'] = colWidths;
@@ -1693,7 +1733,7 @@
             showNotification('Excel template downloaded successfully!', 'success');
         }
 
-        function loadSampleData() {
+         function loadSampleData() {
             // Load the provided sales data
             const sampleData = [
                 ["HEAD", "Crispy Chicken-Hamdan St", "1", "2025", "785537.88", "55272.96", "0", "0", "207908.13", "79328.39", "125061.73", "78456.25", "38265.58", "23471.38", "50561", "95829.04", "5482.62", "15755.12", "9790.68", "26775", "1144", "0", "0", "9935", "2238", "4594", "2770", "1167", "449", "1498", "2308", "97", "377", "192"],
@@ -1702,7 +1742,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "1", "2025", "527597.59", "48211.79", "35", "0", "120193.1", "50495.26", "83440.34", "85619.29", "32059.59", "23144.36", "40854.29", "36604.32", "3547.86", "1861.7", "1490.69", "17770", "969", "1", "0", "5888", "1452", "2990", "2820", "963", "467", "1294", "788", "65", "41", "31"],
                 ["HEAD", "Crispy Chicken Al Barsha", "1", "2025", "611173.74", "38175.48", "0", "0", "178819.55", "66462.64", "73224.5", "84120.81", "49244.9", "27673.05", "50254.01", "28078.99", "6794.63", "5677.37", "2647.81", "24058", "839", "0", "0", "8938", "1902", "3357", "3712", "1652", "854", "1657", "872", "119", "113", "43"],
                 ["HEAD", "Crispy Chicken Al Satwa", "1", "2025", "385718.26", "28527.83", "0", "0", "124512.61", "71302.62", "34050.62", "34706.38", "31417.87", "6986.61", "25312.49", "19861.9", "1432.48", "5835.16", "1736.69", "14065", "632", "0", "0", "5698", "2076", "1352", "1314", "1103", "171", "837", "647", "24", "167", "43"],
-                ["HEAD", "Crispy Chicken Al Rgga", "1", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "1", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "1", "2025", "740083.76", "52228.79", "0", "0", "300244.92", "91589.3", "150467.4", "81937.11", "27260.97", "0", "36355.27", "0", "0", "0", "0", "30341", "1041", "0", "0", "15547", "2623", "6077", "3164", "867", "0", "1022", "0", "139", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "2", "2025", "742068.15", "55021", "0", "0", "183743.1", "71094.5", "107837.1", "70459.9", "39408.15", "21608.3", "67595.7", "89937.3", "5805.2", "17714.4", "10974.5", "25749", "1176", "0", "0", "8862", "2008", "4155", "2443", "1091", "424", "2746", "2036", "0", "417", "227"],
                 ["HEAD", "Crispy Chicken Khaldia", "2", "2025", "566345.35", "46961", "0", "0", "132388.5", "74018.8", "84054.2", "68511.6", "38073.4", "13376.8", "47101.9", "38340.9", "0", "9389.9", "5271.9", "18616", "962", "0", "0", "6357", "2007", "3228", "2175", "654", "234", "1685", "820", "189", "206", "99"],
@@ -1710,7 +1750,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "2", "2025", "501652.3", "37739.4", "0", "0", "117647.8", "54019.4", "81050.3", "78333.9", "24872.9", "21538.1", "40537.8", "36899.4", "2358", "1582.9", "2355.8", "17373", "828", "0", "0", "5743", "1432", "2980", "2627", "917", "435", "1457", "764", "116", "33", "41"],
                 ["HEAD", "Crispy Chicken Al Barsha", "2", "2025", "610930.05", "37097.2", "0", "0", "173216", "76302.9", "73590.9", "82166.1", "42034.8", "24825.7", "55001.25", "26873.7", "5074.6", "6422.9", "2553.8", "23744", "905", "0", "0", "8386", "2101", "3275", "3655", "1511", "708", "1990", "819", "196", "132", "46"],
                 ["HEAD", "Crispy Chicken Al Satwa", "2", "2025", "426646.6", "26462.6", "0", "0", "129080.2", "75701.8", "34280.4", "35910.7", "30554.4", "5245", "59401.4", "19103.6", "10134.8", "7294.9", "2683.6", "15427", "676", "0", "0", "5885", "2121", "1351", "1349", "1155", "140", "1915", "579", "15", "185", "55"],
-                ["HEAD", "Crispy Chicken Al Rgga", "2", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "905", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "2", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "905", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "2", "2025", "710819.7", "42288", "0", "0", "287077.7", "81781.2", "135759.5", "74741.5", "52609.5", "0", "36562.3", "0", "0", "0", "0", "28535", "945", "0", "0", "14484", "2269", "5597", "2907", "923", "0", "1410", "0", "*", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "3", "2025", "603475.3", "58532", "0", "0", "155788.8", "57141", "93312.5", "59885.3", "39450", "29185.4", "22783", "58597.7", "4832.4", "15534.6", "8432.6", "19852", "1258", "0", "0", "7130", "1508", "3590", "2115", "1198", "576", "591", "1301", "92", "342", "151"],
                 ["HEAD", "Crispy Chicken Khaldia", "3", "2025", "458231.5", "47596", "0", "0", "111459.7", "57406", "74431.3", "58843.2", "28444.3", "14202.8", "13248", "30417.8", "9538.8", "8568.7", "4074.9", "14684", "1071", "0", "0", "5171", "1467", "2755", "1856", "757", "257", "346", "634", "172", "143", "55"],
@@ -1718,7 +1758,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "3", "2025", "347325.2", "38980", "0", "0", "72515.9", "38501", "58233.6", "56914.5", "24282.2", "17654.3", "9538", "24153.7", "2721", "2899", "932", "11328", "824", "0", "0", "3642", "981", "2112", "1937", "647", "343", "233", "474", "68", "49", "18"],
                 ["HEAD", "Crispy Chicken Al Barsha", "3", "2025", "475552.3", "38379", "0", "0", "149371.1", "48279", "65862.3", "70819.1", "35823.9", "21620.9", "13662", "20453.7", "6465.6", "3367.8", "1447.9", "18794", "937", "0", "0", "7237", "1261", "3014", "3122", "1191", "745", "399", "682", "108", "70", "28"],
                 ["HEAD", "Crispy Chicken Al Satwa", "3", "2025", "316797.8", "31064", "0", "0", "108133.3", "41738", "33590.5", "32193.6", "27878.8", "6555.8", "13671", "15377.8", "763", "4200", "1632", "11430", "742", "0", "0", "5047", "1085", "1269", "1198", "922", "165", "373", "480", "15", "100", "34"],
-                ["HEAD", "Crispy Chicken Al Rgga", "3", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "3", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "3", "2025", "605098.6", "54285", "0", "0", "243126.1", "72104", "127753", "66548.1", "27856.4", "0", "13426", "0", "0", "0", "0", "24038", "1215", "0", "0", "12074", "1960", "5149", "2563", "734", "0", "343", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "4", "2025", "713032.85", "54117.2", "0", "0", "186014.7", "76678", "108985.2", "81529.3", "33315.5", "30359.4", "29152", "76265.55", "1355", "22846.6", "12414.4", "23797", "1283", "0", "0", "8824", "2094", "4173", "2780", "774", "614", "726", "1749", "30", "500", "250"],
                 ["HEAD", "Crispy Chicken Khaldia", "4", "2025", "568123.4", "66907.5", "0", "0", "141794.5", "70410.55", "96104.2", "75239.4", "24687.85", "15048.5", "14043", "39736.5", "7781", "10359.8", "6010.6", "18743", "1583", "0", "0", "6607", "1909", "3610", "2571", "528", "313", "313", "843", "154", "216", "96"],
@@ -1726,7 +1766,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "4", "2025", "526701.4", "58756.1", "0", "0", "117085.5", "59499.4", "94169.5", "94127", "23090.2", "17654.3", "13822", "39140.9", "3254", "3476.8", "2625.7", "17251", "1332", "0", "0", "5759", "1568", "3301", "3085", "504", "350", "321", "861", "57", "68", "45"],
                 ["HEAD", "Crispy Chicken Al Barsha", "4", "2025", "587672.25", "56932.9", "0", "0", "172377.1", "69635.6", "72508.8", "85775.5", "35817.65", "28896.6", "17572", "32525.2", "5984.2", "6923.8", "2722.9", "22717", "1466", "0", "0", "8636", "1861", "3373", "3863", "923", "927", "488", "889", "110", "134", "47"],
                 ["HEAD", "Crispy Chicken Al Satwa", "4", "2025", "401399.75", "46661.6", "0", "0", "136611.2", "55635.2", "37767.6", "43045.8", "25925.65", "7002.9", "14256", "22150.9", "834", "9113.9", "2395", "14139", "1189", "0", "0", "6186", "1539", "1451", "1591", "650", "222", "348", "659", "21", "220", "63"],
-                ["HEAD", "Crispy Chicken Al Rgga", "4", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "4", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "4", "2025", "725003.9", "85789.3", "0", "0", "285810", "79148.2", "144394.4", "83074.2", "29678.8", "0", "17109", "0", "0", "0", "0", "28496", "2045", "0", "0", "14226", "2248", "5717", "3179", "685", "0", "396", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "5", "2025", "779896.16", "78502.01", "0", "0", "179545", "67466", "105428.8", "87058", "76727.95", "42337.4", "29013", "74728.1", "0", "23807.1", "15282.8", "26810", "2006", "0", "0", "8747", "1726", "4089", "3045", "2496", "822", "1281", "1693", "0", "599", "306"],
                 ["HEAD", "Crispy Chicken Khaldia", "5", "2025", "636993.45", "101706.3", "0", "0", "133816.2", "55736", "92045.9", "77473.6", "65816.15", "18711.5", "24937", "35898.1", "10534.8", "12771.3", "7546.6", "21403", "2479", "0", "0", "6398", "1401", "3601", "2682", "1989", "351", "1104", "732", "227", "296", "143"],
@@ -1734,7 +1774,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "5", "2025", "537997.55", "72217.95", "0", "0", "114084.3", "41839", "90524.7", "91953.1", "45571.1", "21529.4", "17892", "32772.5", "3175.6", "4181", "2256.9", "18430", "1768", "0", "0", "5778", "1032", "3236", "3130", "1448", "415", "753", "679", "60", "90", "41"],
                 ["HEAD", "Crispy Chicken Al Barsha", "5", "2025", "629874.52", "89097.4", "0", "0", "174601.4", "60410.2", "78601.8", "97187", "51857.82", "15437.7", "25703", "21550.7", "6389", "6702.8", "2335.7", "24979", "2413", "0", "0", "9058", "1505", "3491", "4270", "1783", "377", "1294", "504", "108", "134", "42"],
                 ["HEAD", "Crispy Chicken Al Satwa", "5", "2025", "467366.25", "85652.59", "0", "0", "145733.7", "55119", "42165.7", "46452.4", "37542.56", "4925.9", "19178", "15704.8", "1504", "10682.8", "2704.8", "16409", "2333", "0", "0", "6479", "1377", "1615", "1700", "1333", "119", "682", "387", "36", "274", "74"],
-                ["HEAD", "Crispy Chicken Al Rgga", "5", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "5", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "5", "2025", "805574.13", "105621.88", "0", "0", "279068.6", "70771", "147053.2", "90210.9", "83505.55", "0", "29343", "0", "0", "0", "0", "31864", "2717", "0", "0", "13999", "1876", "5927", "3466", "2468", "0", "1411", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "6", "2025", "802422.7", "70292", "0", "0", "167802.1", "70183", "95082", "80223.5", "132121", "48375.7", "42429.6", "57853.3", "0", "24627.1", "13433.4", "26357", "1488", "0", "0", "7747", "1805", "3574", "2765", "3986", "943", "1874", "1375", "0", "545", "255"],
                 ["HEAD", "Crispy Chicken Khaldia", "6", "2025", "673051.75", "110787", "0", "0", "125488.9", "65632", "76390.6", "67505.8", "107789.75", "25847.3", "30508", "31012.6", "12987.4", "13310.4", "5792", "21006", "2258", "0", "0", "5692", "1635", "2830", "2274", "3208", "449", "1330", "629", "324", "268", "109"],
@@ -1742,7 +1782,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "6", "2025", "572960.75", "75584.6", "0", "0", "103700", "47024.35", "78331.1", "83033.2", "95629.3", "24270.7", "23823", "31775", "3189.7", "4295.9", "2303.9", "18287", "1560", "0", "0", "4979", "1165", "2733", "2748", "2864", "455", "980", "621", "62", "91", "29"],
                 ["HEAD", "Crispy Chicken Al Barsha", "6", "2025", "664193.64", "82159", "0", "0", "165442", "74702.92", "69533.7", "89733.8", "91895.22", "19546.5", "36868", "21889.7", "4546", "5947.8", "1929", "24731", "1869", "0", "0", "8348", "1889", "3080", "3981", "2660", "439", "1765", "452", "87", "123", "38"],
                 ["HEAD", "Crispy Chicken Al Satwa", "6", "2025", "509383.02", "78146", "0", "0", "145487", "68818", "38024.2", "46191.6", "71963.92", "6534.8", "24912", "14469.8", "1021", "10674.7", "3140", "16685", "1759", "0", "0", "6172", "1774", "1389", "1669", "2098", "154", "997", "309", "21", "268", "75"],
-                ["HEAD", "Crispy Chicken Al Rgga", "6", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "6", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "6", "2025", "835561.1", "77934.6", "0", "0", "276154.5", "81448", "128717.8", "81216.7", "149330.5", "0", "40759", "0", "0", "0", "0", "31156", "1685", "0", "0", "12991", "2142", "4959", "3003", "4565", "0", "1811", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "7", "2025", "777059.15", "66926.1", "0", "0", "172422.2", "89252", "99073.6", "79656", "92367.75", "51512.1", "26574", "57693.2", "0", "26364.7", "15217.5", "26169", "1591", "0", "0", "8455", "2336", "4052", "2900", "2370", "1151", "901", "1406", "0", "682", "325"],
                 ["HEAD", "Crispy Chicken Khaldia", "7", "2025", "694472.4", "117570", "0", "0", "127529.4", "119262", "77361.8", "65523.2", "80288.5", "24510.4", "19850", "27107.4", "17703.5", "11913.3", "5852.9", "22152", "2681", "0", "0", "6279", "3033", "3060", "2411", "2025", "501", "675", "596", "465", "297", "129"],
@@ -1750,7 +1790,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "7", "2025", "564894", "65616.5", "0", "0", "104652", "84981", "80619.4", "85486", "63691.5", "26768.4", "17051", "26232.9", "3668.7", "4192.8", "1933.8", "18295", "1521", "0", "0", "5239", "2149", "2930", "2887", "1653", "550", "594", "564", "83", "95", "30"],
                 ["HEAD", "Crispy Chicken Al Barsha", "7", "2025", "618161.7", "54250", "0", "0", "160480", "108752", "67285.8", "93884.1", "47575", "23714.9", "27647", "20911.8", "5208.2", "5862", "2590.9", "23642", "1303", "0", "0", "8525", "2735", "3131", "4265", "1288", "521", "1091", "486", "124", "124", "49"],
                 ["HEAD", "Crispy Chicken Al Satwa", "7", "2025", "522713.7", "53308", "0", "0", "152499.2", "112494", "42893.4", "56615.5", "39813", "8327", "20813", "16357.8", "1510", "13780.9", "4301.9", "17692", "1275", "0", "0", "6968", "2870", "1619", "2027", "1101", "184", "794", "344", "26", "376", "108"],
-                ["HEAD", "Crispy Chicken Al Rgga", "7", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "7", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "7", "2025", "857462.9", "106325.7", "0", "*", "270913.8", "141613", "123620.7", "85049.2", "104304.5", "0", "25636", "0", "0", "0", "0", "31963", "2537", "0", "0", "13510", "3788", "5195", "3357", "2692", "0", "884", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "8", "2025", "755184.5", "34146", "0", "0", "153603.6", "82445", "90102.7", "72028", "169359.1", "55024.6", "15481", "48159.5", "0", "23005.4", "11829.6", "25560", "773", "0", "0", "7589", "2245", "3613", "2556", "5174", "1139", "592", "1108", "0", "551", "220"],
                 ["HEAD", "Crispy Chicken Khaldia", "8", "2025", "637005.25", "85718", "0", "0", "105227.4", "84210", "70391.9", "61783.4", "138502.75", "27759.7", "10877", "23279.7", "11894", "11873.5", "5487.9", "20366", "1868", "0", "0", "5043", "2209", "2721", "2215", "4171", "511", "407", "521", "335", "252", "113"],
@@ -1758,7 +1798,7 @@
                 ["HEAD", "Crispy Chicken Muroor", "8", "2025", "516549.3", "47553", "0", "0", "97705.7", "62998", "72921.3", "80103.3", "94395.9", "23238.6", "8410", "21122.8", "2217", "3829.8", "2053.9", "16968", "1015", "0", "0", "4790", "1625", "2651", "2710", "2813", "492", "297", "420", "39", "80", "36"],
                 ["HEAD", "Crispy Chicken Al Barsha", "8", "2025", "648693.85", "52223", "0", "0", "156793.3", "88138.5", "67635.7", "89040.8", "118072.25", "24315.8", "12843", "24979.9", "7248", "4830.9", "2572.7", "23814", "1208", "0", "0", "7983", "2267", "2987", "3984", "3639", "498", "531", "403", "155", "109", "50"],
                 ["HEAD", "Crispy Chicken Al Satwa", "8", "2025", "532036.55", "47974", "0", "0", "140287.4", "99441", "40173.8", "50752.5", "105013.25", "8769.9", "9176", "13705.9", "1840", "11337.8", "3565", "17853", "1155", "0", "0", "6294", "2562", "1490", "1845", "3254", "178", "322", "314", "52", "287", "100"],
-                ["HEAD", "Crispy Chicken Al Rgga", "8", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
+                ["HEAD", "Crispy Chicken Al Rgga", "8", "2025", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-ELctria", "8", "2025", "805213.3", "71230", "0", "0", "248702.3", "100728.5", "117440.6", "81469.4", "174850.5", "0", "10792", "0", "0", "0", "0", "30581", "1706", "0", "0", "12414", "2751", "4762", "3138", "5390", "0", "420", "0", "0", "0", "0"],
                 ["HEAD", "Crispy Chicken-Hamdan St", "9", "2025", "722126.83", "0", "0", "0", "156497.9", "121182.74", "90563.8", "73915.8", "96353.49", "58980.8", "35906", "47580.7", "0", "25945.1", "15200.5", "24619", "0", "0", "0", "7519", "3553", "3600", "2753", "2674", "1234", "1286", "1111", "0", "602", "287"],
                 ["HEAD", "Crispy Chicken Khaldia", "9", "2025", "571512.2", "0", "0", "0", "114135", "118512.13", "73708.8", "62959", "81100.77", "29906.7", "27564", "27862.7", "19268.5", "9426.7", "7067.9", "19137", "0", "0", "0", "5554", "3300", "2890", "2280", "2218", "581", "949", "563", "486", "194", "122"],
